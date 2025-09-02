@@ -1,0 +1,514 @@
+---
+title: "Supporting 10 common mistakes article"
+author: "Mark Ziemann & Anusuiya Bora"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+    fig_width: 5
+    fig_height: 5
+theme: cosmo
+---
+
+Source: https://github.com/markziemann/10mistakes
+
+## Introduction
+
+```{r,libs}
+
+suppressPackageStartupMessages({
+  library("getDEE2")
+  library("DESeq2")
+  library("kableExtra")
+  library("clusterProfiler")
+  library("eulerr")
+  library("gplots")
+  library("mitch")
+  library("fgsea")
+  library("RhpcBLASctl")
+})
+
+RhpcBLASctl::blas_set_num_threads(1)
+
+```
+
+For this guide I will be using bulk RNA-seq data from a previous study, which is
+deposited at NCBI GEO and SRA under accession numbers: GSE55123 and SRP038101 (Lund et al, 2014).
+The experiment is designed to investigate the effect of Azacitidine treatment on AML3 cells.
+
+The raw data have been processed by the DEE2 project, and the summary gene expression counts are
+available at the dee2.io website, and programmatically with the getDEE2 bioconductor package
+(Ziemann et al, 2019).
+
+The gene counts have also been deposited to the `/data` folder in the `example.Rdata` file in case
+the DEE2 resource becomes unavailable.
+To import it, use the command: `load("data/example.Rdata")`
+
+Alternatively, you could fetch data from another resource like NCBI GEO, Zenodo or from the host
+storage drive.
+
+```{r,fetch}
+
+mdat <- getDEE2Metadata("hsapiens")
+
+# get sample sheet
+ss <- subset(mdat,SRP_accession=="SRP038101")
+
+# fetch the whole set of RNA-seq data
+x <- getDEE2("hsapiens",ss$SRR_accession , metadata=mdat, legacy=TRUE)
+mx <- x$GeneCounts
+rownames(mx) <- paste(rownames(mx),x$GeneInfo$GeneSymbol)
+dim(mx)
+
+# aza no filtering
+ss$trt <- grepl("Treated",ss$Experiment_title)
+
+ss %>%
+  kbl(caption="sample sheet for Aza treatment in AML3 cells") %>%
+  kable_paper("hover", full_width = F)
+
+```
+
+## Data quality control
+
+QC is important, even if you are using public transcriptome data.
+For RNA-seq it is a good idea to show the number of reads for each sample.
+
+```{r,counts1}
+
+par(mar=c(5,7,5,1))
+barplot(rev(colSums(mx)),horiz=TRUE,las=1,main="number of reads per sample in SRP038101")
+
+```
+
+Now make a MDS plot.
+
+```{r,mds1}
+
+mds <- cmdscale(dist(t(mx)))
+
+# expand plot area
+XMIN=min(mds[,1])*1.3
+XMAX=max(mds[,1])*1.3
+YMIN=min(mds[,2])*1.3
+YMAX=max(mds[,2])*1.3
+
+cols <- as.character(grepl("Treated",ss$Experiment_title))
+cols <- gsub("FALSE","lightblue",cols)
+cols <- gsub("TRUE","pink",cols)
+plot(mds, xlab="Coordinate 1", ylab="Coordinate 2",
+  xlim=c(XMIN,XMAX),ylim=c(YMIN,YMAX),
+  pch=19,cex=2,col=cols, main="MDS plot")
+text(cmdscale(dist(t(mx))), labels=colnames(mx) )
+
+```
+
+## Differential expression analysis
+
+I will be using DESeq2 for DE analysis, the count matrix is prefiltered using
+a detection threshold of 10 reads per sample across all samples.
+All genes that meet the detection threshold will comprise the background list.
+The first 6 rows of the count matrix are shows.
+
+```{r,de1}
+
+mxf <- mx[which(rowMeans(mx)>=10),]
+dim(mxf)
+
+head(mxf,6) %>%
+  kbl(caption="Count matrix format") %>%
+  kable_paper("hover", full_width = F)
+
+dds <- DESeqDataSetFromMatrix(countData = mxf , colData = ss, design = ~ trt )
+res <- DESeq(dds)
+z <- results(res)
+vsd <- vst(dds, blind=FALSE)
+zz <-cbind(as.data.frame(z),mxf)
+def <-as.data.frame(zz[order(zz$pvalue),])
+
+head(def,10) %>%
+  kbl(caption="Top DE genes for Aza treatment") %>%
+  kable_paper("hover", full_width = F)
+
+```
+
+Make a smear plot.
+
+```{r,smearplot}
+
+sigf <- subset(def,padj<=0.05)
+
+DET=nrow(mxf)
+NSIG=nrow(sigf)
+NUP=nrow(subset(sigf,log2FoldChange>0))
+NDN=nrow(subset(sigf,log2FoldChange<0))
+
+HEADER=paste(DET,"detected genes;",NSIG,"w/FDR<0.05;",NUP,"up;",NDN,"down")
+
+plot(log10(def$baseMean) ,def$log2FoldChange,
+  cex=0.6,pch=19,col="darkgray",
+  main="5-azacitidine treatment in AML3 cells",
+  xlab="log10(basemean)",ylab="log2(fold change)")
+
+points(log10(sigf$baseMean) ,sigf$log2FoldChange,
+  cex=0.6,pch=19,col="red")
+
+mtext(HEADER)
+
+```
+
+In the next sections I will run enrichment analysis with over-representation test
+and compare it to functional class scoring.
+
+## Get gene sets
+
+```{r,gs}
+# from https://reactome.org/download/current/ReactomePathways.gmt.zip
+genesets2 <- read.gmt("ref/ReactomePathways_2025-09-02.gmt")
+gsets <- gmtPathways("ref/ReactomePathways_2025-09-02.gmt")
+
+```
+
+## Mistake 1 - Raw p-values
+
+## Mistake 2 - Background
+
+Will try FORA and mitch.
+
+| Reporting criteria | Method/resource used |
+| --- | --- |
+| Origin of gene sets | Reactome (2023-03-06) |
+| Tool used | FORA (check fgsea version at foot of report) |
+| Statistical test used | hypergeometric |
+| P-value correction for multiple comparisons | FDR method |
+| Background list | Genes with >=10 reads per sample on average across all samples |
+| Gene Selection | DESeq2 FDR<0.05 and log2FC>0 or log2FC<0 |
+| Data availability | via DEE2 at accession SRP038101 (human) |
+| Other parameters | Min gene set size of 5 |
+
+```{r,mistake2}
+
+up <- unique(sapply(strsplit(rownames(subset(def, log2FoldChange>0 & padj<0.05))," "),"[[",2))
+
+dn <- unique(sapply(strsplit(rownames(subset(def, log2FoldChange<0 & padj<0.05))," "),"[[",2))
+
+bg <- unique(sapply(strsplit(rownames(def)," "),"[[",2))
+
+gt <- read.table("https://dee2.io/data/hsapiens/hsa_gene_info.tsv",header=TRUE)
+head(gt)
+
+all <- unique(gt$GeneSymbol)
+
+lapply(list(up,dn,bg,all),length)
+
+fres_up_bg <- fora(pathways=gsets, genes=up, universe=bg, minSize = 5, maxSize = Inf)
+fres_up_bg <- subset(fres_up_bg,padj<0.05)$pathway
+length(fres_up_bg)
+
+fres_up_all <- fora(pathways=gsets, genes=up, universe=all, minSize = 5, maxSize = Inf)
+fres_up_all <- subset(fres_up_all,padj<0.05)$pathway
+length(fres_up_all)
+
+fres_dn_bg <- fora(pathways=gsets, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
+fres_dn_bg <- subset(fres_dn_bg,padj<0.05)$pathway
+length(fres_dn_bg)
+
+fres_dn_all <- fora(pathways=gsets, genes=dn, universe=all, minSize = 5, maxSize = Inf)
+fres_dn_all <- subset(fres_dn_all,padj<0.05)$pathway
+length(fres_dn_all)
+
+v1 <- list("up"=fres_up_bg, "up*"=fres_up_all, "dn"=fres_dn_bg, "dn*"=fres_dn_all)
+
+par(mar=c(1,1,1,1))
+par(mfrow=c(1,1))
+plot(euler(v1),quantities = list(cex = 2), labels = list(cex = 2))
+
+v2 <- list("up"=fres_up_bg, "up*"=fres_up_all)
+plot(euler(v2),quantities = list(cex = 2), labels = list(cex = 2))
+
+par(mar=c(5.1,4.1,4.1,2.1))
+
+
+```
+
+## Mistake 4 - prioritisation by p-values
+
+| Reporting criteria | Method/resource used |
+| --- | --- |
+| Origin of gene sets | Reactome (2023-03-06) |
+| Tool used | mitch (check version at foot of report) |
+| Statistical test used | Rank ANOVA (Kruskal Wallis) |
+| P-value correction for multiple comparisons | FDR method |
+| Background list | Genes with >=10 reads per sample on average across all samples |
+| Gene Scoring | DESeq2 Wald stat |
+| Data availability | via DEE2 at accession SRP038101 (human) |
+| Other parameters | Min gene set size of 5 |
+
+```{r,mistake4a}
+
+gt <- def
+gt$genename <- sapply(strsplit(rownames(gt)," "),"[[",2)
+gt <- gt[,"genename",drop=FALSE]
+gt$id <- rownames(gt)
+m <- mitch_import(x=def,DEtype="deseq2",geneTable=gt)
+mres <- mitch_calc(x=m,genesets=gsets,minsetsize=5,cores=4,priority="significance")
+
+mres_sig_up <- head(subset(mres$enrichment_result,s.dist>0),10)
+mres_sig_dn <- head(subset(mres$enrichment_result,s.dist<0),10)
+
+mres_sig_up %>%
+  kbl(caption="Top upregulated pathways when prioritised by FDR") %>%
+  kable_paper("hover", full_width = F)
+
+mres_sig_dn %>%
+  kbl(caption="Top downregulated pathways when prioritised by FDR") %>%
+  kable_paper("hover", full_width = F)
+
+mres <- mitch_calc(x=m,genesets=gsets,minsetsize=5,cores=4,priority="effect")
+
+mres_es_up <- head(subset(mres$enrichment_result,s.dist>0 & p.adjustANOVA < 0.05),10)
+mres_es_dn <- head(subset(mres$enrichment_result,s.dist<0 & p.adjustANOVA < 0.05),10)
+
+mres_es_up %>%
+  kbl(caption="Top upregulated pathways when prioritised by ES (discarding any with FDR>0.05)") %>%
+  kable_paper("hover", full_width = F)
+
+mres_es_dn %>%
+  kbl(caption="Top upregulated pathways when prioritised by ES (discarding any with FDR>0.05)") %>%
+  kable_paper("hover", full_width = F)
+
+```
+
+Make a barplot
+
+```{r,mistake4b,fig.height=6,fig.width=6}
+
+par(mar=c(2,20,2,0))
+
+mres_sig_up_vals <- -log(mres_sig_up$pANOVA)
+names(mres_sig_up_vals) <- mres_sig_up$set
+
+mres_sig_dn_vals <- -log(mres_sig_dn$pANOVA)
+names(mres_sig_dn_vals) <- mres_sig_dn$set
+
+mres_es_up_vals <- mres_es_up$s.dist
+names(mres_es_up_vals) <- mres_es_up$set
+
+mres_es_dn_vals <- -1 * mres_es_dn$s.dist
+names(mres_es_dn_vals) <- mres_es_dn$set
+
+par(mfrow=c(2,1))
+
+barplot( mres_sig_up_vals,
+  horiz=TRUE,las=1,cex.names=0.65,col="gray",
+  main="Up Sig (-log10 p-value)",
+  xlab="-log10 p-value",
+  cex.main=0.9)
+
+barplot( mres_es_up_vals,
+  horiz=TRUE,las=1,cex.names=0.65,col="gray",
+  main="Up ES",
+  xlab="ES",
+  cex.main=0.9)
+
+barplot( mres_sig_dn_vals,
+  horiz=TRUE,las=1,cex.names=0.65,col="gray",
+  main="Down Sig (-log10 p-value)",
+  xlab="-log10 p-value",
+  cex.main=0.9)
+
+barplot( mres_es_dn_vals,
+  horiz=TRUE,las=1,cex.names=0.65,col="gray",
+  main="Down ES",
+  xlab="-ES",
+  cex.main=0.9)
+
+par(mfrow=c(1,1))
+par(mar=c(5.1,4.1,4.1,2.1))
+
+```
+
+## Mistake 5 - gene set list size too small or long
+
+```{r,mistake5}
+
+bg <- unique(sapply(strsplit(rownames(def)," "),"[[",2))
+
+nrow(subset(def,padj<0.05 & log2FoldChange>0))
+nrow(subset(def,padj<0.05 & log2FoldChange<0))
+nrow(def)
+
+sizes <- c(50,100,200,300,400,500,750,1000,1500,2000,2500,3000,4000,5000,6000,7000)
+
+fup <- nrow(subset(fora(pathways=gsets, genes=up, universe=bg, minSize = 5, maxSize = Inf),padj<0.05))
+fdn <- nrow(subset(fora(pathways=gsets, genes=dn, universe=bg, minSize = 5, maxSize = Inf),padj<0.05))
+
+nups <- unlist(lapply(sizes, function(i) {
+  genes <- unique(sapply(strsplit(rownames(head(subset(def, log2FoldChange>0),i))," "),"[[",2))
+  fres <- fora(pathways=gsets, genes=genes, universe=bg, minSize = 5, maxSize = Inf)
+  nrow(subset(fres,padj<0.05))
+}))
+
+ndns <- unlist(lapply(sizes, function(i) {
+  genes <- unique(sapply(strsplit(rownames(head(subset(def, log2FoldChange<0),i))," "),"[[",2))
+  fres <- fora(pathways=gsets, genes=genes, universe=bg, minSize = 5, maxSize = Inf)
+  nrow(subset(fres,padj<0.05))
+}))
+
+df <- data.frame("up"=nups,"dn"=ndns,row.names=sizes)
+df$tot <- df$up + df$dn
+df
+
+plot(sizes,df$up,type="b",col="red",ylab="no. gene sets with FDR<0.05",xlab="gene list length")
+lines(sizes,df$dn,type="b",col="blue")
+
+plot(sizes,df$up,type="b",col="red",ylab="no. gene sets with FDR<0.05",xlab="gene list length",
+  xlim=c(0,500), ylim=c(0,125))
+lines(sizes,df$dn,type="b",col="blue")
+
+```
+
+## Mistake 6 - combining up and downregulated genes into the same test.
+
+```{r,mistake6a}
+
+updn <- unique(c(up,dn))
+
+fres_updn_bg <- fora(pathways=gsets, genes=updn, universe=bg, minSize = 5, maxSize = Inf)
+fres_updn_bg <- subset(fres_updn_bg,padj<0.05)$pathway
+length(fres_updn_bg)
+
+length(fres_up_bg)
+length(fres_dn_bg)
+length(unique(c(fres_up_bg,fres_dn_bg)))
+
+v1 <- list("up"=fres_up_bg,"dn"=fres_dn_bg,"both"=fres_updn_bg)
+plot(euler(v1),quantities = list(cex = 2), labels = list(cex = 2))
+
+```
+
+## Mistake 8 - using shallow gene annotations
+
+```{r,m8a}
+
+msdb <- gmtPathways("ref/msigdb/msigdb.v2025.1.Hs.symbols.gmt")
+kegg <- msdb[grep("KEGG",names(msdb))]
+kegg_med <- msdb[grep("KEGG_MED",names(msdb))]
+kegg <- kegg[grep("KEGG_MED",names(kegg),invert=TRUE)] #separate KEGG LEG from KEGG MED
+gobp <- msdb[grep("GOBP",names(msdb))]
+reactome <- msdb[grep("REACTOME",names(msdb))]
+gslist <- list("KEGG"=kegg,"KEGGM"=kegg_med,"Reactome"=reactome,"GOBP"=gobp,"MSigDB"=msdb)
+
+# no. gene sets
+d1 <- unlist( lapply(gslist,length) )
+
+# total number of annotations
+d2 <- unlist( lapply(gslist,function(i) { length(unlist(i)) } ) )
+
+# median gene set size
+d3 <- unlist(lapply(gslist,function(i) { median(unlist(lapply(i,length))) } ))
+
+# number of genes with one or more functions
+d4 <- unlist( lapply(gslist,function(i) { length(unique(unlist(i))) } ))
+
+d5 <- unlist(lapply(gslist,function(i) { median(unlist(lapply(i,length))) } ))
+
+data.frame(d1,d2,d3,d4) %>%
+  kbl(caption="Gene set metrics") %>%
+  kable_paper("hover", full_width = F)
+
+kegg_up <- fora(pathways=kegg, genes=up, universe=bg, minSize = 5, maxSize = Inf)
+kegg_dn <- fora(pathways=kegg, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
+nrow(subset(kegg_up,padj<0.05))
+nrow(subset(kegg_dn,padj<0.05))
+sum(nrow(subset(kegg_up,padj<0.05)), nrow(subset(kegg_dn,padj<0.05) ))
+
+kegg_med_up <- fora(pathways=kegg_med, genes=up, universe=bg, minSize = 5, maxSize = Inf)
+kegg_med_dn <- fora(pathways=kegg_med, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
+nrow(subset(kegg_med_up,padj<0.05))
+nrow(subset(kegg_med_dn,padj<0.05))
+sum(nrow(subset(kegg_med_up,padj<0.05)), nrow(subset(kegg_med_dn,padj<0.05) ))
+
+reactome_up <- fora(pathways=reactome, genes=up, universe=bg, minSize = 5, maxSize = Inf)
+reactome_dn <- fora(pathways=reactome, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
+nrow(subset(reactome_up,padj<0.05))
+nrow(subset(reactome_dn,padj<0.05))
+sum(nrow(subset(reactome_up,padj<0.05)), nrow(subset(reactome_dn,padj<0.05) ))
+
+gobp_up <- fora(pathways=gobp, genes=up, universe=bg, minSize = 5, maxSize = Inf)
+gobp_dn <- fora(pathways=gobp, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
+nrow(subset(gobp_up,padj<0.05))
+nrow(subset(gobp_dn,padj<0.05))
+sum(nrow(subset(gobp_up,padj<0.05)), nrow(subset(gobp_dn,padj<0.05) ))
+
+msdb_up <- fora(pathways=msdb, genes=up, universe=bg, minSize = 5, maxSize = Inf)
+msdb_dn <- fora(pathways=msdb, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
+nrow(subset(msdb_up,padj<0.05))
+nrow(subset(msdb_dn,padj<0.05))
+sum(nrow(subset(msdb_up,padj<0.05)), nrow(subset(msdb_dn,padj<0.05) ))
+
+```
+
+## Mistake 9 - outated gene sets
+
+```{r,outdated}
+
+par(mar=c(5.1,5.1,4.1,2.1))
+
+reactome_files <- list.files("ref/msigdb/reactome/",full.names=TRUE)
+reactome_files <- reactome_files[c(6:20,1:5)]
+reactome_files <- c(reactome_files,"ref/ReactomePathways_2025-09-02.gmt")
+
+reactomes <- lapply(reactome_files,gmtPathways)
+
+names(reactomes) <- c("2010_09","2012_09","2013_05","2015_04","2016_01","2016_09","2017_04",
+  "2017_10","2018_07","2019_08","2020_03","2020_09","2021_03","2021_04","2022_01","2022_09",
+  "2023_03","2023_10","2024_08","2025_06","2025_09")
+
+nogs <- unlist(lapply(reactomes,length))
+nogs
+
+# remove sets with 4 or fewer genes
+reactomes_filt <- lapply(reactomes,function(gs) {
+  l <- lapply(gs,length)
+  gs[which(l>=5)]
+})
+nogs <- unlist(lapply(reactomes_filt,length))
+nogs
+
+barplot(nogs,las=2,ylim=c(0,2500),ylab="no. gene sets",main="Reactome gene sets over time")
+
+reactomes <- reactomes_filt
+
+tot_anno <- unlist(lapply(reactomes,function(gs) {
+  length(unlist(gs))
+}))
+tot_anno
+
+barplot(tot_anno,las=2,ylim=c(0,140000),main="Total no. annotations")
+
+gene_coverage <- unlist(lapply(reactomes,function(gs) {
+  length(unique(unlist(gs)))
+}))
+gene_coverage
+
+barplot(gene_coverage,las=2,ylim=c(0,12000),ylab="gene coverage")
+
+```
+
+## Session information
+
+For reproducibility
+
+<br><details><summary><b>Click HERE to show session info</b></summary><br><p>
+
+```{r,session}
+
+save.image("example_10m.Rdata")
+sessionInfo()
+
+```
+
+</details>
