@@ -11,3 +11,6 @@
 8. Using shallow gene annotations
 9. Using outdated gene identifiers and gene sets
 10. Not providing detailed methodological info
+
+docker run -it -v $PWD:/10mistakes mziemann/10mistakes:latest
+
