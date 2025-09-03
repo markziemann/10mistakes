@@ -162,6 +162,44 @@ mtext(HEADER)
 In the next sections I will run enrichment analysis with over-representation test
 and compare it to functional class scoring.
 
+## Get update gene symbols
+
+Let's see if many of the gene symbols have changed.
+
+Comparing Ensembl release 90 to GENCODE Release 49 (GRCh38.p14) which corresponds to Ensembl 115 (Sept 2025).
+
+So v90 had 58k genes and v115 has 86k which is a big increase.
+The v90 has 1609 genes that have been removed an v115 has 29676 that have been added.
+There are 56693 common.
+
+From these common ones, 20456 have different gene names.
+I think the approach to naming these putative genes has changed a lot.
+Lots of CXorfXX genes have changed, not just AL358472.5 type names.
+
+```{r,genesymbolupdate}
+
+gt <- read.table("https://dee2.io/data/hsapiens/hsa_gene_info.tsv",header=TRUE)
+head(gt)
+
+gtnew <- read.table("ref/gencode.v49.genenames.tsv")
+
+v1 <- list("Ens90"=gt$GeneID, "Ens115"=gtnew$V1)
+plot(euler(v1),quantities = list(cex = 2), labels = list(cex = 2))
+length(gt$GeneID)
+length(gtnew$V1)
+length(intersect(gt$GeneID,gtnew$V1))
+length(setdiff(gt$GeneID,gtnew$V1))
+length(setdiff(gtnew$V1,gt$GeneID))
+
+gtm <- merge(gt,gtnew,by.x="GeneID",by.y="V1")
+nrow(gtm)
+table(gtm$GeneSymbol == gtm$V2)
+
+head(gtm[which(gtm$GeneSymbol != gtm$V2),],10)
+tail(gtm[which(gtm$GeneSymbol != gtm$V2),],10)
+
+```
+
 ## Get gene sets
 
 ```{r,gs}
@@ -172,6 +210,37 @@ gsets <- gmtPathways("ref/ReactomePathways_2025-09-02.gmt")
 ```
 
 ## Mistake 1 - Raw p-values
+
+Here we are discarding the old gene symbols in favour of the new ones.
+
+```{r,mistake1}
+
+up <- rownames(subset(def, log2FoldChange>0 & padj<0.05))
+up <- sapply(strsplit(up," "),'[[',1)
+up <- unique(gtnew[match(up,gtnew$V1),2])
+up <- up[which(!is.na(up))]
+
+dn <- rownames(subset(def, log2FoldChange<0 & padj<0.05))
+dn <- sapply(strsplit(dn," "),'[[',1)
+dn <- unique(gtnew[match(dn,gtnew$V1),2])
+dn <- dn[which(!is.na(dn))]
+
+bg <- rownames(def)
+bg <- sapply(strsplit(bg," "),'[[',1)
+bg <- unique(gtnew[match(bg,gtnew$V1),2])
+bg <- bg[which(!is.na(bg))]
+
+lapply(list(up,dn,bg),length)
+
+fres_up <- fora(pathways=gsets, genes=up, universe=bg, minSize = 5, maxSize = Inf)
+nrow(subset(fres_up,padj<0.05))
+nrow(subset(fres_up,pval<0.05))
+
+fres_dn <- fora(pathways=gsets, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
+nrow(subset(fres_dn,padj<0.05))
+nrow(subset(fres_dn,pval<0.05))
+
+```
 
 ## Mistake 2 - Background
 
@@ -190,16 +259,8 @@ Will try FORA and mitch.
 
 ```{r,mistake2}
 
-up <- unique(sapply(strsplit(rownames(subset(def, log2FoldChange>0 & padj<0.05))," "),"[[",2))
-
-dn <- unique(sapply(strsplit(rownames(subset(def, log2FoldChange<0 & padj<0.05))," "),"[[",2))
-
-bg <- unique(sapply(strsplit(rownames(def)," "),"[[",2))
-
-gt <- read.table("https://dee2.io/data/hsapiens/hsa_gene_info.tsv",header=TRUE)
-head(gt)
-
-all <- unique(gt$GeneSymbol)
+# up dn and bg are defines above
+all <- unique(gtm$V2)
 
 lapply(list(up,dn,bg,all),length)
 
@@ -230,7 +291,6 @@ plot(euler(v2),quantities = list(cex = 2), labels = list(cex = 2))
 
 par(mar=c(5.1,4.1,4.1,2.1))
 
-
 ```
 
 ## Mistake 4 - prioritisation by p-values
@@ -248,11 +308,10 @@ par(mar=c(5.1,4.1,4.1,2.1))
 
 ```{r,mistake4a}
 
-gt <- def
-gt$genename <- sapply(strsplit(rownames(gt)," "),"[[",2)
-gt <- gt[,"genename",drop=FALSE]
-gt$id <- rownames(gt)
-m <- mitch_import(x=def,DEtype="deseq2",geneTable=gt)
+def2 <- def
+rownames(def2) <- sapply(strsplit(rownames(def)," "),'[[',1)
+
+m <- mitch_import(x=def2,DEtype="deseq2",geneTable=gtnew)
 mres <- mitch_calc(x=m,genesets=gsets,minsetsize=5,cores=4,priority="significance")
 
 mres_sig_up <- head(subset(mres$enrichment_result,s.dist>0),10)
@@ -334,11 +393,22 @@ par(mar=c(5.1,4.1,4.1,2.1))
 
 ```{r,mistake5}
 
-bg <- unique(sapply(strsplit(rownames(def)," "),"[[",2))
+up <- rownames(subset(def, log2FoldChange>0 & padj<0.05))
+up <- sapply(strsplit(up," "),'[[',1)
+up <- unique(gtnew[match(up,gtnew$V1),2])
+up <- up[which(!is.na(up))]
 
-nrow(subset(def,padj<0.05 & log2FoldChange>0))
-nrow(subset(def,padj<0.05 & log2FoldChange<0))
-nrow(def)
+dn <- rownames(subset(def, log2FoldChange<0 & padj<0.05))
+dn <- sapply(strsplit(dn," "),'[[',1)
+dn <- unique(gtnew[match(dn,gtnew$V1),2])
+dn <- dn[which(!is.na(dn))]
+
+bg <- rownames(def)
+bg <- sapply(strsplit(bg," "),'[[',1)
+bg <- unique(gtnew[match(bg,gtnew$V1),2])
+bg <- bg[which(!is.na(bg))]
+
+lapply(list(up,dn,bg),length)
 
 sizes <- c(50,100,200,300,400,500,750,1000,1500,2000,2500,3000,4000,5000,6000,7000)
 
@@ -346,13 +416,17 @@ fup <- nrow(subset(fora(pathways=gsets, genes=up, universe=bg, minSize = 5, maxS
 fdn <- nrow(subset(fora(pathways=gsets, genes=dn, universe=bg, minSize = 5, maxSize = Inf),padj<0.05))
 
 nups <- unlist(lapply(sizes, function(i) {
-  genes <- unique(sapply(strsplit(rownames(head(subset(def, log2FoldChange>0),i))," "),"[[",2))
+  ids <- rownames(subset(def2, log2FoldChange>0))
+  ids <- head(ids,i)
+  genes <- unique(gtnew[match(ids,gtnew$V1),2])
   fres <- fora(pathways=gsets, genes=genes, universe=bg, minSize = 5, maxSize = Inf)
   nrow(subset(fres,padj<0.05))
 }))
 
 ndns <- unlist(lapply(sizes, function(i) {
-  genes <- unique(sapply(strsplit(rownames(head(subset(def, log2FoldChange<0),i))," "),"[[",2))
+  ids <- rownames(subset(def2, log2FoldChange<0))
+  ids <- head(ids,i)
+  genes <- unique(gtnew[match(ids,gtnew$V1),2])
   fres <- fora(pathways=gsets, genes=genes, universe=bg, minSize = 5, maxSize = Inf)
   nrow(subset(fres,padj<0.05))
 }))
@@ -368,6 +442,16 @@ plot(sizes,df$up,type="b",col="red",ylab="no. gene sets with FDR<0.05",xlab="gen
   xlim=c(0,500), ylim=c(0,125))
 lines(sizes,df$dn,type="b",col="blue")
 
+png("img/5m.png", width = 700, height = 480)
+par(mfrow=c(1,2))
+plot(sizes,df$up,type="b",col="red",ylab="no. gene sets with FDR<0.05",xlab="gene list length")
+lines(sizes,df$dn,type="b",col="blue")
+plot(sizes,df$up,type="b",col="red",ylab="no. gene sets with FDR<0.05",xlab="gene list length",
+  xlim=c(0,500), ylim=c(0,125))
+lines(sizes,df$dn,type="b",col="blue")
+dev.off()
+par(mfrow=c(1,1))
+
 ```
 
 ## Mistake 6 - combining up and downregulated genes into the same test.
@@ -378,8 +462,8 @@ updn <- unique(c(up,dn))
 
 fres_updn_bg <- fora(pathways=gsets, genes=updn, universe=bg, minSize = 5, maxSize = Inf)
 fres_updn_bg <- subset(fres_updn_bg,padj<0.05)$pathway
-length(fres_updn_bg)
 
+length(fres_updn_bg)
 length(fres_up_bg)
 length(fres_dn_bg)
 length(unique(c(fres_up_bg,fres_dn_bg)))

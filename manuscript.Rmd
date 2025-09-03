@@ -100,8 +100,14 @@ detected.
 If you want to avoid making arbitrary thresholds (which seem to annoy reviewers) then we’d
 suggest using a method like GSEA instead that calculates enrichment from all detected genes.
 
-Figure XX. Effect of gene list size on number of significant pathways.
-Up-regulated in red, down-regulated in blue.
+```{r,5m,fig.cap="Figure XX. Effect of gene list size on number of significant pathways. Up-regulated in red, down-regulated in blue.",echo=FALSE,fig.height=4.5,fig.width=7}
+
+library(png)
+library(grid)
+mypng = readPNG('img/5m.png')
+grid.raster(mypng, x=0.5, y=.5, width=1)
+
+```
 
 # 6. Combining up and down-regulated genes in the same ORA test 
 
