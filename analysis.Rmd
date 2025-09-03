@@ -506,7 +506,7 @@ For reproducibility
 
 ```{r,session}
 
-save.image("example_10m.Rdata")
+save.image("analysis.Rdata")
 sessionInfo()
 
 ```
