@@ -1,0 +1,198 @@
+---
+title: "10 common mistakes that could ruin your enrichment analysis"
+date: "`r Sys.Date()`"
+output:
+  rmdformats::robobook:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+    fig_width: 5
+    fig_height: 5
+bibliography: 10mistakes.bib
+csl: f1000research.csl
+---
+
+<strong>Anusuiya Bora<sup>1,2</sup> & Mark Ziemann<sup>1,2</sup></strong>
+
+1. Deakin University, School of Life and Environmental Sciences, Geelong, Australia.
+
+2. Burnet Institute, Melbourne, Australia
+
+(*) Correspondence: mark.ziemann@burnet.edu.au
+
+| Author | ORCID |
+| --- | --- |
+| Mark Ziemann | 0000-0002-7688-6974 |
+| Anusuiya Bora | 0009-0006-2908-1352 |
+
+Target journal: F1000 Research
+
+Enrichment analysis is an incredibly powerful way to summarise complex genomics data into
+information about the regulation of biological pathways including cellular metabolism,
+signalling and immune responses.
+About 10,000 scientific articles describe using pathway enrichment analysis each year,
+making it among the top 10 most used techniques in bioinformatics.
+While enrichment analysis has become a routine part of workflows via myriad software
+packages and easy to use websites, mistakes can easily creep in due to poor tool design and
+unawareness among users of the potential pitfalls.
+
+# 1. Using uncorrected p-values for statistical significance 
+
+AB
+
+# 2. Not using a background gene list 
+
+AB
+
+# 3. Using a tool that doesn’t report enrichment scores 
+
+FDR values can tell us whether something is statically significant, but it doesn’t directly
+indicate whether there will be any biological impact.
+For that, we need some measure of effect size.
+In enrichment analysis, we can use an enrichment score as a proxy measure of effect size.
+For rank-based tools like GSEA, the enrichment score varies from -1  to +1 denoting the
+distribution of genes in a gene set relative to all other genes.
+A score of 1.0 would mean that X genes in the set are the X most upregulated, while if a
+value is close to 0, it means the distribution of genes is close to what you might get by
+random chance.
+For over-representation methods like DAVID, the fold enrichment score is often quoted, which
+is the odds ratio of genes of a gene set in the list as compared to the background.
+Unfortunately, DAVID doesn’t provide the fold enrichment scores in the main results page,
+they are only available in the table for download.
+Many other common tools don’t even calculate the enrichment scores (looking at you
+clusterProfiler), which leaves researchers in the dark about their effect sizes.
+
+# 4. Prioritising results solely by p-value 
+
+Pathway enrichment analysis can return hundreds of significant results, which can be
+confusing to interpret.
+Many tools by default will sort the results by significance, but this can lead you to
+prioritise pathways that are very large but where each gene is only slightly dysregulated.
+To demonstrate this, see the results from a typical pathway enrichment analysis result with
+p-value prioritisation and with enrichment score prioritisation after removal of
+non-significant pathways (Table 1).
+P-value prioritisation emphasises generic functions with really large gene sets, while
+enrichment score prioritisation highlights much smaller gene sets with highly specific
+functions, where each member gene is showing a relatively bigger change in expression.
+These more specific gene sets are in general better candidates for downstream validation due
+to their explanatory power.
+
+Table 1. Prioritisation of enrichment results by p-value and by enrichment score after
+removal of pathways with FDR>0.05.
+Pathways upregulated by azacitidine exposure on AML3 cells.
+For details, see the supplement.
+
+# 5. Using gene lists that are too large or too small for ORA 
+
+It’s a common misconception that only differentially expressed genes that meet the FDR
+threshold should be submitted to an enrichment test, but this simply isn’t true.
+So long as you’re using proper FDR control of your pathways (See #1 above), you can select
+genes in any arbitrary way your like.
+The caveat here is that enrichment tests (like hypergeometric method) have ranges of input
+gene lists that work best.
+We tested different input gene list sizes in ORA and found that 2500 yielded the most (456
+with FDR<0.0), while sizes 200 and less yielded very few significant pathways (Figure XX).
+In the range of 300-1000, there’s a steep increase in the number of significant pathways, and
+after that the gradient reduces.
+This suggests a sweet spot around 1000, which in our example is 7.6% of the 13,168 genes
+detected.
+If you want to avoid making arbitrary thresholds (which seem to annoy reviewers) then we’d
+suggest using a method like GSEA instead that calculates enrichment from all detected genes.
+
+Figure XX. Effect of gene list size on number of significant pathways.
+Up-regulated in red, down-regulated in blue.
+
+# 6. Combining up and down-regulated genes in the same ORA test 
+
+In some articles we’ve read, we noticed that authors didn’t conduct separate ORA tests for
+up- and down-regulated gene lists, instead opting to submit the combined list for ORA.
+This isn’t necessarily an error, as it tests the hypothesis that some pathways are
+“dysregulated”, a mix of up- and down-regulated genes, that appear at an elevated rate.
+The combined approach can miss a lot of results as compared to the separate approach.
+According to the results of our example analysis the separate approach identified 355
+pathways and the combined approach found only 149, that’s 58% less (see Fig XX).
+The combined approach could uniquely identify some pathways, but this is relatively few.
+In the example dataset, only 2.2% of results were identified exclusively with the combined
+test.
+
+The reason behind this is two-fold.
+Firstly, we know that genes in the same pathway are typically correlated with each other
+@Gatti2010-tb.
+Consider cell cycle genes, or genes responding to pathogens, which are activated in unison
+to coordinate a complex biological process.
+In a typical differential expression experiment after a stimulus, this results in pathways
+that are predominantly up or down regulated, but rarely a mix of up and down.
+Due to this phenomenon, the up and down lists each have relatively strong enrichments, but
+they are diluted when combined @Hong2014-yn.
+Based on this, failing to report data of the separate approach could leave you 58% fewer
+results, and an incomplete picture of what's happening at the molecular level.
+
+Figure XX. Combining up and downregulated genes into one ORA test yields far fewer results.
+
+# 7. Bad visualisation 
+
+AB
+
+# 8. Using shallow gene annotations 
+
+One of the most important decisions you’ll make when doing a pathway enrichment analysis is
+selecting the database to query.
+There are many options to consider, both proprietary and open source.
+When choosing, consider whether the database contains the gene sets that you a priori
+suspect will be altered in the profile you’re looking at.
+Secondly consider the breadth and depth of the pathway library, this will be where the
+unexpected discoveries may occur, and it pays to use a comprehensive one to capture as many
+aspects of your data as possible.
+To demonstrate this, see how KEGG legacy and KEGG Medicus seem tiny when compared to Reactome,
+which is itself dwarfed by Gene Ontology’s Biological Process (GOBP; Table 2).
+Consequently, the results obtained are substantially richer for Reactome and GOBP as compared
+to KEGG libraries.
+
+Table 2. Selecting a gene set library impacts results.
+
+# 9. Using outdated gene identifiers and gene sets 
+
+One great thing about working with omics data is that databases like GEO are loaded with old
+data sets that we can reanalyse with new pathway databases and software tools to eke out
+further insights.
+When the data is several years old, we should use the processed data with caution, as many
+gene names may have since changes.
+For example, Illumina’s EPIC DNA Methylation microarray was released in 2016, and in the
+following eight years, 3,253 of 22,588 gene names have changed (14.4%)
+@Ziemann2024-be, meaning that those genes wouldn’t be recognised by the pathway
+enrichment software.
+To update defunct gene symbols, the HGNChelper R package can help @Oh2020-ku, and it
+has the benefit of fixing gene symbols ruined by Excel autocorrect, which are unfortunately
+common in GEO @Ziemann2016-hp.
+
+Also, the depth of pathway databases increases every year as annotation consortia continue
+assimilating functional information from the literature.
+Sometimes these increases are fairly large, as shown by the chart of Reactome growth below
+(Figure XX).
+To be certain you have the best possible gene annotation for your analysis, it’s always best
+to download the newest version.
+
+Figure XX. Reactome gene set growth.
+Gene sets were downloaded from the MSigDB website, except The last bar which represents the
+latest gene sets downloaded directly from Reactome, not yet incorporated into MSigDB.
+
+# 10. Not providing detailed methodological info 
+
+# Conclusion 
+
+The natural selection of bad science
+
+Paul E. Smaldino and Richard McElreath
+Published:01 September 2016 https://doi.org/10.1098/rsos.160384
+
+## Other notes 
+
+* It’s official. ORA is not as sensitive as FCS
+
+* Showing too many results
+
+* Not distinguishing results from multiple tools
+
+# Bibliography
+
