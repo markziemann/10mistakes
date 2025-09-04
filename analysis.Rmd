@@ -590,7 +590,16 @@ reactomes_filt <- lapply(reactomes,function(gs) {
 nogs <- unlist(lapply(reactomes_filt,length))
 nogs
 
-barplot(nogs,las=2,ylim=c(0,2500),ylab="no. gene sets",main="Reactome gene sets over time")
+barplot(nogs,las=2,ylim=c(0,2500),ylab="no. gene sets",main="Reactome gene sets over time",
+  border=NA)
+lapply(seq(0,2500,500),function(h) { abline(h=h,lty=2,col="gray") })
+
+unlink("img/9m.png")
+png("img/9m.png", width = 480, height = 300)
+barplot(nogs,las=2,ylim=c(0,2500),ylab="no. gene sets",main="Reactome gene sets over time",
+  border=NA,col="darkgray")
+lapply(seq(0,2500,500),function(h) { abline(h=h,lty=2,col="lightgray") })
+dev.off()
 
 reactomes <- reactomes_filt
 

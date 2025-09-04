@@ -104,8 +104,8 @@ It’s a common misconception that only differentially expressed genes that meet
 threshold should be submitted to an enrichment test, but this simply isn’t true.
 So long as you’re using proper FDR control of your pathways (See #1 above), you can select
 genes in any arbitrary way your like.
-The caveat here is that enrichment tests (like hypergeometric method) have ranges of input
-gene lists that work best.
+The caveat here is that enrichment tests (like hypergeometric method) have size ranges of
+input gene lists that work best.
 We tested different input gene list sizes in ORA and found that 2500 yielded the most (456
 with FDR<0.0), while sizes 200 and less yielded very few significant pathways (**Figure XX**).
 In the range of 300-1000, there’s a steep increase in the number of significant pathways, and
@@ -177,8 +177,6 @@ which is itself dwarfed by Gene Ontology’s Biological Process (GOBP; Table 3).
 Consequently, the results obtained are substantially richer for Reactome and GOBP as compared
 to KEGG libraries.
 
-Table 2. Selecting a gene set library impacts results.
-
 ```{r,m8tbl,echo=FALSE}
 
 m8 <- readRDS("m8tbl.Rds")
@@ -213,6 +211,15 @@ to download the newest version.
 Figure XX. Reactome gene set growth.
 Gene sets were downloaded from the MSigDB website, except The last bar which represents the
 latest gene sets downloaded directly from Reactome, not yet incorporated into MSigDB.
+
+```{r,9m,fig.cap="Figure XX. Reactome gene set growth over time. Gene sets were downloaded from the MSigDB website, except The last bar which represents the latest gene sets downloaded directly from Reactome, not yet incorporated into MSigDB.",echo=FALSE,fig.height=4.5,fig.width=7}
+
+library(png)
+library(grid)
+mypng = readPNG('img/9m.png')
+grid.raster(mypng, x=0.5, y=.5, width=1)
+
+```
 
 # 10. Not providing detailed methodological info 
 
