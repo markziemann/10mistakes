@@ -317,12 +317,15 @@ mres <- mitch_calc(x=m,genesets=gsets,minsetsize=5,cores=4,priority="significanc
 mres_sig_up <- head(subset(mres$enrichment_result,s.dist>0),10)
 mres_sig_dn <- head(subset(mres$enrichment_result,s.dist<0),10)
 
-mres_sig_up %>%
-  kbl(caption="Top upregulated pathways when prioritised by FDR") %>%
+mres_sig_up_tbl <- apply(data.frame(mres_sig_up[,1:2],apply(mres_sig_up[,3:5],2,signif,2)),2,as.character)
+mres_sig_dn_tbl <- apply(data.frame(mres_sig_dn[,1:2],apply(mres_sig_dn[,3:5],2,signif,2)),2,as.character)
+
+mres_sig_up_tbl %>%
+  kbl(caption="Top upregulated pathways when prioritised by FDR",row.names=FALSE) %>%
   kable_paper("hover", full_width = F)
 
-mres_sig_dn %>%
-  kbl(caption="Top downregulated pathways when prioritised by FDR") %>%
+mres_sig_dn_tbl %>%
+  kbl(caption="Top downregulated pathways when prioritised by FDR",row.names=FALSE) %>%
   kable_paper("hover", full_width = F)
 
 mres <- mitch_calc(x=m,genesets=gsets,minsetsize=5,cores=4,priority="effect")
@@ -330,13 +333,19 @@ mres <- mitch_calc(x=m,genesets=gsets,minsetsize=5,cores=4,priority="effect")
 mres_es_up <- head(subset(mres$enrichment_result,s.dist>0 & p.adjustANOVA < 0.05),10)
 mres_es_dn <- head(subset(mres$enrichment_result,s.dist<0 & p.adjustANOVA < 0.05),10)
 
-mres_es_up %>%
-  kbl(caption="Top upregulated pathways when prioritised by ES (discarding any with FDR>0.05)") %>%
+mres_es_up_tbl <- apply(data.frame(mres_es_up[,1:2],apply(mres_es_up[,3:5],2,signif,2)),2,as.character)
+mres_es_dn_tbl <- apply(data.frame(mres_es_dn[,1:2],apply(mres_es_dn[,3:5],2,signif,2)),2,as.character)
+
+mres_es_up_tbl %>%
+  kbl(caption="Top upregulated pathways when prioritised by ES (discarding any with FDR>0.05)",row.names=FALSE) %>%
   kable_paper("hover", full_width = F)
 
-mres_es_dn %>%
-  kbl(caption="Top upregulated pathways when prioritised by ES (discarding any with FDR>0.05)") %>%
+mres_es_dn_tbl %>%
+  kbl(caption="Top upregulated pathways when prioritised by ES (discarding any with FDR>0.05)",row.names=FALSE) %>%
   kable_paper("hover", full_width = F)
+
+m4tbls <- list("esup"=mres_es_up_tbl,"esdn"=mres_es_dn_tbl,"sigup"=mres_sig_up_tbl,"sigdn"=mres_sig_dn_tbl)
+saveRDS(m4tbls,"m4tbls.Rds")
 
 ```
 
@@ -442,6 +451,7 @@ plot(sizes,df$up,type="b",col="red",ylab="no. gene sets with FDR<0.05",xlab="gen
   xlim=c(0,500), ylim=c(0,125))
 lines(sizes,df$dn,type="b",col="blue")
 
+unlink("img/5m.png")
 png("img/5m.png", width = 700, height = 480)
 par(mfrow=c(1,2))
 plot(sizes,df$up,type="b",col="red",ylab="no. gene sets with FDR<0.05",xlab="gene list length")
@@ -471,6 +481,11 @@ length(unique(c(fres_up_bg,fres_dn_bg)))
 v1 <- list("up"=fres_up_bg,"dn"=fres_dn_bg,"both"=fres_updn_bg)
 plot(euler(v1),quantities = list(cex = 2), labels = list(cex = 2))
 
+unlink("img/6m.png")
+png("img/6m.png", width = 480, height = 300)
+plot(euler(v1),quantities = list(cex = 2), labels = list(cex = 2))
+dev.off()
+
 ```
 
 ## Mistake 8 - using shallow gene annotations
@@ -496,12 +511,6 @@ d3 <- unlist(lapply(gslist,function(i) { median(unlist(lapply(i,length))) } ))
 
 # number of genes with one or more functions
 d4 <- unlist( lapply(gslist,function(i) { length(unique(unlist(i))) } ))
-
-d5 <- unlist(lapply(gslist,function(i) { median(unlist(lapply(i,length))) } ))
-
-data.frame(d1,d2,d3,d4) %>%
-  kbl(caption="Gene set metrics") %>%
-  kable_paper("hover", full_width = F)
 
 kegg_up <- fora(pathways=kegg, genes=up, universe=bg, minSize = 5, maxSize = Inf)
 kegg_dn <- fora(pathways=kegg, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
@@ -532,6 +541,25 @@ msdb_dn <- fora(pathways=msdb, genes=dn, universe=bg, minSize = 5, maxSize = Inf
 nrow(subset(msdb_up,padj<0.05))
 nrow(subset(msdb_dn,padj<0.05))
 sum(nrow(subset(msdb_up,padj<0.05)), nrow(subset(msdb_dn,padj<0.05) ))
+
+up_pw <- c(nrow(subset(kegg_up,padj<0.05)),nrow(subset(kegg_med_up,padj<0.05)),
+  nrow(subset(reactome_up,padj<0.05)), nrow(subset(gobp_up,padj<0.05)),
+  nrow(subset(msdb_up,padj<0.05)) )
+
+dn_pw <- c(nrow(subset(kegg_dn,padj<0.05)), nrow(subset(kegg_med_dn,padj<0.05)),
+  nrow(subset(reactome_dn,padj<0.05)), nrow(subset(gobp_dn,padj<0.05)),
+  nrow(subset(msdb_dn,padj<0.05)) )
+
+m8tbl <- data.frame(d1,d2,d3,d4,up_pw, dn_pw)
+
+colnames(m8tbl) <- c("No. gene sets","Total no. annotations","Median gene set size",
+  "No. genes with ≥1 annotation","Up-regulated","Down-regulated")
+
+m8tbl %>%
+  kbl(caption="Table XX. Gene set metrics, and number of significantly differentially regulated pathways (FDR<0.05).") %>%
+  kable_paper("hover", full_width = F)
+
+saveRDS(m8tbl,"m8tbl.Rds")
 
 ```
 

@@ -37,6 +37,12 @@ While enrichment analysis has become a routine part of workflows via myriad soft
 packages and easy to use websites, mistakes can easily creep in due to poor tool design and
 unawareness among users of the potential pitfalls.
 
+```{r,setup,echo=FALSE}
+
+knitr::opts_chunk$set(dev = 'svg')
+
+```
+
 # 1. Using uncorrected p-values for statistical significance 
 
 AB
@@ -71,17 +77,26 @@ Many tools by default will sort the results by significance, but this can lead y
 prioritise pathways that are very large but where each gene is only slightly dysregulated.
 To demonstrate this, see the results from a typical pathway enrichment analysis result with
 p-value prioritisation and with enrichment score prioritisation after removal of
-non-significant pathways (Table 1).
+non-significant pathways **(Table 1 and Table 2)**.
 P-value prioritisation emphasises generic functions with really large gene sets, while
 enrichment score prioritisation highlights much smaller gene sets with highly specific
 functions, where each member gene is showing a relatively bigger change in expression.
 These more specific gene sets are in general better candidates for downstream validation due
 to their explanatory power.
 
-Table 1. Prioritisation of enrichment results by p-value and by enrichment score after
-removal of pathways with FDR>0.05.
-Pathways upregulated by azacitidine exposure on AML3 cells.
-For details, see the supplement.
+```{r,m4tbl,echo=FALSE}
+
+m4 <- readRDS("m4tbls.Rds")
+
+m4[[3]] %>%
+  kbl(caption="Table 1. Top upregulated pathways when prioritised by FDR.",row.names=FALSE) %>%
+  kable_paper("hover", full_width = F)
+
+m4[[1]] %>%
+  kbl(caption="Table 2. Top upregulated pathways when prioritised by ES. Pathways with FDR>0.05 were excluded.",row.names=FALSE) %>%
+  kable_paper("hover", full_width = F)
+
+```
 
 # 5. Using gene lists that are too large or too small for ORA 
 
@@ -92,7 +107,7 @@ genes in any arbitrary way your like.
 The caveat here is that enrichment tests (like hypergeometric method) have ranges of input
 gene lists that work best.
 We tested different input gene list sizes in ORA and found that 2500 yielded the most (456
-with FDR<0.0), while sizes 200 and less yielded very few significant pathways (Figure XX).
+with FDR<0.0), while sizes 200 and less yielded very few significant pathways (**Figure XX**).
 In the range of 300-1000, there’s a steep increase in the number of significant pathways, and
 after that the gradient reduces.
 This suggests a sweet spot around 1000, which in our example is 7.6% of the 13,168 genes
@@ -134,7 +149,14 @@ they are diluted when combined @Hong2014-yn.
 Based on this, failing to report data of the separate approach could leave you 58% fewer
 results, and an incomplete picture of what's happening at the molecular level.
 
-Figure XX. Combining up and downregulated genes into one ORA test yields far fewer results.
+```{r,6m,fig.cap="Figure XX. Combining up and downregulated genes into one ORA test yields far fewer results.",echo=FALSE,fig.height=3,fig.width=5}
+
+library(png)
+library(grid)
+mypng = readPNG('img/6m.png')
+grid.raster(mypng, x=0.5, y=.5, width=1)
+
+```
 
 # 7. Bad visualisation 
 
@@ -151,11 +173,20 @@ Secondly consider the breadth and depth of the pathway library, this will be whe
 unexpected discoveries may occur, and it pays to use a comprehensive one to capture as many
 aspects of your data as possible.
 To demonstrate this, see how KEGG legacy and KEGG Medicus seem tiny when compared to Reactome,
-which is itself dwarfed by Gene Ontology’s Biological Process (GOBP; Table 2).
+which is itself dwarfed by Gene Ontology’s Biological Process (GOBP; Table 3).
 Consequently, the results obtained are substantially richer for Reactome and GOBP as compared
 to KEGG libraries.
 
 Table 2. Selecting a gene set library impacts results.
+
+```{r,m8tbl,echo=FALSE}
+
+m8 <- readRDS("m8tbl.Rds")
+m8 %>%
+  kbl(caption="Table 3. Size metrics of selected gene set libraries, and the number of differentially regulated pathways (FDR<0.05).") %>%
+  kable_paper("hover", full_width = F)
+
+```
 
 # 9. Using outdated gene identifiers and gene sets 
 
@@ -175,7 +206,7 @@ common in GEO @Ziemann2016-hp.
 Also, the depth of pathway databases increases every year as annotation consortia continue
 assimilating functional information from the literature.
 Sometimes these increases are fairly large, as shown by the chart of Reactome growth below
-(Figure XX).
+(**Figure XX**).
 To be certain you have the best possible gene annotation for your analysis, it’s always best
 to download the newest version.
 
@@ -184,6 +215,8 @@ Gene sets were downloaded from the MSigDB website, except The last bar which rep
 latest gene sets downloaded directly from Reactome, not yet incorporated into MSigDB.
 
 # 10. Not providing detailed methodological info 
+
+AB
 
 # Conclusion 
 
