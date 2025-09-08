@@ -28,18 +28,52 @@ csl: f1000research.csl
 
 Target journal: F1000 Research
 
-Enrichment analysis is an incredibly powerful way to summarise complex genomics data into
-information about the regulation of biological pathways including cellular metabolism,
-signalling and immune responses.
-About 10,000 scientific articles describe using pathway enrichment analysis each year,
-making it among the top 10 most used techniques in bioinformatics.
-While enrichment analysis has become a routine part of workflows via myriad software
-packages and easy to use websites, mistakes can easily creep in due to poor tool design and
-unawareness among users of the potential pitfalls.
+# Abstract
+
+Functional enrichment analysis (FEA) is an incredibly powerful way to summarise complex
+genomics data into information about the regulation of biological pathways including cellular
+metabolism, signalling and immune responses.
+About 10,000 scientific articles describe using FEA each year, making it among the most
+used techniques in bioinformatics.
+While FEA has become a routine part of workflows via myriad software packages and easy-to-use
+websites, mistakes can easily creep in due to poor tool design and unawareness among users of
+pitfalls.
+Here we outline 10 mistakes that undermine the effectiveness of FEA which we commonly see in
+research articles.
+We provide practical advice on their mitigation.
+
+# Background
+
+PubMed searches indicate keywords like "Pathway analysis" and "Enrichment analysis" appear in title
+or abstracts of approximately 10,000 articles per year, and that the number of articles matching these
+keywords has increased by a factor of 5.4 between 2014 and 2024.
+The purpose of FEA is to understand whether gene categories are collectively
+differentially represented in the molecular profile at hand, and involves querying hundreds or
+thousands of functional categories which commonly represent gene pathways or ontologies.
+There are a variety of methods for FEA, but the main two are over-representation analysis (ORA) and
+functional class scoring (FCS) @Khatri2012-yq.
+ORA involves selecting genes based on a hard cut-off followed by a test of enrichment (e.g.: Fisher's
+exact test) as compared to a background list @Tavazoie1999-as.
+Popular ORA tools include websites like DAVID @Sherman2022-kg and software packages like
+ClusterProfiler @Wu2021-mg.
+FCS involves ranking all detected genes followed by a test to asses whether the distribution of scores
+deviates towards the up- or down-regulated directions.
+GSEA @Subramanian2005-bd is a stand-alone FCS software with a graphical user interface, and there
+are several command-line implementations such as fgsea @Korotkevich2021-xm.
+
+Recommendations on correct application of pathway enrichment have been previously published
+[@Tilford2009-kh; @Tipney2010-sy; @Chicco2022-aa; @Zhao2023-av], yet we and others continue to
+observe blatant mistakes and methodological deficiencies appearing in peer-reviewed publications at
+an alarming rate [@Timmons2015-yb; @Wijesooriya2022-we].
+The purpose of this opinion article is to share what our group has learned about successful FEA over
+the past 15 years having authored dozens of articles using it and critically examining hundreds of
+published articles using the method.
 
 ```{r,setup,echo=FALSE}
 
 knitr::opts_chunk$set(dev = 'svg')
+
+library("kableExtra")
 
 ```
 
@@ -68,6 +102,8 @@ Unfortunately, DAVID doesn’t provide the fold enrichment scores in the main re
 they are only available in the table for download.
 Many other common tools don’t even calculate the enrichment scores (looking at you
 clusterProfiler), which leaves researchers in the dark about their effect sizes.
+Tools that do provide enrichment scores include ShinyGO (web) @Ge2020-lr, GSEA @Subramanian2005-bd
+and fgsea (fora) @Korotkevich2021-xm.
 
 # 4. Prioritising results solely by p-value 
 
@@ -88,12 +124,12 @@ to their explanatory power.
 
 m4 <- readRDS("m4tbls.Rds")
 
-m4[[3]] %>%
-  kbl(caption="Table 1. Top upregulated pathways when prioritised by FDR.",row.names=FALSE) %>%
+m4[[3]] |>
+  kbl(caption="Table 1. Top upregulated pathways when prioritised by FDR.",row.names=FALSE) |>
   kable_paper("hover", full_width = F)
 
-m4[[1]] %>%
-  kbl(caption="Table 2. Top upregulated pathways when prioritised by ES. Pathways with FDR>0.05 were excluded.",row.names=FALSE) %>%
+m4[[1]] |>
+  kbl(caption="Table 2. Top upregulated pathways when prioritised by ES. Pathways with FDR>0.05 were excluded.",row.names=FALSE) |>
   kable_paper("hover", full_width = F)
 
 ```
@@ -180,8 +216,8 @@ to KEGG libraries.
 ```{r,m8tbl,echo=FALSE}
 
 m8 <- readRDS("m8tbl.Rds")
-m8 %>%
-  kbl(caption="Table 3. Size metrics of selected gene set libraries, and the number of differentially regulated pathways (FDR<0.05).") %>%
+m8 |>
+  kbl(caption="Table 3. Size metrics of selected gene set libraries, and the number of differentially regulated pathways (FDR<0.05).") |>
   kable_paper("hover", full_width = F)
 
 ```
@@ -212,7 +248,7 @@ Figure XX. Reactome gene set growth.
 Gene sets were downloaded from the MSigDB website, except The last bar which represents the
 latest gene sets downloaded directly from Reactome, not yet incorporated into MSigDB.
 
-```{r,9m,fig.cap="Figure XX. Reactome gene set growth over time. Gene sets were downloaded from the MSigDB website, except The last bar which represents the latest gene sets downloaded directly from Reactome, not yet incorporated into MSigDB.",echo=FALSE,fig.height=4.5,fig.width=7}
+```{r,9m,fig.cap="Figure XX. Reactome gene set growth over time. Gene sets were downloaded from the MSigDB website, except The last bar which represents the latest gene sets downloaded directly from Reactome, not yet incorporated into MSigDB.",echo=FALSE,fig.height=3,fig.width=5}
 
 library(png)
 library(grid)
@@ -227,8 +263,29 @@ AB
 
 # Conclusion 
 
-The natural selection of bad science
+More subtle issues:
 
+* Karp, P.D., Midford, P.E., Caspi, R. et al. Pathway size matters: the influence of pathway granularity on over-representation (enrichment analysis) statistics. BMC Genomics 22, 191 (2021). https://doi.org/10.1186/s12864-021-07502-8
+
+* Length Bias Correction in Gene Ontology Enrichment Analysis Using Logistic Regression
+Gu Mi ,Yanming Di,Sarah Emerson,Jason S. Cumbie,Jeff H. Chang
+Published: October 2, 2012
+https://doi.org/10.1371/journal.pone.0046128
+
+* Analyzing gene expression data in terms of gene sets: methodological issues
+Jelle J Goeman 1, Peter Bühlmann
+Affiliations Expand
+PMID: 17303618 DOI: 10.1093/bioinformatics/btm051
+
+* PLoS Biol. 2019 Nov 12;17(11):e3000481. doi: 10.1371/journal.pbio.3000481
+Recurrent functional misinterpretation of RNA-seq data caused by sample-specific gene length bias
+Shir Mandelboum 1,2, Zohar Manber 3, Orna Elroy-Stein 1,2,*, Ran Elkon 2,3,
+
+* On the influence of several factors on pathway enrichment analysis
+Briefings in Bioinformatics, Volume 23, Issue 3, May 2022, bbac143,
+Sarah Mubeen, Alpha Tom Kodamullil, Martin Hofmann-Apitius, Daniel Domingo-Fernández
+
+The natural selection of bad science
 Paul E. Smaldino and Richard McElreath
 Published:01 September 2016 https://doi.org/10.1098/rsos.160384
 
