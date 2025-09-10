@@ -71,9 +71,11 @@ published articles using the method.
 
 ```{r,setup,echo=FALSE}
 
-knitr::opts_chunk$set(dev = 'svg')
+#knitr::opts_chunk$set(dev = 'svg')
 
 library("kableExtra")
+library("png")
+library("grid")
 
 ```
 
@@ -81,9 +83,46 @@ library("kableExtra")
 
 AB
 
+```{r,1a,fig.cap="Figure 1A. Impact of FDR correction of p-values on the number of \'significant\' gene sets.",echo=FALSE,fig.height=3,fig.width=3}
+
+mypng = readPNG('img/1a.png')
+grid.raster(mypng, x=0.5, y=.5, width=1)
+
+```
+
+
+```{r,1b,fig.cap="Figure 1B. FDR control reduces false positives.",echo=FALSE,fig.height=4,fig.width=4}
+
+mypng = readPNG('img/1b.png')
+grid.raster(mypng, x=0.5, y=.5, width=1)
+
+```
+
 # 2. Not using a background gene list 
 
 AB
+
+```{r,2a,fig.cap="Figure 2A. Impact of background list on the number of significant gene sets. Example dataset.",echo=FALSE,fig.height=3,fig.width=3}
+
+mypng = readPNG('img/2a.png')
+grid.raster(mypng, x=0.5, y=.5, width=1)
+
+```
+
+```{r,2b,fig.cap="Figure 2B. Impact of background list on the number of significant gene sets. 100 simulations.",echo=FALSE,fig.height=4,fig.width=4}
+
+mypng = readPNG('img/2b.png')
+grid.raster(mypng, x=0.5, y=.5, width=1)
+
+```
+
+```{r,2c,fig.cap="Figure 2C. Gene sets consistently appearing as false positives include those related to cancer.",echo=FALSE,fig.height=4,fig.width=4}
+
+mypng = readPNG('img/2c.png')
+grid.raster(mypng, x=0.5, y=.5, width=1)
+
+```
+
 
 # 3. Using a tool that doesn’t report enrichment scores 
 
@@ -143,7 +182,7 @@ genes in any arbitrary way your like.
 The caveat here is that enrichment tests (like hypergeometric method) have size ranges of
 input gene lists that work best.
 We tested different input gene list sizes in ORA and found that 2500 yielded the most (456
-with FDR<0.0), while sizes 200 and less yielded very few significant pathways (**Figure XX**).
+with FDR<0.0), while sizes 200 and less yielded very few significant pathways (**Figure 3**).
 In the range of 300-1000, there’s a steep increase in the number of significant pathways, and
 after that the gradient reduces.
 This suggests a sweet spot around 1000, which in our example is 7.6% of the 13,168 genes
@@ -151,10 +190,8 @@ detected.
 If you want to avoid making arbitrary thresholds (which seem to annoy reviewers) then we’d
 suggest using a method like GSEA instead that calculates enrichment from all detected genes.
 
-```{r,5m,fig.cap="Figure XX. Effect of gene list size on number of significant pathways. Up-regulated in red, down-regulated in blue.",echo=FALSE,fig.height=4.5,fig.width=7}
+```{r,5m,fig.cap="Figure 3. Effect of gene list size on number of significant pathways. Up-regulated in red, down-regulated in blue.",echo=FALSE,fig.height=4.5,fig.width=7}
 
-library(png)
-library(grid)
 mypng = readPNG('img/5m.png')
 grid.raster(mypng, x=0.5, y=.5, width=1)
 
@@ -187,8 +224,6 @@ results, and an incomplete picture of what's happening at the molecular level.
 
 ```{r,6m,fig.cap="Figure XX. Combining up and downregulated genes into one ORA test yields far fewer results.",echo=FALSE,fig.height=3,fig.width=5}
 
-library(png)
-library(grid)
 mypng = readPNG('img/6m.png')
 grid.raster(mypng, x=0.5, y=.5, width=1)
 
@@ -250,8 +285,6 @@ latest gene sets downloaded directly from Reactome, not yet incorporated into MS
 
 ```{r,9m,fig.cap="Figure XX. Reactome gene set growth over time. Gene sets were downloaded from the MSigDB website, except The last bar which represents the latest gene sets downloaded directly from Reactome, not yet incorporated into MSigDB.",echo=FALSE,fig.height=3,fig.width=5}
 
-library(png)
-library(grid)
 mypng = readPNG('img/9m.png')
 grid.raster(mypng, x=0.5, y=.5, width=1)
 
