@@ -222,7 +222,7 @@ they are diluted when combined @Hong2014-yn.
 Based on this, failing to report data of the separate approach could leave you 58% fewer
 results, and an incomplete picture of what's happening at the molecular level.
 
-```{r,6m,fig.cap="Figure XX. Combining up and downregulated genes into one ORA test yields far fewer results.",echo=FALSE,fig.height=3,fig.width=5}
+```{r,6m,fig.cap="Figure 6. Combining up and downregulated genes into one ORA test yields far fewer results.",echo=FALSE,fig.height=3,fig.width=5}
 
 mypng = readPNG('img/6m.png')
 grid.raster(mypng, x=0.5, y=.5, width=1)
