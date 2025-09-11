@@ -86,7 +86,7 @@ AB
 ```{r,1a,fig.cap="Figure 1A. Impact of FDR correction of p-values on the number of \'significant\' gene sets.",echo=FALSE,fig.height=3,fig.width=3}
 
 mypng = readPNG('img/1a.png')
-grid.raster(mypng, x=0.5, y=.5, width=1)
+grid.raster(mypng, x=0.5, y=0.5, width=1)
 
 ```
 
@@ -94,7 +94,7 @@ grid.raster(mypng, x=0.5, y=.5, width=1)
 ```{r,1b,fig.cap="Figure 1B. FDR control reduces false positives.",echo=FALSE,fig.height=4,fig.width=4}
 
 mypng = readPNG('img/1b.png')
-grid.raster(mypng, x=0.5, y=.5, width=1)
+grid.raster(mypng, x=0.5, y=0.5, width=1)
 
 ```
 
@@ -105,21 +105,21 @@ AB
 ```{r,2a,fig.cap="Figure 2A. Impact of background list on the number of significant gene sets. Example dataset.",echo=FALSE,fig.height=3,fig.width=3}
 
 mypng = readPNG('img/2a.png')
-grid.raster(mypng, x=0.5, y=.5, width=1)
+grid.raster(mypng, x=0.5, y=0.5, width=1)
 
 ```
 
 ```{r,2b,fig.cap="Figure 2B. Impact of background list on the number of significant gene sets. 100 simulations.",echo=FALSE,fig.height=4,fig.width=4}
 
 mypng = readPNG('img/2b.png')
-grid.raster(mypng, x=0.5, y=.5, width=1)
+grid.raster(mypng, x=0.5, y=0.5, width=1)
 
 ```
 
 ```{r,2c,fig.cap="Figure 2C. Gene sets consistently appearing as false positives include those related to cancer.",echo=FALSE,fig.height=4,fig.width=4}
 
 mypng = readPNG('img/2c.png')
-grid.raster(mypng, x=0.5, y=.5, width=1)
+grid.raster(mypng, x=0.5, y=0.5, width=1)
 
 ```
 
@@ -271,8 +271,11 @@ enrichment software.
 To update defunct gene symbols, the HGNChelper R package can help @Oh2020-ku, and it
 has the benefit of fixing gene symbols ruined by Excel autocorrect, which are unfortunately
 common in GEO @Ziemann2016-hp.
+Persistent gene identifiers like Ensembl (eg: ENSG00000180096) and HGNC (eg: HGNC:2879)
+are less likely to change over time and would therefore be preferable over gene symbols
+(eg: SEPTIN1) for FEA.
 
-Also, the depth of pathway databases increases every year as annotation consortia continue
+The depth of pathway databases increases every year as annotation consortia continue
 assimilating functional information from the literature.
 Sometimes these increases are fairly large, as shown by the chart of Reactome growth below
 (**Figure XX**).
