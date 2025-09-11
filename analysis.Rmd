@@ -216,6 +216,9 @@ gsets <- gmtPathways("ref/ReactomePathways_2025-09-02.gmt")
 
 Here we are discarding the old gene symbols in favour of the new ones.
 
+In this analysis, we are doing ORA with fora, and comparing the results
+of raw p-values versus using FDR correction.
+
 ```{r,mistake1,fig.height=3,fig.width=5}
 
 up <- rownames(subset(def, log2FoldChange>0 & padj<0.05))
@@ -273,8 +276,15 @@ par(mar=c(5.1,4.1,4.1,2.1))
 
 ```
 
-Demonstrate with simulation.
-Select 1000 genes from the background list and run.
+That analysis shows how a big difference between FDR and raw p-values,
+but it doesn't prove that the p-value hits are false positives.
+
+Here, we can prove they are false positives by randomly selecting 1000
+genes from the list of detected ones, and testing them for enrichment.
+
+When doing enrichment analysis of a random list of 1000 genes, we got an
+average of 51.6 pathways with p<0.05, while after p-value correction,
+that number was just 0.16 with FDR<0.05.
 
 ```{r,mistake1_sim,fig.height=6,fig.width=6}
 
@@ -314,7 +324,7 @@ par(mar=c(5.1,4.1,4.1,2.1))
 
 ## Mistake 2 - Background
 
-Will try FORA and mitch.
+Will try FORA.
 
 | Reporting criteria | Method/resource used |
 | --- | --- |
@@ -326,6 +336,10 @@ Will try FORA and mitch.
 | Gene Selection | DESeq2 FDR<0.05 and log2FC>0 or log2FC<0 |
 | Data availability | via DEE2 at accession SRP038101 (human) |
 | Other parameters | Min gene set size of 5 |
+
+In this first analysis, we run parallel fora tests, one uses the correct
+background made up of detected genes (bg), while the other one
+uses all genes in the genome (marked with *).
 
 ```{r,mistake2,fig.height=3,fig.width=5}
 
@@ -373,7 +387,13 @@ par(mar=c(5.1,4.1,4.1,2.1))
 ```
 
 Mistake 2 simulation.
-select genes randomly from BG list and compare to "all".
+select genes randomly from the genes above the detection threshold (bg list) and compare to
+whole genome background.
+
+There are ~444 gene sets significant on average with this approach, as the genes expressed
+in AML3 cells are distinctive compared to the whole genome annotation.
+
+When using the correct background, a mean of 0.16 was obtained.
 
 ```{r,mistake2sim,fig.height=6,fig.width=6}
 
