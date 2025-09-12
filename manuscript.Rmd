@@ -83,6 +83,13 @@ library("grid")
 
 AB
 
+A commonly used test statistic is the P-value. P-value refers to the probability of an observed result occurring by random chance. P value is important to accept or reject the null hypothesis (H₀) of an experiment. Null hypothesis in enrichment analysis refers to a gene (from gene list of interest) randomly occurring in a category of interest (eg - gene ontology, pathways, specific gene sets, etc). Smaller the P value, lower is the chance that the particular gene has associations randomly with the category of interest. In other words, when P value is lower, the presence of the gene is significant. 
+
+Raw P values do not account for false positives. It is important to do P value correction to account for multiple testing and reduce the chance/probability of getting a false positive when compared to background gene list.  
+P value correction is recommended before any data interpretations are made. FDR values are better values for significance comparison. 
+
+There are certain thresholds followed by researchers to deem a term significant. P value less than 0.05 is usually used.
+
 ```{r,1a,fig.cap="Figure 1A. Impact of FDR correction of p-values on the number of \'significant\' gene sets.",echo=FALSE,fig.height=3,fig.width=3}
 
 mypng = readPNG('img/1a.png')
@@ -101,6 +108,9 @@ grid.raster(mypng, x=0.5, y=0.5, width=1)
 # 2. Not using a background gene list 
 
 AB
+
+When there is no background gene list present, the gene list of interest is compared to the entire genome of the organism - this is not a true representation of enrichment analysis. The meaning is lost and incorrect interpretations can be made. For example - for a pathway dysregulation in the brain of an organism, it is incorrect to compare input gene list for the entire body. It should be compared to the tissue of interest. In this case - the brain genome. 
+
 
 ```{r,2a,fig.cap="Figure 2A. Impact of background list on the number of significant gene sets. Example dataset.",echo=FALSE,fig.height=3,fig.width=3}
 
@@ -296,6 +306,8 @@ grid.raster(mypng, x=0.5, y=.5, width=1)
 # 10. Not providing detailed methodological info 
 
 AB
+
+Methods lacking detailed information often lead to problems in reproducibility and validation. Authors should provide the list of tools used, version numbers of tools used, which options were applied for the analysis, which gene list was used, whether background gene list was applied, which statistical tests were done, what tools were used to obtain a certain result. The more descriptive the methodology is, the better for an independent researcher to go through the analysis or use the results for future experiments. 
 
 # Conclusion 
 
