@@ -306,7 +306,6 @@ grid.raster(mypng, x=0.5, y=.5, width=1)
 # 10. Not providing detailed methodological info 
 
 AB
-
 Methods lacking detailed information often lead to problems in reproducibility and validation. Authors should provide the list of tools used, version numbers of tools used, which options were applied for the analysis, which gene list was used, whether background gene list was applied, which statistical tests were done, what tools were used to obtain a certain result. The more descriptive the methodology is, the better for an independent researcher to go through the analysis or use the results for future experiments. 
 
 # Conclusion 
