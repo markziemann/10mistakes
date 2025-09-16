@@ -31,9 +31,14 @@ suppressPackageStartupMessages({
   library("fgsea")
   library("RhpcBLASctl")
   library("parallel")
+  library("beeswarm")
 })
 
 RhpcBLASctl::blas_set_num_threads(1)
+
+if ( ! dir.exists("img") ) {
+  dir.create("img")
+}
 
 ```
 

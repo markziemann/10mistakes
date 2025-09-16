@@ -77,6 +77,10 @@ library("kableExtra")
 library("png")
 library("grid")
 
+if ( ! file.exists("analysis.html") ) {
+  rmarkdown::render("analysis.Rmd")
+}
+
 ```
 
 # 1. Using uncorrected p-values for statistical significance 
