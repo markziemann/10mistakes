@@ -49,7 +49,7 @@ or abstracts of approximately 10,000 articles per year, and that the number of a
 keywords has increased by a factor of 5.4 between 2014 and 2024.
 The purpose of FEA is to understand whether gene categories are collectively
 differentially represented in the molecular profile at hand, and involves querying hundreds or
-thousands of functional categories which commonly represent gene pathways or ontologies.
+thousands of functional categories representing gene pathways or ontologies.
 There are a variety of methods for FEA, but the main two are over-representation analysis (ORA) and
 functional class scoring (FCS) @Khatri2012-yq.
 ORA involves selecting genes based on a hard cut-off followed by a test of enrichment (e.g.: Fisher's
@@ -85,14 +85,27 @@ if ( ! file.exists("analysis.html") ) {
 
 # 1. Using uncorrected p-values for statistical significance 
 
-AB
+Enrichment tests generate p-values (probability values) between 0 and 1.
+The p-value estimates the probability of an observed result occurring by random chance.
+A low p-value (eg: p<0.05) suggests the observed result would be unlikely from random data,
+suggesting a real effect.
+However, as gene set libraries can contain thousands of categories, we could expect 5% of the
+gene sets to meet the p<0.05 threshold with random data.
+In the example dataset, we randomly selected 1000 genes that met the detection threshold and submitted
+these to ORA with Reactome.
+Of the 1840 Reactomes with five or more members detected, we obtained a mean of 51.6 hits with these
+random genes (Figure 1A), proving that reporting raw p-values is bound to yield many false positives,
+in this case a rate of 2.8%.
 
-A commonly used test statistic is the P-value. P-value refers to the probability of an observed result occurring by random chance. P value is important to accept or reject the null hypothesis (H₀) of an experiment. Null hypothesis in enrichment analysis refers to a gene (from gene list of interest) randomly occurring in a category of interest (eg - gene ontology, pathways, specific gene sets, etc). Smaller the P value, lower is the chance that the particular gene has associations randomly with the category of interest. In other words, when P value is lower, the presence of the gene is significant. 
+Raw P values do not account for false positives.
+It is important to do P value correction to account for multiple testing and reduce the
+chance/probability of getting a false positive when compared to background gene list.
+P value correction is recommended before any data interpretations are made.
+FDR values are better
+values for significance comparison.
 
-Raw P values do not account for false positives. It is important to do P value correction to account for multiple testing and reduce the chance/probability of getting a false positive when compared to background gene list.  
-P value correction is recommended before any data interpretations are made. FDR values are better values for significance comparison. 
-
-There are certain thresholds followed by researchers to deem a term significant. P value less than 0.05 is usually used.
+There are certain thresholds followed by researchers to deem a term significant.
+P value less than 0.05 is usually used.
 
 ```{r,1a,fig.cap="Figure 1A. Impact of FDR correction of p-values on the number of \'significant\' gene sets.",echo=FALSE,fig.height=3,fig.width=3}
 
