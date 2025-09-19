@@ -93,19 +93,22 @@ However, as gene set libraries can contain thousands of categories, we could exp
 gene sets to meet the p<0.05 threshold with random data.
 In the example dataset, we randomly selected 1000 genes that met the detection threshold and submitted
 these to ORA with Reactome.
-Of the 1840 Reactomes with five or more members detected, we obtained a mean of 51.6 hits with these
-random genes (Figure 1A), proving that reporting raw p-values is bound to yield many false positives,
-in this case a rate of 2.8%.
+Of the 1840 Reactomes with five or more members detected, we obtained a mean of 51.6 hits (p<0.05)
+with these random genes (**Figure 1A**), proving that reporting raw p-values is bound to yield many
+false positives, in this case at a rate of 2.8%.
 
-Raw P values do not account for false positives.
-It is important to do P value correction to account for multiple testing and reduce the
-chance/probability of getting a false positive when compared to background gene list.
-P value correction is recommended before any data interpretations are made.
-FDR values are better
-values for significance comparison.
+There are a variety of p-value correction methods to reduce the risk of false positives @Tilford2009-kh,
+including approaches from Sidak @Ury01021976, Holm-Bonferroni @holm1979simple and Benjamini-Hochberg
+@benjamini1995controlling.
+The Benjamini-Hochberg method, also called the false discovery rate (FDR) method, appears to be the
+most widely used in genomics to adjust p-values, but it has been critiqued as being overly
+conservative when a larger fraction of tests are not null @storey2003statistical.
+After applying FDR adjustment to the results of the random gene sets (**Figure 1A**), we see that
+the mean number of significant hits (FDR adjusted p<0.05) is 0.16, effectively eliminating false
+positives.
 
-There are certain thresholds followed by researchers to deem a term significant.
-P value less than 0.05 is usually used.
+In the example dataset, omitting FDR correction would therefore lead to identification of 696
+Reactomes with p<0.05, of which 345 are likely false positives (~49.6%).
 
 ```{r,1a,fig.cap="Figure 1A. Impact of FDR correction of p-values on the number of \'significant\' gene sets.",echo=FALSE,fig.height=3,fig.width=3}
 
