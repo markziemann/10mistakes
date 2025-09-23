@@ -271,8 +271,8 @@ fres_nom <- union(fres_dn_nom,fres_up_nom)
 v1 <- list("p"=fres_nom, "FDR"=fres_fdr)
 plot(euler(v1),quantities = list(cex = 2), labels = list(cex = 2))
 
-unlink("img/1a.png")
-png("img/1a.png", width = 480, height = 400)
+unlink("img/1b.png")
+png("img/1b.png", width = 480, height = 400)
 plot(euler(v1),quantities = list(cex = 2), labels = list(cex = 2))
 dev.off()
 par(mfrow=c(1,1))
@@ -313,8 +313,8 @@ lab1 <- paste("Mean=",signif(mean(m1sim[,1]) , 3),sep="")
 lab2 <- paste("Mean=",signif(mean(m1sim[,2]) , 2),sep="")
 text(c(1.2,2.2), c( mean(m1sim[,1])+5, mean(m1sim[,2])+5 ), labels=c(lab1,lab2) )
 
-unlink("img/1b.png")
-png("img/1b.png", width = 480, height = 480)
+unlink("img/1a.png")
+png("img/1a.png", width = 480, height = 480)
 boxplot(m1sim,main="Random gene sets",ylab="no. gene sets meeting \"significance\" threshold <0.05")
 beeswarm(list(mean(m1sim[,1]), mean(m1sim[,2])),add=TRUE,pch=4,cex=2)
 lab1 <- paste("Mean=",signif(mean(m1sim[,1]) , 3),sep="")
@@ -341,6 +341,64 @@ Will try FORA.
 | Gene Selection | DESeq2 FDR<0.05 and log2FC>0 or log2FC<0 |
 | Data availability | via DEE2 at accession SRP038101 (human) |
 | Other parameters | Min gene set size of 5 |
+
+```{r,detectionthreshold}
+
+nrow(x$GeneCounts)
+
+rowmeans <- rowMeans(x$GeneCounts)
+
+length(rowmeans[which(rowmeans>=10)])
+
+length(rowmeans[which(rowmeans<10)])
+
+length(rowmeans[which(rowmeans<10)]) / length(rowmeans)
+
+( 1- sum(rowmeans[which(rowmeans>=10)]) / sum(rowmeans) ) * 100
+
+unfilt <- x$GeneCounts
+
+dds_unfilt <- DESeqDataSetFromMatrix(countData = unfilt , colData = ss, design = ~ trt )
+res_unfilt <- DESeq(dds_unfilt)
+z_unfilt <- results(res_unfilt)
+vsd_unfilt <- vst(dds_unfilt, blind=FALSE)
+zz_unfilt <-cbind(as.data.frame(z_unfilt),unfilt)
+def_unfilt <-as.data.frame(zz_unfilt[order(zz_unfilt$pvalue),])
+
+filt <- unfilt[which(rowMeans(unfilt)>=10),]
+dds_filt <- DESeqDataSetFromMatrix(countData = filt , colData = ss, design = ~ trt )
+res_filt <- DESeq(dds_filt)
+z_filt <- results(res_filt)
+vsd_filt <- vst(dds_filt, blind=FALSE)
+zz_filt <-cbind(as.data.frame(z_filt),filt)
+def_filt <-as.data.frame(zz_filt[order(zz_filt$pvalue),])
+
+nrow(subset(def_unfilt,padj<0.05))
+nrow(subset(def_filt,padj<0.05))
+
+deg_unfilt <- subset(def_unfilt,padj<0.05)
+ns_unfilt <- subset(def_unfilt,padj>0.05)
+
+rowmeans_deg_unfilt <- rowMeans(deg_unfilt[,7:12])
+rowmeans_ns_unfilt <- rowMeans(ns_unfilt[,7:12])
+
+viodata <- list("DEG"=log10(rowmeans_deg_unfilt+0.01),"NS"=log10(rowmeans_ns_unfilt+0.01))
+
+deg_filt <- subset(def_filt,padj<0.05)
+ns_filt <- subset(def_filt,padj>0.05)
+
+rowmeans_deg_filt <- rowMeans(deg_filt[,7:12])
+rowmeans_ns_filt <- rowMeans(ns_filt[,7:12])
+
+
+viodata2 <- list("DEG unfilt"=log10(rowmeans_deg_unfilt+0.01),
+  "NS unfilt"=log10(rowmeans_ns_unfilt+0.01),
+  "DEG filt"=log10(rowmeans_deg_filt+0.01),
+  "NS filt"=log10(rowmeans_ns_filt+0.01))
+
+
+```
+
 
 In this first analysis, we run parallel fora tests, one uses the correct
 background made up of detected genes (bg), while the other one
@@ -381,8 +439,8 @@ v2 <- list("bg"=union(fres_up_bg,fres_dn_bg),
 plot(euler(v2),quantities = list(cex = 2), labels = list(cex = 2))
 
 par(mar=c(1,1,1,1))
-unlink("img/2a.png")
-png("img/2a.png", width = 480, height = 400)
+unlink("img/2c.png")
+png("img/2c.png", width = 480, height = 400)
 plot(euler(v2),quantities = list(cex = 2), labels = list(cex = 2))
 dev.off()
 par(mfrow=c(1,1))
@@ -427,8 +485,8 @@ lab2 <- paste("Mean=",signif(mean(m2sim[,2]) , 2),sep="")
 text(c(1.2,2.2), c( mean(m2sim[,1])+15, mean(m2sim[,2])+15 ), labels=c(lab1,lab2) )
 
 par(mar=c(5.1,4.1,4.1,2.1))
-unlink("img/2b.png")
-png("img/2b.png", width = 480, height = 480)
+unlink("img/2a.png")
+png("img/2a.png", width = 480, height = 480)
 boxplot(m2sim,main="Random gene sets drawn from BG",ylab="no. gene sets FDR<0.05")
 mtext("100 simulations")
 beeswarm(list(mean(m2sim[,1]), mean(m2sim[,2])),add=TRUE,pch=4,cex=2)
@@ -468,8 +526,8 @@ set.seed(42) ; m2selected <- sample(names(which(m2tbl==100)),20)
 text(100,seq(from=40,to=120,by=(120-40)/20),labels=m2selected,cex=0.8,pos=2)
 
 par(mar=c(5.1,4.1,4.1,2.1))
-unlink("img/2c.png")
-png("img/2c.png", width = 480, height = 480)
+unlink("img/2b.png")
+png("img/2b.png", width = 480, height = 480)
 plot(table(m2tbl),type="b",
   xlab="no. appearances as false positive, from 100 simulations",
   ylab="no. gene sets",
@@ -481,6 +539,7 @@ dev.off()
 par(mfrow=c(1,1))
 par(mar=c(5.1,4.1,4.1,2.1))
 
+blah()
 ```
 
 ## Mistake 4 - prioritisation by p-values

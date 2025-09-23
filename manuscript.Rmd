@@ -69,6 +69,10 @@ The purpose of this opinion article is to share what our group has learned about
 the past 15 years having authored dozens of articles using it and critically examining hundreds of
 published articles using the method.
 
+Using an example RNA-seq dataset and simulation analysis, we provide evidence to show just how
+impactful these mistakes are.
+Details of the analysis are provided in the Supplementary Material.
+
 ```{r,setup,echo=FALSE}
 
 #knitr::opts_chunk$set(dev = 'svg')
@@ -107,52 +111,87 @@ After applying FDR adjustment to the results of the random gene sets (**Figure 1
 the mean number of significant hits (FDR adjusted p<0.05) is 0.16, effectively eliminating false
 positives.
 
-In the example dataset, omitting FDR correction would therefore lead to identification of 696
-Reactomes with p<0.05, of which 345 are likely false positives (~49.6%).
+In the example dataset (AML3 cells treated with azacitidine), omitting FDR correction leads to the
+identification of 696 Reactomes with p<0.05, of which 345 are likely false positives (~49.6%)
+(**Figure 1B**).
+Omitting p-value correction could lead to half of the enrichment results being false, which is why it
+is number one on our list.
+Most enrichment analysis packages provide adjusted p-values, so if the tool you're using doesn't, then
+it is time for a change.
 
-```{r,1a,fig.cap="Figure 1A. Impact of FDR correction of p-values on the number of \'significant\' gene sets.",echo=FALSE,fig.height=3,fig.width=3}
-
-mypng = readPNG('img/1a.png')
-grid.raster(mypng, x=0.5, y=0.5, width=1)
-
-```
-
-
-```{r,1b,fig.cap="Figure 1B. FDR control reduces false positives.",echo=FALSE,fig.height=4,fig.width=4}
+```{r,1a,fig.cap="Figure 1A. FDR control reduces false positives.",echo=FALSE,fig.height=4,fig.width=4}
 
 mypng = readPNG('img/1b.png')
 grid.raster(mypng, x=0.5, y=0.5, width=1)
 
 ```
 
-# 2. Not using a background gene list 
+```{r,1b,fig.cap="Figure 1B. Impact of FDR correction of p-values on the number of \'significant\' gene sets.",echo=FALSE,fig.height=3,fig.width=3}
 
-AB
+mypng = readPNG('img/1a.png')
+grid.raster(mypng, x=0.5, y=0.5, width=1)
 
-When there is no background gene list present, the gene list of interest is compared to the entire genome of the organism - this is not a true representation of enrichment analysis. The meaning is lost and incorrect interpretations can be made. For example - for a pathway dysregulation in the brain of an organism, it is incorrect to compare input gene list for the entire body. It should be compared to the tissue of interest. In this case - the brain genome. 
+```
 
+# 2. Not using a custom background gene list 
 
-```{r,2a,fig.cap="Figure 2A. Impact of background list on the number of significant gene sets. Example dataset.",echo=FALSE,fig.height=3,fig.width=3}
+Every omics analysis has its limitations.
+In the world of gene expression, microarrays can only measure genes it has been designed to assay.
+RNA-seq has certain genes that are poorly detected as a result of sequence similarity or GC bias.
+Biological differences also play a big part in what is detected @Timmons2015-yb.
+Out of the 78,691 human genes annotated in GENCODE's latest release, typically only 12-20k are
+expressed at detectable levels in any one tissue.
+In the example dataset based on an earlier Ensembl release (v90) that involves 58,302 annotated genes,
+most are silent.
+For example, 45,134 recorded a mean less than 10 reads per sample across the six samples.
+Only 13,168 genes met this detection threshold.
+Although 77.4% of genes are discarded at this step, they account for a miniscule 0.2% of reads.
+Filtering poorly detected genes gives a slight boost to differential gene identification
+@sha2015effect, but it is most crucial in defining the background gene list for subsequent enrichment
+analysis.
+Those genes are expressed at such low levels that they didn't have a realistic chance of being called
+as differentially expressed.
+
+Using a simulation approach we can demonstrate the consequence of omitting a background on an RNA-seq
+experiment.
+By drawing a random set of 1000 genes from among the ones with expression above 10 reads per sample
+on average in the AML3 example dataset and using an enrichment test (hypergeometric) that uses the
+whole genome annotation as a background we see that on average we should expect 444 gene sets
+reaching the FDR<0.05 significance level (**Figure 2A**).
+Meanwhile, if we use a custom background gene list composed of genes meeting the 10 reads per sample
+threshold, we should expect on average 0.16 genesets with FDR<0.05, practically eliminating false
+positives.
+Many of these false positives are highly reproducible (**Figure 2B**), and as many of them are
+related to relevant cell functions like cell cycle, immune function and signalling, they have the
+potential to mislead readers.
+
+Now coming back to the example dataset, we did ORA with a whole genome background and separately with
+the custom background of detected genes.
+The whole genome background gave a much larger number of significant gene sets (1279) in contrast
+to the custom background analysis (351) (**Figure 2C**).
+The overlap between them was just 347, giving a Jaccard statistic of 0.27.
+In other words, without the right background gene list, up to 72% of results could be false positives.
+
+```{r,2a,fig.cap="Figure 2A. Impact of background list on the number of significant gene sets. 100 simulations.",echo=FALSE,fig.height=4,fig.width=4}
 
 mypng = readPNG('img/2a.png')
 grid.raster(mypng, x=0.5, y=0.5, width=1)
 
 ```
 
-```{r,2b,fig.cap="Figure 2B. Impact of background list on the number of significant gene sets. 100 simulations.",echo=FALSE,fig.height=4,fig.width=4}
+```{r,2b,fig.cap="Figure 2B. Gene sets consistently appearing as false positives include those related to cancer.",echo=FALSE,fig.height=4,fig.width=4}
 
 mypng = readPNG('img/2b.png')
 grid.raster(mypng, x=0.5, y=0.5, width=1)
 
 ```
 
-```{r,2c,fig.cap="Figure 2C. Gene sets consistently appearing as false positives include those related to cancer.",echo=FALSE,fig.height=4,fig.width=4}
+```{r,2c,fig.cap="Figure 2C. Impact of background list on the number of significant gene sets. Example dataset.",echo=FALSE,fig.height=3,fig.width=3}
 
 mypng = readPNG('img/2c.png')
 grid.raster(mypng, x=0.5, y=0.5, width=1)
 
 ```
-
 
 # 3. Using a tool that doesn’t report enrichment scores 
 
@@ -326,7 +365,12 @@ grid.raster(mypng, x=0.5, y=.5, width=1)
 # 10. Not providing detailed methodological info 
 
 AB
-Methods lacking detailed information often lead to problems in reproducibility and validation. Authors should provide the list of tools used, version numbers of tools used, which options were applied for the analysis, which gene list was used, whether background gene list was applied, which statistical tests were done, what tools were used to obtain a certain result. The more descriptive the methodology is, the better for an independent researcher to go through the analysis or use the results for future experiments. 
+Methods lacking detailed information often lead to problems in reproducibility and validation.
+Authors should provide the list of tools used, version numbers of tools used, which options were
+applied for the analysis, which gene list was used, whether background gene list was applied, which
+statistical tests were done, what tools were used to obtain a certain result.
+The more descriptive the methodology is, the better for an independent researcher to go through the
+analysis or use the results for future experiments.
 
 # Conclusion 
 
