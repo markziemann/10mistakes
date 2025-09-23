@@ -390,12 +390,12 @@ ns_filt <- subset(def_filt,padj>0.05)
 rowmeans_deg_filt <- rowMeans(deg_filt[,7:12])
 rowmeans_ns_filt <- rowMeans(ns_filt[,7:12])
 
-
 viodata2 <- list("DEG unfilt"=log10(rowmeans_deg_unfilt+0.01),
   "NS unfilt"=log10(rowmeans_ns_unfilt+0.01),
   "DEG filt"=log10(rowmeans_deg_filt+0.01),
   "NS filt"=log10(rowmeans_ns_filt+0.01))
 
+vioplot(viodata2,ylab="log10 mean expression",las=2,side="left")
 
 ```
 
@@ -539,7 +539,6 @@ dev.off()
 par(mfrow=c(1,1))
 par(mar=c(5.1,4.1,4.1,2.1))
 
-blah()
 ```
 
 ## Mistake 4 - prioritisation by p-values

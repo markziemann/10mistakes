@@ -121,14 +121,14 @@ it is time for a change.
 
 ```{r,1a,fig.cap="Figure 1A. FDR control reduces false positives.",echo=FALSE,fig.height=4,fig.width=4}
 
-mypng = readPNG('img/1b.png')
+mypng = readPNG('img/1a.png')
 grid.raster(mypng, x=0.5, y=0.5, width=1)
 
 ```
 
 ```{r,1b,fig.cap="Figure 1B. Impact of FDR correction of p-values on the number of \'significant\' gene sets.",echo=FALSE,fig.height=3,fig.width=3}
 
-mypng = readPNG('img/1a.png')
+mypng = readPNG('img/1b.png')
 grid.raster(mypng, x=0.5, y=0.5, width=1)
 
 ```
