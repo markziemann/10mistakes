@@ -274,7 +274,7 @@ This isn’t necessarily an error, as it tests the hypothesis that some pathways
 “dysregulated”, a mix of up- and down-regulated genes, that appear at an elevated rate.
 The combined approach can miss a lot of results as compared to the separate approach.
 According to the results of our example analysis the separate approach identified 355
-pathways and the combined approach found only 149, that’s 58% less (see Fig XX).
+pathways and the combined approach found only 149, that’s 58% less (see Fig 4).
 The combined approach could uniquely identify some pathways, but this is relatively few.
 In the example dataset, only 2.2% of results were identified exclusively with the combined
 test.
@@ -291,7 +291,7 @@ they are diluted when combined @Hong2014-yn.
 Based on this, failing to report data of the separate approach could leave you 58% fewer
 results, and an incomplete picture of what's happening at the molecular level.
 
-```{r,6m,fig.cap="Figure 6. Combining up and downregulated genes into one ORA test yields far fewer results.",echo=FALSE,fig.height=3,fig.width=5}
+```{r,6m,fig.cap="Figure 4. Combining up and downregulated genes into one ORA test yields far fewer results.",echo=FALSE,fig.height=3,fig.width=5}
 
 mypng = readPNG('img/6m.png')
 grid.raster(mypng, x=0.5, y=.5, width=1)
@@ -347,30 +347,65 @@ are less likely to change over time and would therefore be preferable over gene 
 The depth of pathway databases increases every year as annotation consortia continue
 assimilating functional information from the literature.
 Sometimes these increases are fairly large, as shown by the chart of Reactome growth below
-(**Figure XX**).
+(**Figure 5**).
 To be certain you have the best possible gene annotation for your analysis, it’s always best
 to download the newest version.
 
-Figure XX. Reactome gene set growth.
-Gene sets were downloaded from the MSigDB website, except The last bar which represents the
-latest gene sets downloaded directly from Reactome, not yet incorporated into MSigDB.
-
-```{r,9m,fig.cap="Figure XX. Reactome gene set growth over time. Gene sets were downloaded from the MSigDB website, except The last bar which represents the latest gene sets downloaded directly from Reactome, not yet incorporated into MSigDB.",echo=FALSE,fig.height=3,fig.width=5}
+```{r,9m,fig.cap="Figure 5. Reactome gene set growth over time. Gene sets were downloaded from the MSigDB website, except The last bar which represents the latest gene sets downloaded directly from Reactome, not yet incorporated into MSigDB.",echo=FALSE,fig.height=3,fig.width=5}
 
 mypng = readPNG('img/9m.png')
 grid.raster(mypng, x=0.5, y=.5, width=1)
 
 ```
 
-# 10. Not providing detailed methodological info 
+# 10. Neglecting methods reproducibility
 
-AB
-Methods lacking detailed information often lead to problems in reproducibility and validation.
-Authors should provide the list of tools used, version numbers of tools used, which options were
-applied for the analysis, which gene list was used, whether background gene list was applied, which
-statistical tests were done, what tools were used to obtain a certain result.
-The more descriptive the methodology is, the better for an independent researcher to go through the
-analysis or use the results for future experiments.
+According to Goodman and colleagues @goodman2016does, methods reproducibility is:
+
+> "the provision of enough detail about study procedures and data so the same procedures
+could, in theory or in actuality, be exactly repeated."
+
+There are several crucial pieces of information required in order to enable reproducibility
+of enrichment analysis including;
+
+* how genes were selected or scored,
+
+* the tool used, and it's version,
+
+* the options or parameters applied,
+
+* the statistical test used,
+
+* the database(s) queries, and their versions,
+
+* for ORA, how a background list was defined, and,
+
+* how p-value correction was done [@Chicco2022-aa;@wijesooriya2021guidelines].
+
+A systematic literature analysis published in 2022 found insufficient background description
+in 95% of articles describing ORA tests, and p-value correction was insufficiently
+described in 57% of articles, suggesting that enrichment analysis generally suffers from a
+lack of methods reproducibility @Wijesooriya2022-we.
+Indeed, this literature analysis turned up some memorably poor methods sections including
+these:
+
+>"GO and KEGG enrichment analysis were performed on the DEGs by perl scripts in house."
+@zhou2019transcriptome.
+
+>"Gene ontology (GO) and pathway analysis were performed in the standard enrichment
+computation method." @liu2019long.
+
+And some cases where FEA wasn't described in the methods at all, despite being important
+enough to mention FEA results in the abstract [@hu2019high; @zhao2019characterization;
+@chen2019usf1].
+
+And cases where the tool mentioned in the methods section doesn't
+actually match what's shown in the results [@li2019spag5;@tong2019combined].
+
+In addition to including the methodological details mentioned above, authors could also
+provide gene profile data and/or gene lists used for enrichment analysis as supplementary
+files, or better still, providing full reproducibility and transparancy with the five
+pillars framework @ziemann2023five.
 
 # Conclusion 
 
