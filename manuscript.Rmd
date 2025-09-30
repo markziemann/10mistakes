@@ -485,7 +485,7 @@ Problems 2, 3, 5 and 6 appear to be specific to ORA-based tools, and can be avoi
 FCS tools like GSEA; this has the added benefit of enhanced accuracy in terms of precision and
 recall [@kaspi2020mitch;@ziemann2024two].
 Although learning and running FCS tools is more difficult and time-consuming, the benefits to the quality of results
-is substantial.
+are substantial.
 
 The deluge of manuscripts in genomics and other fields places increasing burden on a limited pool of competant,
 voluntary peer-reviewers to a point where editors are struggling to maintain the peer-review system as we know it
