@@ -468,7 +468,7 @@ Fourth, tight correlation between genes' expression within a pathway could exace
 Fifth, slight differences in the implementation of ORA tests can impact results in some circumstances
 @ziemann2024two.
 Lastly, some web-based FEA tools lack longevity.
-For example, DAVID 6.8 [@huang2009systematic;@sherman2022david] has been used for over 10,000 publications but has
+For example, DAVID 6.8 [@huang2009systematic;@Sherman2022-kg] has been used for over 10,000 publications but has
 since 2022 been taken offline leaving those articles in an irreproducible state.
 As web-based tools appear to be most popular option for FEA [@xie2021popularity;@Wijesooriya2022-we],
 we should advocate using tools which allow preservation/archiving of the tool as a Docker image (eg: @Ge2020-lr),
