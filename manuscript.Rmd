@@ -346,7 +346,7 @@ edges aren't described @bandi2019hepatic.
 6. FEA mentioned in the abstract but no data shown in the main article
 [@xu2019sirt2; @di2019genome].
 
-7. Confusion around which tool was used for each figure and panel.
+7. Confusion around which tool was used for each figure and panel (eg: @jin2019expression).
 
 # 8. Using shallow gene annotations 
 
