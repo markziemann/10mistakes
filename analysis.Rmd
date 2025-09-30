@@ -520,7 +520,8 @@ m2pw <- table(m2tbl)
 plot(table(m2tbl),type="b",
   xlab="no. appearances as false positive, from 100 simulations",
   ylab="no. gene sets",
-  main="1000 random genes drawn from expressed genes"
+  main="1000 random genes drawn from expressed genes",
+  bty="n"
 )
 set.seed(42) ; m2selected <- sample(names(which(m2tbl==100)),20)
 text(100,seq(from=40,to=120,by=(120-40)/20),labels=m2selected,cex=0.8,pos=2)
@@ -531,7 +532,8 @@ png("img/2b.png", width = 480, height = 480)
 plot(table(m2tbl),type="b",
   xlab="no. appearances as false positive, from 100 simulations",
   ylab="no. gene sets",
-  main="1000 random genes drawn from expressed genes"
+  main="1000 random genes drawn from expressed genes",
+  bty="n"
 )
 set.seed(42) ; m2selected <- sample(names(which(m2tbl==100)),20)
 text(100,seq(from=40,to=120,by=(120-40)/20),labels=m2selected,cex=0.8,pos=2)
