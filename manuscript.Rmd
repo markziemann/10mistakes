@@ -306,7 +306,64 @@ grid.raster(mypng, x=0.5, y=.5, width=1)
 
 ```
 
-# 7. Bad presentation
+# 7. Using shallow gene annotations 
+
+One of the most important decisions you’ll make when doing a pathway enrichment analysis is
+selecting the database to query.
+There are many options to consider, both proprietary and open source.
+When choosing, consider whether the database contains the gene sets that you a priori
+suspect will be altered in the profile you’re looking at.
+Secondly consider the breadth and depth of the pathway library, this will be where the
+unexpected discoveries may occur, and it pays to use a comprehensive one to capture as many
+aspects of your data as possible.
+To demonstrate this, see how KEGG legacy and KEGG Medicus seem tiny when compared to Reactome,
+which is itself dwarfed by Gene Ontology’s Biological Process (GOBP; Table 3).
+Consequently, the results obtained are substantially richer for Reactome and GOBP as compared
+to KEGG libraries.
+
+```{r,m8tbl,echo=FALSE}
+
+m8 <- readRDS("m8tbl.Rds")
+m8 |>
+  kbl(caption="Table 3. Size metrics of selected gene set libraries, and the number of differentially regulated pathways (FDR<0.05).") |>
+  kable_paper("hover", full_width = F)
+
+```
+
+# 8. Using outdated gene identifiers and gene sets 
+
+One great thing about working with omics data is that databases like GEO are loaded with old
+data sets that we can reanalyse with new pathway databases and software tools to eke out
+further insights.
+When the data is several years old, we should use the processed data with caution, as many
+gene names may have since changes.
+For example, Illumina’s EPIC DNA Methylation microarray was released in 2016, and in the
+following eight years, 3,253 of 22,588 gene names on the chip have changed (14.4%)
+@Ziemann2024-be, meaning that those genes wouldn’t be recognised by the pathway
+enrichment software.
+To update defunct gene symbols, the HGNChelper R package can help @Oh2020-ku, and it
+has the benefit of fixing gene symbols ruined by Excel autocorrect, which are unfortunately
+common in GEO @Ziemann2016-hp.
+Persistent gene identifiers like Ensembl (eg: ENSG00000180096) and HGNC (eg: HGNC:2879)
+are less likely to change over time and would therefore be preferable over gene symbols
+(eg: SEPTIN1) for FEA.
+
+The depth of pathway databases increases every year as annotation consortia continue
+assimilating functional information from the literature, and this impacts the
+quality of results and the conclusions that can be derived @wadi2016impact.
+Sometimes these databases undergo large updates, as shown by the chart of Reactome growth below
+(**Figure 6**).
+To be certain you have the best possible gene annotation for your analysis, it’s always best
+to download the newest version.
+
+```{r,9m,fig.cap="Figure 6. Reactome gene set growth over time. Gene sets were downloaded from the MSigDB website, except The last bar which represents the latest gene sets downloaded directly from Reactome, not yet incorporated into MSigDB.",echo=FALSE,fig.height=3,fig.width=5}
+
+mypng = readPNG('img/9m.png')
+grid.raster(mypng, x=0.5, y=.5, width=1)
+
+```
+
+# 9. Bad presentation
 
 When discussing FEA with colleagues, it is often said that the method is used to generate
 "filler"; data and charts used to "pad out" articles that would otherwise be too short or
@@ -348,63 +405,6 @@ edges aren't described @bandi2019hepatic.
 
 7. Confusion around which tool was used for each figure and panel (eg: @jin2019expression).
 
-# 8. Using shallow gene annotations 
-
-One of the most important decisions you’ll make when doing a pathway enrichment analysis is
-selecting the database to query.
-There are many options to consider, both proprietary and open source.
-When choosing, consider whether the database contains the gene sets that you a priori
-suspect will be altered in the profile you’re looking at.
-Secondly consider the breadth and depth of the pathway library, this will be where the
-unexpected discoveries may occur, and it pays to use a comprehensive one to capture as many
-aspects of your data as possible.
-To demonstrate this, see how KEGG legacy and KEGG Medicus seem tiny when compared to Reactome,
-which is itself dwarfed by Gene Ontology’s Biological Process (GOBP; Table 3).
-Consequently, the results obtained are substantially richer for Reactome and GOBP as compared
-to KEGG libraries.
-
-```{r,m8tbl,echo=FALSE}
-
-m8 <- readRDS("m8tbl.Rds")
-m8 |>
-  kbl(caption="Table 3. Size metrics of selected gene set libraries, and the number of differentially regulated pathways (FDR<0.05).") |>
-  kable_paper("hover", full_width = F)
-
-```
-
-# 9. Using outdated gene identifiers and gene sets 
-
-One great thing about working with omics data is that databases like GEO are loaded with old
-data sets that we can reanalyse with new pathway databases and software tools to eke out
-further insights.
-When the data is several years old, we should use the processed data with caution, as many
-gene names may have since changes.
-For example, Illumina’s EPIC DNA Methylation microarray was released in 2016, and in the
-following eight years, 3,253 of 22,588 gene names on the chip have changed (14.4%)
-@Ziemann2024-be, meaning that those genes wouldn’t be recognised by the pathway
-enrichment software.
-To update defunct gene symbols, the HGNChelper R package can help @Oh2020-ku, and it
-has the benefit of fixing gene symbols ruined by Excel autocorrect, which are unfortunately
-common in GEO @Ziemann2016-hp.
-Persistent gene identifiers like Ensembl (eg: ENSG00000180096) and HGNC (eg: HGNC:2879)
-are less likely to change over time and would therefore be preferable over gene symbols
-(eg: SEPTIN1) for FEA.
-
-The depth of pathway databases increases every year as annotation consortia continue
-assimilating functional information from the literature, and this impacts the
-quality of results and the conclusions that can be derived @wadi2016impact.
-Sometimes these databases undergo large updates, as shown by the chart of Reactome growth below
-(**Figure 6**).
-To be certain you have the best possible gene annotation for your analysis, it’s always best
-to download the newest version.
-
-```{r,9m,fig.cap="Figure 6. Reactome gene set growth over time. Gene sets were downloaded from the MSigDB website, except The last bar which represents the latest gene sets downloaded directly from Reactome, not yet incorporated into MSigDB.",echo=FALSE,fig.height=3,fig.width=5}
-
-mypng = readPNG('img/9m.png')
-grid.raster(mypng, x=0.5, y=.5, width=1)
-
-```
-
 # 10. Neglecting methods reproducibility
 
 According to Goodman and colleagues @goodman2016does, methods reproducibility is:
@@ -442,11 +442,10 @@ including:
 >"Gene ontology (GO) and pathway analysis were performed in the standard enrichment
 computation method." @liu2019long.
 
-And some cases where FEA wasn't described in the methods at all, despite being important
+We've also noted some cases where FEA wasn't described in the methods at all, despite being important
 enough to mention said results in the abstract [@hu2019high; @zhao2019characterization;
 @chen2019usf1].
-
-And cases where the tool mentioned in the methods section doesn't
+Moreover, we've identified cases where the tool mentioned in the methods section doesn't
 actually match what's shown in the results [@li2019spag5;@tong2019combined].
 
 In addition to including the methodological details mentioned above, authors could also
@@ -486,7 +485,6 @@ FCS tools like GSEA; this has the added benefit of enhanced accuracy in terms of
 recall [@kaspi2020mitch;@ziemann2024two].
 Although learning and running FCS tools is more difficult and time-consuming, the benefits to the quality of results
 are substantial.
-
 The deluge of manuscripts in genomics and other fields places increasing burden on a limited pool of competant,
 voluntary peer-reviewers to a point where editors are struggling to maintain the peer-review system as we know it
 @adam2025peer.
@@ -494,4 +492,3 @@ As studies become ever more multi-disciplinary, this makes it more difficult for
 aspects thoroughly, causing mistakes like the above to become widespread.
 
 # Bibliography
-
