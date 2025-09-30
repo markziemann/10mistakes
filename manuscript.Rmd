@@ -222,11 +222,6 @@ prioritise pathways that are very large but where each gene is only slightly dys
 To demonstrate this, see the results from a typical pathway enrichment analysis result with
 p-value prioritisation and with enrichment score prioritisation after removal of
 non-significant pathways **(Table 1 and Table 2)**.
-P-value prioritisation emphasises generic functions with really large gene sets, while
-enrichment score prioritisation highlights much smaller gene sets with highly specific
-functions, where each member gene is showing a relatively bigger change in expression.
-These more specific gene sets are in general better candidates for downstream validation due
-to their explanatory power.
 
 ```{r,m4tbl,echo=FALSE}
 
@@ -242,6 +237,19 @@ m4[[1]] |>
 
 ```
 
+P-value prioritisation emphasises generic functions with really large gene sets, while
+enrichment score prioritisation highlights much smaller gene sets with highly specific
+functions, where each member gene is showing a relatively bigger change in expression (**Figure 3**).
+These more specific gene sets are in general better candidates for downstream validation due
+to their explanatory power.
+
+```{r,m4fig,fig.cap="Figure 3. Scatterplot showing absolute enrichment scores (x-axis) and log-transformed significance values (y-axis). Gene sets with FDR<0.05 are highlighted in red.",echo=FALSE,fig.height=5,fig.width=5}
+
+mypng = readPNG('img/3a.png')
+grid.raster(mypng, x=0.5, y=.5, width=1)
+
+```
+
 # 5. Using gene lists that are too large or too small for ORA 
 
 It’s a common misconception that only differentially expressed genes that meet the FDR
@@ -251,7 +259,7 @@ genes in any arbitrary way your like.
 The caveat here is that enrichment tests (like hypergeometric method) have size ranges of
 input gene lists that work best.
 We tested different input gene list sizes in ORA and found that 2500 yielded the most (456
-with FDR<0.0), while sizes 200 and less yielded very few significant pathways (**Figure 3**).
+with FDR<0.0), while sizes 200 and less yielded very few significant pathways (**Figure 4**).
 In the range of 300-1000, there’s a steep increase in the number of significant pathways, and
 after that the gradient reduces.
 This suggests a sweet spot around 1000, which in our example is 7.6% of the 13,168 genes
@@ -259,7 +267,7 @@ detected.
 If you want to avoid making arbitrary thresholds (which seem to annoy reviewers) then we’d
 suggest using a method like GSEA instead that calculates enrichment from all detected genes.
 
-```{r,5m,fig.cap="Figure 3. Effect of gene list size on number of significant pathways. Up-regulated in red, down-regulated in blue.",echo=FALSE,fig.height=4.5,fig.width=7}
+```{r,5m,fig.cap="Figure 4. Effect of gene list size on number of significant pathways. Up-regulated in red, down-regulated in blue.",echo=FALSE,fig.height=4.5,fig.width=7}
 
 mypng = readPNG('img/5m.png')
 grid.raster(mypng, x=0.5, y=.5, width=1)
@@ -274,7 +282,7 @@ This isn’t necessarily an error, as it tests the hypothesis that some pathways
 “dysregulated”, a mix of up- and down-regulated genes, that appear at an elevated rate.
 The combined approach can miss a lot of results as compared to the separate approach.
 According to the results of our example analysis the separate approach identified 355
-pathways and the combined approach found only 149, that’s 58% less (see Fig 4).
+pathways and the combined approach found only 149, that’s 58% less (see **Figure 5**).
 The combined approach could uniquely identify some pathways, but this is relatively few.
 In the example dataset, only 2.2% of results were identified exclusively with the combined
 test.
@@ -291,7 +299,7 @@ they are diluted when combined @Hong2014-yn.
 Based on this, failing to report data of the separate approach could leave you 58% fewer
 results, and an incomplete picture of what's happening at the molecular level.
 
-```{r,6m,fig.cap="Figure 4. Combining up and downregulated genes into one ORA test yields far fewer results.",echo=FALSE,fig.height=3,fig.width=5}
+```{r,6m,fig.cap="Figure 5. Combining up and downregulated genes into one ORA test yields far fewer results.",echo=FALSE,fig.height=3,fig.width=5}
 
 mypng = readPNG('img/6m.png')
 grid.raster(mypng, x=0.5, y=.5, width=1)
@@ -338,6 +346,8 @@ edges aren't described @bandi2019hepatic.
 6. FEA mentioned in the abstract but no data shown in the main article
 [@xu2019sirt2; @di2019genome].
 
+7. Confusion around which tool was used for each figure and panel.
+
 # 8. Using shallow gene annotations 
 
 One of the most important decisions you’ll make when doing a pathway enrichment analysis is
@@ -370,7 +380,7 @@ further insights.
 When the data is several years old, we should use the processed data with caution, as many
 gene names may have since changes.
 For example, Illumina’s EPIC DNA Methylation microarray was released in 2016, and in the
-following eight years, 3,253 of 22,588 gene names have changed (14.4%)
+following eight years, 3,253 of 22,588 gene names on the chip have changed (14.4%)
 @Ziemann2024-be, meaning that those genes wouldn’t be recognised by the pathway
 enrichment software.
 To update defunct gene symbols, the HGNChelper R package can help @Oh2020-ku, and it
@@ -381,13 +391,14 @@ are less likely to change over time and would therefore be preferable over gene 
 (eg: SEPTIN1) for FEA.
 
 The depth of pathway databases increases every year as annotation consortia continue
-assimilating functional information from the literature.
-Sometimes these increases are fairly large, as shown by the chart of Reactome growth below
-(**Figure 5**).
+assimilating functional information from the literature, and this impacts the
+quality of results and the conclusions that can be derived @wadi2016impact.
+Sometimes these databases undergo large updates, as shown by the chart of Reactome growth below
+(**Figure 6**).
 To be certain you have the best possible gene annotation for your analysis, it’s always best
 to download the newest version.
 
-```{r,9m,fig.cap="Figure 5. Reactome gene set growth over time. Gene sets were downloaded from the MSigDB website, except The last bar which represents the latest gene sets downloaded directly from Reactome, not yet incorporated into MSigDB.",echo=FALSE,fig.height=3,fig.width=5}
+```{r,9m,fig.cap="Figure 6. Reactome gene set growth over time. Gene sets were downloaded from the MSigDB website, except The last bar which represents the latest gene sets downloaded directly from Reactome, not yet incorporated into MSigDB.",echo=FALSE,fig.height=3,fig.width=5}
 
 mypng = readPNG('img/9m.png')
 grid.raster(mypng, x=0.5, y=.5, width=1)
@@ -445,43 +456,42 @@ pillars framework @ziemann2023five.
 
 # Conclusion 
 
-More subtle issues:
+There are several more subtle issues not covered in depth here but are worth mentioning because they
+have been flagged as potential problems.
+First, the length of genes is known to impact the ease at which they are detected and so correction of
+gene length has been suggested to improve enrichment results [@mi2012length;@mandelboum2019recurrent].
+Second, many FEA tests use genes as the sampling unit and do not take into consideration or model biological
+variation which could yield inrealistic significance values @goeman2007analyzing.
+Third, the size of gene sets, even though they represent similar biology, can disproportionately impact significance
+scores and complicate interpretation [@karp2021pathway;@mubeen2022influence].
+Fourth, tight correlation between genes' expression within a pathway could exacerbate false positive rates
+[@gatti2010heading; @wu2012camera].
+Fifth, slight differences in the implementation of ORA tests can impact results in some circumstances
+@ziemann2024two.
+Lastly, some web-based FEA tools lack longevity.
+For example, DAVID 6.8 [@huang2009systematic;@sherman2022david] has been used for over 10,000 publications but has
+since 2022 been taken offline leaving those articles in an irreproducible state.
+As web-based tools appear to be most popular option for FEA [@xie2021popularity;@Wijesooriya2022-we],
+we should advocate using tools which allow preservation/archiving of the tool as a Docker image (eg: @Ge2020-lr),
+which could enable reproducibility into the future @perkel2020challenge.
 
-* Karp, P.D., Midford, P.E., Caspi, R. et al. Pathway size matters: the influence of pathway
-granularity on over-representation (enrichment analysis) statistics.
-BMC Genomics 22, 191 (2021). https://doi.org/10.1186/s12864-021-07502-8
+So why are problems so pervasive in enrichment analysis?
+It's likely a combination of poor researcher training, supervision and peer-review scrutiny.
+The design of tools and (poor) quality of tool documentation might also play a role.
+We also know that poor methods have a type of advantage compared to the more rigorous ones
+due to researcher preferences to present significant findings @smaldino2016natural and reliance upon default settings
+even if they are incorrect [@mubeen2022influence;@Wijesooriya2022-we].
+Problems 2, 3, 5 and 6 appear to be specific to ORA-based tools, and can be avoided entirely by switching to
+FCS tools like GSEA; this has the added benefit of enhanced accuracy in terms of precision and
+recall [@kaspi2020mitch;@ziemann2024two].
+Although learning and running FCS tools is more difficult and time-consuming, the benefits to the quality of results
+is substantial.
 
-* Length Bias Correction in Gene Ontology Enrichment Analysis Using Logistic Regression
-Gu Mi ,Yanming Di,Sarah Emerson,Jason S. Cumbie,Jeff H. Chang
-Published: October 2, 2012
-https://doi.org/10.1371/journal.pone.0046128
-
-* Analyzing gene expression data in terms of gene sets: methodological issues
-Jelle J Goeman 1, Peter Bühlmann
-PMID: 17303618 DOI: 10.1093/bioinformatics/btm051
-
-* PLoS Biol. 2019 Nov 12;17(11):e3000481. doi: 10.1371/journal.pbio.3000481
-Recurrent functional misinterpretation of RNA-seq data caused by sample-specific gene length bias
-Shir Mandelboum 1,2, Zohar Manber 3, Orna Elroy-Stein 1,2,*, Ran Elkon 2,3,
-
-* On the influence of several factors on pathway enrichment analysis
-Briefings in Bioinformatics, Volume 23, Issue 3, May 2022, bbac143,
-Sarah Mubeen, Alpha Tom Kodamullil, Martin Hofmann-Apitius, Daniel Domingo-Fernández
-
-The natural selection of bad science
-Paul E. Smaldino and Richard McElreath
-Published:01 September 2016 https://doi.org/10.1098/rsos.160384
-
-10 year challenge.
-
-
-## Other notes 
-
-* It’s official. ORA is not as sensitive as FCS
-
-* Showing too many results
-
-* Not distinguishing results from multiple tools
+The deluge of manuscripts in genomics and other fields places increasing burden on a limited pool of competant,
+voluntary peer-reviewers to a point where editors are struggling to maintain the peer-review system as we know it
+@adam2025peer.
+As studies become ever more multi-disciplinary, this makes it more difficult for editors to cover all the technical
+aspects thoroughly, causing mistakes like the above to become widespread.
 
 # Bibliography
 

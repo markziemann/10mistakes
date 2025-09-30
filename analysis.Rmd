@@ -32,6 +32,7 @@ suppressPackageStartupMessages({
   library("RhpcBLASctl")
   library("parallel")
   library("beeswarm")
+  library("vioplot")
 })
 
 RhpcBLASctl::blas_set_num_threads(1)
@@ -307,7 +308,7 @@ m1sim <- mclapply(seeds, function(seed) {
 m1sim <- do.call(rbind,m1sim)
 colnames(m1sim) <- c("p","FDR")
 
-boxplot(m1sim,main="Random gene sets",ylab="no. gene sets meeting \"significance\" threshold <0.05")
+boxplot(m1sim,main="Random gene sets",ylab="no. gene sets meeting \"significance\" threshold <0.05",frame=FALSE)
 beeswarm(list(mean(m1sim[,1]), mean(m1sim[,2])),add=TRUE,pch=4,cex=2)
 lab1 <- paste("Mean=",signif(mean(m1sim[,1]) , 3),sep="")
 lab2 <- paste("Mean=",signif(mean(m1sim[,2]) , 2),sep="")
@@ -315,7 +316,7 @@ text(c(1.2,2.2), c( mean(m1sim[,1])+5, mean(m1sim[,2])+5 ), labels=c(lab1,lab2) 
 
 unlink("img/1a.png")
 png("img/1a.png", width = 480, height = 480)
-boxplot(m1sim,main="Random gene sets",ylab="no. gene sets meeting \"significance\" threshold <0.05")
+boxplot(m1sim,main="Random gene sets",ylab="no. gene sets meeting \"significance\" threshold <0.05",frame=FALSE)
 beeswarm(list(mean(m1sim[,1]), mean(m1sim[,2])),add=TRUE,pch=4,cex=2)
 lab1 <- paste("Mean=",signif(mean(m1sim[,1]) , 3),sep="")
 lab2 <- paste("Mean=",signif(mean(m1sim[,2]) , 2),sep="")
@@ -399,7 +400,6 @@ vioplot(viodata2,ylab="log10 mean expression",las=2,side="left")
 
 ```
 
-
 In this first analysis, we run parallel fora tests, one uses the correct
 background made up of detected genes (bg), while the other one
 uses all genes in the genome (marked with *).
@@ -477,7 +477,7 @@ colnames(m2sim) <- c("Whole genome background","Correct background")
 
 par(mar=c(5.1,4.1,4.1,2.1))
 
-boxplot(m2sim,main="Random gene sets drawn from BG",ylab="no. gene sets FDR<0.05")
+boxplot(m2sim,main="Random gene sets drawn from BG",ylab="no. gene sets FDR<0.05",frame=FALSE)
 mtext("100 simulations")
 beeswarm(list(mean(m2sim[,1]), mean(m2sim[,2])),add=TRUE,pch=4,cex=2)
 lab1 <- paste("Mean=",signif(mean(m2sim[,1]) , 3),sep="")
@@ -487,7 +487,7 @@ text(c(1.2,2.2), c( mean(m2sim[,1])+15, mean(m2sim[,2])+15 ), labels=c(lab1,lab2
 par(mar=c(5.1,4.1,4.1,2.1))
 unlink("img/2a.png")
 png("img/2a.png", width = 480, height = 480)
-boxplot(m2sim,main="Random gene sets drawn from BG",ylab="no. gene sets FDR<0.05")
+boxplot(m2sim,main="Random gene sets drawn from BG",ylab="no. gene sets FDR<0.05",frame=FALSE)
 mtext("100 simulations")
 beeswarm(list(mean(m2sim[,1]), mean(m2sim[,2])),add=TRUE,pch=4,cex=2)
 lab1 <- paste("Mean=",signif(mean(m2sim[,1]) , 3),sep="")
@@ -541,7 +541,7 @@ par(mar=c(5.1,4.1,4.1,2.1))
 
 ```
 
-## Mistake 4 - prioritisation by p-values
+## Mistake 3 and 4 - not reporting enrichment scores and prioritisation only by p-values
 
 | Reporting criteria | Method/resource used |
 | --- | --- |
@@ -561,6 +561,38 @@ rownames(def2) <- sapply(strsplit(rownames(def)," "),'[[',1)
 
 m <- mitch_import(x=def2,DEtype="deseq2",geneTable=gtnew)
 mres <- mitch_calc(x=m,genesets=gsets,minsetsize=5,cores=4,priority="significance")
+
+mresdf <- mres$enrichment_result
+
+sig <- subset(mresdf,p.adjustANOVA<0.05)
+
+plot(abs(mresdf$s.dist),-log10(mresdf$pANOVA),
+  main="enrichment scores versus significance",
+  bty="n",pch=19,cex=1,col="darkgray",
+  xlab="absolute enrichment score",
+  ylab="-log10(p-value)",
+  xlim=c(0,0.95))
+points(abs(sig$s.dist),-log10(sig$pANOVA),
+  pch=19,cex=1,col="red")
+points(c(0.35,0.8),c(42,8),cex=18,pch=0)
+text(c(0.35,0.8),c(42,8),c("generic, boring","specific,\ninteresting"))
+
+par(mar=c(5.1,4.1,4.1,2.1))
+unlink("img/3a.png")
+png("img/3a.png", width = 480, height = 480)
+plot(abs(mresdf$s.dist),-log10(mresdf$pANOVA),
+  main="enrichment scores versus significance",
+  bty="n",pch=19,cex=1,col="darkgray",
+  xlab="absolute enrichment score",
+  ylab="-log10(p-value)",
+  xlim=c(0,0.95))
+points(abs(sig$s.dist),-log10(sig$pANOVA),
+  pch=19,cex=1,col="red")
+points(c(0.35,0.8),c(41,8),cex=18,pch=0)
+text(c(0.35,0.8),c(41,8),c("generic, boring","specific,\ninteresting"))
+dev.off()
+par(mfrow=c(1,1))
+par(mar=c(5.1,4.1,4.1,2.1))
 
 mres_sig_up <- head(subset(mres$enrichment_result,s.dist>0),10)
 mres_sig_dn <- head(subset(mres$enrichment_result,s.dist<0),10)
@@ -606,7 +638,7 @@ mres2 <- mres$enrichment_result
 sig <- subset(mres2,p.adjustANOVA<0.05)
 plot(abs(mres2$s.dist),-log10(mres2$pANOVA),pch=19,cex=0.6,frame.plot=FALSE,
   xlab="enrichment score (absolute)", ylab="significance [-log10(p-value)]",
-  xlim=c(0,0.9),ylim=c(0,50))
+  xlim=c(0,0.9),ylim=c(0,50), bty="n")
 points(abs(sig$s.dist),-log10(sig$pANOVA),pch=19,cex=0.61,col="red")
 
 par(mar=c(5.1,4.1,4.1,2.1))
@@ -614,7 +646,7 @@ unlink("img/4a.png")
 png("img/4a.png", width = 480, height = 480)
 plot(abs(mres2$s.dist),-log10(mres2$pANOVA),pch=19,cex=0.6,frame.plot=FALSE,
   xlab="enrichment score (absolute)", ylab="significance [-log10(p-value)]",
-  xlim=c(0,0.9),ylim=c(0,50))
+  xlim=c(0,0.9),ylim=c(0,50), bty="n")
 points(abs(sig$s.dist),-log10(sig$pANOVA),pch=19,cex=0.61,col="red")
 dev.off()
 par(mfrow=c(1,1))
@@ -717,28 +749,28 @@ df <- data.frame("up"=nups,"dn"=ndns,row.names=sizes)
 df$tot <- df$up + df$dn
 df
 
-plot(sizes,df$up,type="b",col="red",ylab="no. gene sets with FDR<0.05",xlab="gene list length")
+plot(sizes,df$up,type="b",col="red",ylab="no. gene sets with FDR<0.05",xlab="gene list length",bty="n")
 lines(sizes,df$dn,type="b",col="blue")
 
 plot(sizes,df$up,type="b",col="red",ylab="no. gene sets with FDR<0.05",xlab="gene list length",
-  xlim=c(0,500), ylim=c(0,125))
+  xlim=c(0,500), ylim=c(0,125),bty="n")
 lines(sizes,df$dn,type="b",col="blue")
 
 par(mfrow=c(1,2))
-plot(sizes,df$up,type="b",col="red",ylab="no. gene sets with FDR<0.05",xlab="gene list length")
+plot(sizes,df$up,type="b",col="red",ylab="no. gene sets with FDR<0.05",xlab="gene list length",bty="n")
 lines(sizes,df$dn,type="b",col="blue")
 
 plot(sizes,df$up,type="b",col="red",ylab="no. gene sets with FDR<0.05",xlab="gene list length",
-  xlim=c(0,500), ylim=c(0,125))
+  xlim=c(0,500), ylim=c(0,125),bty="n")
 lines(sizes,df$dn,type="b",col="blue")
 
 unlink("img/5m.png")
 png("img/5m.png", width = 700, height = 480)
 par(mfrow=c(1,2))
-plot(sizes,df$up,type="b",col="red",ylab="no. gene sets with FDR<0.05",xlab="gene list length")
+plot(sizes,df$up,type="b",col="red",ylab="no. gene sets with FDR<0.05",xlab="gene list length",bty="n")
 lines(sizes,df$dn,type="b",col="blue")
 plot(sizes,df$up,type="b",col="red",ylab="no. gene sets with FDR<0.05",xlab="gene list length",
-  xlim=c(0,500), ylim=c(0,125))
+  xlim=c(0,500), ylim=c(0,125),bty="n")
 lines(sizes,df$dn,type="b",col="blue")
 dev.off()
 par(mfrow=c(1,1))
