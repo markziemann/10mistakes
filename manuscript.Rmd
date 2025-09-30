@@ -298,9 +298,45 @@ grid.raster(mypng, x=0.5, y=.5, width=1)
 
 ```
 
-# 7. Bad visualisation 
+# 7. Bad presentation
 
-AB
+When discussing FEA with colleagues, it is often said that the method is used to generate
+"filler"; data and charts used to "pad out" articles that would otherwise be too short or
+lack the normal number of figures.
+For FEA, a general rule of thumb is to only show the charts and data that are relevant to
+assessing aims and hypotheses, and contribute to the conclusions.
+While others have recommended using multiple PEA tools @Chicco2022-aa, we'd suggest limiting
+the amount of data shown in an article to just one FEA method and one or two gene set
+databases (eg: Reactome, transcription factor target genes).
+Excessive use of tools and databases can make the results difficult to interpret, as in
+@lin2019indoxyl.
+
+We've also noticed cases of outright confusing, incomplete and simply wrong data
+presentatation choices that you should avoid:
+
+1. The number of selected genes in category is often shown as evidence of enrichment,
+[@zhao2019itraq; @li2019candidate;@sariman2019investigation;@bhatia2019long],
+but this can be misleading because this is one of four numbers that goes into calculating
+a fold enrichment score.
+
+2. Similarly, the proportion of selected genes that belong to a gene category is sometimes
+shown [@wang2019osteoporosatlas;@wang2019comparison;@hu2019itraq;@koh2019baicalein],
+but this does not directly reflect the fold enrichment score.
+
+3. Presenting enrichment results as a pie chart
+[@liu20196;@li2019candidate;@hu2019itraq;@lin2019indoxyl]
+isn't recommended because it isn't possible to show enrichment scores and significance
+values in this form.
+
+4. Sometimes a network of genes or pathways are shown, but the significance of nodes and
+edges aren't described @bandi2019hepatic.
+
+5. Figures missing key elements such as axis labels
+[@boyko2019reference;@lou2019high;@shi2019physiological;@li2019identification;
+@li2019candidate].
+
+6. FEA mentioned in the abstract but no data shown in the main article
+[@xu2019sirt2; @di2019genome].
 
 # 8. Using shallow gene annotations 
 
@@ -386,8 +422,8 @@ A systematic literature analysis published in 2022 found insufficient background
 in 95% of articles describing ORA tests, and p-value correction was insufficiently
 described in 57% of articles, suggesting that enrichment analysis generally suffers from a
 lack of methods reproducibility @Wijesooriya2022-we.
-Indeed, this literature analysis turned up some memorably poor methods sections including
-these:
+Indeed, this literature analysis turned up some memorably poor methodological descrioptions
+including:
 
 >"GO and KEGG enrichment analysis were performed on the DEGs by perl scripts in house."
 @zhou2019transcriptome.
@@ -396,7 +432,7 @@ these:
 computation method." @liu2019long.
 
 And some cases where FEA wasn't described in the methods at all, despite being important
-enough to mention FEA results in the abstract [@hu2019high; @zhao2019characterization;
+enough to mention said results in the abstract [@hu2019high; @zhao2019characterization;
 @chen2019usf1].
 
 And cases where the tool mentioned in the methods section doesn't
@@ -411,7 +447,9 @@ pillars framework @ziemann2023five.
 
 More subtle issues:
 
-* Karp, P.D., Midford, P.E., Caspi, R. et al. Pathway size matters: the influence of pathway granularity on over-representation (enrichment analysis) statistics. BMC Genomics 22, 191 (2021). https://doi.org/10.1186/s12864-021-07502-8
+* Karp, P.D., Midford, P.E., Caspi, R. et al. Pathway size matters: the influence of pathway
+granularity on over-representation (enrichment analysis) statistics.
+BMC Genomics 22, 191 (2021). https://doi.org/10.1186/s12864-021-07502-8
 
 * Length Bias Correction in Gene Ontology Enrichment Analysis Using Logistic Regression
 Gu Mi ,Yanming Di,Sarah Emerson,Jason S. Cumbie,Jeff H. Chang
@@ -420,7 +458,6 @@ https://doi.org/10.1371/journal.pone.0046128
 
 * Analyzing gene expression data in terms of gene sets: methodological issues
 Jelle J Goeman 1, Peter B√ºhlmann
-Affiliations Expand
 PMID: 17303618 DOI: 10.1093/bioinformatics/btm051
 
 * PLoS Biol. 2019 Nov 12;17(11):e3000481. doi: 10.1371/journal.pbio.3000481
@@ -434,6 +471,9 @@ Sarah Mubeen, Alpha Tom Kodamullil, Martin Hofmann-Apitius, Daniel Domingo-Fern√
 The natural selection of bad science
 Paul E. Smaldino and Richard McElreath
 Published:01 September 2016 https://doi.org/10.1098/rsos.160384
+
+10 year challenge.
+
 
 ## Other notes 
 
