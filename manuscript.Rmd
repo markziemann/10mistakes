@@ -13,7 +13,7 @@ bibliography: 10mistakes.bib
 csl: f1000research.csl
 ---
 
-<strong>Anusuiya Bora<sup>1,2</sup> & Mark Ziemann<sup>1,2</sup></strong>
+<strong>Anusuiya Bora<sup>1,2</sup> & Mark Ziemann<sup>1,2*</sup></strong>
 
 1. Deakin University, School of Life and Environmental Sciences, Geelong, Australia.
 
@@ -23,8 +23,8 @@ csl: f1000research.csl
 
 | Author | ORCID |
 | --- | --- |
-| Mark Ziemann | 0000-0002-7688-6974 |
 | Anusuiya Bora | 0009-0006-2908-1352 |
+| Mark Ziemann | 0000-0002-7688-6974 |
 
 Target journal: F1000 Research
 
@@ -44,7 +44,7 @@ We provide practical advice on their mitigation.
 
 # Background
 
-PubMed searches indicate keywords like "Pathway analysis" and "Enrichment analysis" appear in title
+PubMed searches indicate keywords like "pathway analysis" and "enrichment analysis" appear in title
 or abstracts of approximately 10,000 articles per year, and that the number of articles matching these
 keywords has increased by a factor of 5.4 between 2014 and 2024.
 The purpose of FEA is to understand whether gene categories are collectively
@@ -186,7 +186,7 @@ grid.raster(mypng, x=0.5, y=0.5, width=1)
 
 ```
 
-```{r,2c,fig.cap="Figure 2C. Impact of background list on the number of significant gene sets. Example dataset.",echo=FALSE,fig.height=3,fig.width=3}
+```{r,2c,fig.cap="Figure 2C. Impact of background list on the number of significant gene sets. Example dataset. The correct background based on the implementation of detection threshold is labelled 'bg', while the incorrect whole genome background is lebelled 'bg*'.",echo=FALSE,fig.height=3,fig.width=3}
 
 mypng = readPNG('img/2c.png')
 grid.raster(mypng, x=0.5, y=0.5, width=1)
@@ -220,18 +220,26 @@ confusing to interpret.
 Many tools by default will sort the results by significance, but this can lead you to
 prioritise pathways that are very large but where each gene is only slightly dysregulated.
 To demonstrate this, see the results from a typical pathway enrichment analysis result with
-p-value prioritisation and with enrichment score prioritisation after removal of
+p-value prioritisation and with enrichment score (ES) prioritisation after removal of
 non-significant pathways **(Table 1 and Table 2)**.
 
 ```{r,m4tbl,echo=FALSE}
 
 m4 <- readRDS("m4tbls.Rds")
 
-m4[[3]] |>
+mytbl <- m4[[3]]
+mytbl <- mytbl[,c(1,2,3,5,4)]
+colnames(mytbl) <- c("Gene set","Set Size","p-value","FDR","ES")
+
+mytbl |>
   kbl(caption="Table 1. Top upregulated pathways when prioritised by FDR.",row.names=FALSE) |>
   kable_paper("hover", full_width = F)
 
-m4[[1]] |>
+mytbl <- m4[[1]]
+mytbl <- mytbl[,c(1,2,3,5,4)]
+colnames(mytbl) <- c("Gene set","Set Size","p-value","FDR","ES")
+
+mytbl |>
   kbl(caption="Table 2. Top upregulated pathways when prioritised by ES. Pathways with FDR>0.05 were excluded.",row.names=FALSE) |>
   kable_paper("hover", full_width = F)
 
@@ -259,7 +267,7 @@ genes in any arbitrary way your like.
 The caveat here is that enrichment tests (like hypergeometric method) have size ranges of
 input gene lists that work best.
 We tested different input gene list sizes in ORA and found that 2500 yielded the most (456
-with FDR<0.0), while sizes 200 and less yielded very few significant pathways (**Figure 4**).
+with FDR<0.05), while sizes 200 and less yielded very few significant pathways (**Figure 4**).
 In the range of 300-1000, there’s a steep increase in the number of significant pathways, and
 after that the gradient reduces.
 This suggests a sweet spot around 1000, which in our example is 7.6% of the 13,168 genes
@@ -370,7 +378,7 @@ When discussing FEA with colleagues, it is often said that the method is used to
 lack the normal number of figures.
 For FEA, a general rule of thumb is to only show the charts and data that are relevant to
 assessing aims and hypotheses, and contribute to the conclusions.
-While others have recommended using multiple PEA tools @Chicco2022-aa, we'd suggest limiting
+While others have recommended using multiple FEA tools @Chicco2022-aa, we'd suggest limiting
 the amount of data shown in an article to just one FEA method and one or two gene set
 databases (eg: Reactome, transcription factor target genes).
 Excessive use of tools and databases can make the results difficult to interpret, as in
@@ -453,7 +461,7 @@ provide gene profile data and/or gene lists used for enrichment analysis as supp
 files, or better still, providing full reproducibility and transparancy with the five
 pillars framework @ziemann2023five.
 
-# Conclusion 
+# Other issues
 
 There are several more subtle issues not covered in depth here but are worth mentioning because they
 have been flagged as potential problems.
@@ -474,6 +482,8 @@ As web-based tools appear to be most popular option for FEA [@xie2021popularity;
 we should advocate using tools which allow preservation/archiving of the tool as a Docker image (eg: @Ge2020-lr),
 which could enable reproducibility into the future @perkel2020challenge.
 
+# Conclusion
+
 So why are problems so pervasive in enrichment analysis?
 It's likely a combination of poor researcher training, supervision and peer-review scrutiny.
 The design of tools and (poor) quality of tool documentation might also play a role.
@@ -485,6 +495,7 @@ FCS tools like GSEA; this has the added benefit of enhanced accuracy in terms of
 recall [@kaspi2020mitch;@ziemann2024two].
 Although learning and running FCS tools is more difficult and time-consuming, the benefits to the quality of results
 are substantial.
+
 The deluge of manuscripts in genomics and other fields places increasing burden on a limited pool of competant,
 voluntary peer-reviewers to a point where editors are struggling to maintain the peer-review system as we know it
 @adam2025peer.
