@@ -185,6 +185,10 @@ From these common ones, 20456 have different gene names.
 I think the approach to naming these putative genes has changed a lot.
 Lots of CXorfXX genes have changed, not just AL358472.5 type names.
 
+In the next chunk, I'll show a few lines of the older source gene names.
+
+There is also an Euler diagram of the gene symbol repertoires.
+
 ```{r,genesymbolupdate,fig.height=3,fig.width=5}
 
 gt <- read.table("https://dee2.io/data/hsapiens/hsa_gene_info.tsv",header=TRUE)
@@ -194,33 +198,50 @@ gtnew <- read.table("ref/gencode.v49.genenames.tsv")
 
 v1 <- list("Ens90"=gt$GeneID, "Ens115"=gtnew$V1)
 plot(euler(v1),quantities = list(cex = 2), labels = list(cex = 2))
+
+```
+
+```{r,genesymbolupdate2,fig.height=3,fig.width=5}
+
+message("Number of unique genes in the original gene table:")
 length(gt$GeneID)
+
+message("Number of unique genes in the new gene annotation set:")
 length(gtnew$V1)
+
+message("Number of shared gene IDs between new and old annotations:")
 length(intersect(gt$GeneID,gtnew$V1))
+
+message("Number of gene IDs specific to the old annotation:")
 length(setdiff(gt$GeneID,gtnew$V1))
+
+message("Number of gene IDs specific to the new annotation:")
 length(setdiff(gtnew$V1,gt$GeneID))
 
+message("Here is the mapping table for old-new gene symbols:")
 gtm <- merge(gt,gtnew,by.x="GeneID",by.y="V1")
-nrow(gtm)
-table(gtm$GeneSymbol == gtm$V2)
 
-head(gtm[which(gtm$GeneSymbol != gtm$V2),],10)
-tail(gtm[which(gtm$GeneSymbol != gtm$V2),],10)
+message("Number of rows:")
+nrow(gtm)
+
+message("How many of these gene symbols are the same?")
+table(gtm$GeneSymbol == gtm$V2)
 
 ```
 
 ## Get gene sets
 
+Reading in Reactome gene sets.
+
 ```{r,gs}
 # from https://reactome.org/download/current/ReactomePathways.gmt.zip
-genesets2 <- read.gmt("ref/ReactomePathways_2025-09-02.gmt")
 gsets <- gmtPathways("ref/ReactomePathways_2025-09-02.gmt")
 
 ```
 
 ## Mistake 1 - Raw p-values
 
-Here we are discarding the old gene symbols in favour of the new ones.
+First, discard old gene symbols in favour of the new ones.
 
 In this analysis, we are doing ORA with fora, and comparing the results
 of raw p-values versus using FDR correction.
