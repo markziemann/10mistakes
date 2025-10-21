@@ -232,7 +232,7 @@ mytbl <- mytbl[,c(1,2,3,5,4)]
 colnames(mytbl) <- c("Gene set","Set Size","p-value","FDR","ES")
 
 mytbl |>
-  kbl(caption="Table 1. Top upregulated pathways when prioritised by FDR.",row.names=FALSE) |>
+  kbl(caption="Table 1. Top upregulated pathways when prioritised by FDR. This emphasises larger and more generic functions.",row.names=FALSE) |>
   kable_paper("hover", full_width = F)
 
 mytbl <- m4[[1]]
@@ -240,7 +240,7 @@ mytbl <- mytbl[,c(1,2,3,5,4)]
 colnames(mytbl) <- c("Gene set","Set Size","p-value","FDR","ES")
 
 mytbl |>
-  kbl(caption="Table 2. Top upregulated pathways when prioritised by ES. Pathways with FDR>0.05 were excluded.",row.names=FALSE) |>
+  kbl(caption="Table 2. Top upregulated pathways when prioritised by ES. Pathways with FDR>0.05 were excluded. This emphasises smaller, more specific categories with larger effect sizes.",row.names=FALSE) |>
   kable_paper("hover", full_width = F)
 
 ```

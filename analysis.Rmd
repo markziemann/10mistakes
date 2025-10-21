@@ -246,6 +246,8 @@ First, discard old gene symbols in favour of the new ones.
 In this analysis, we are doing ORA with fora, and comparing the results
 of raw p-values versus using FDR correction.
 
+This corresponds to the results shown in Figure 1B.
+
 ```{r,mistake1,fig.height=3,fig.width=5}
 
 up <- rownames(subset(def, log2FoldChange>0 & padj<0.05))
@@ -263,18 +265,26 @@ bg <- sapply(strsplit(bg," "),'[[',1)
 bg <- unique(gtnew[match(bg,gtnew$V1),2])
 bg <- bg[which(!is.na(bg))]
 
+message("length of up, down and background sets")
 lapply(list(up,dn,bg),length)
 
 fres_up <- fora(pathways=gsets, genes=up, universe=bg, minSize = 5, maxSize = Inf)
+
+message("number of gene sets in the results")
 nrow(fres_up)
+
+message("number of up-regulated gene sets with FDR<0.05")
 nrow(subset(fres_up,padj<0.05))
+message("number of up-regulated gene sets with p<0.05")
 nrow(subset(fres_up,pval<0.05))
 
 fres_up_fdr <- subset(fres_up,padj<0.05)$pathway
 fres_up_nom <- subset(fres_up,pval<0.05)$pathway
 
 fres_dn <- fora(pathways=gsets, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
+message("number of down-regulated gene sets with FDR<0.05")
 nrow(subset(fres_dn,padj<0.05))
+message("number of down-regulated gene sets with p<0.05")
 nrow(subset(fres_dn,pval<0.05))
 
 fres_dn_fdr <- subset(fres_dn,padj<0.05)$pathway
@@ -312,6 +322,7 @@ genes from the list of detected ones, and testing them for enrichment.
 When doing enrichment analysis of a random list of 1000 genes, we got an
 average of 51.6 pathways with p<0.05, while after p-value correction,
 that number was just 0.16 with FDR<0.05.
+This correponds to the data shown in Figure 1A.
 
 ```{r,mistake1_sim,fig.height=6,fig.width=6}
 
@@ -366,20 +377,26 @@ Will try FORA.
 
 ```{r,detectionthreshold}
 
+message("Number of genes in the count matrix")
 nrow(x$GeneCounts)
 
 rowmeans <- rowMeans(x$GeneCounts)
 
+message("Number of genes in the count matrix with more than 10 reads per gene on average.")
 length(rowmeans[which(rowmeans>=10)])
 
+message("Number of genes in the count matrix with less than 10 reads per gene on average.")
 length(rowmeans[which(rowmeans<10)])
 
+message("Proportion of genes below the detection threshold.")
 length(rowmeans[which(rowmeans<10)]) / length(rowmeans)
 
+message("Proportion of genes above the detection threshold.")
 ( 1- sum(rowmeans[which(rowmeans>=10)]) / sum(rowmeans) ) * 100
 
 unfilt <- x$GeneCounts
 
+message("Run deseq2 for differential expression with and without filtering.")
 dds_unfilt <- DESeqDataSetFromMatrix(countData = unfilt , colData = ss, design = ~ trt )
 res_unfilt <- DESeq(dds_unfilt)
 z_unfilt <- results(res_unfilt)
@@ -395,8 +412,26 @@ vsd_filt <- vst(dds_filt, blind=FALSE)
 zz_filt <-cbind(as.data.frame(z_filt),filt)
 def_filt <-as.data.frame(zz_filt[order(zz_filt$pvalue),])
 
+message("No significant genes without filtering low genes")
 nrow(subset(def_unfilt,padj<0.05))
+
+message("No significant genes with filtering low genes")
 nrow(subset(def_filt,padj<0.05))
+
+```
+
+The violin chart is used to understand whether the distribution of gene expression levels
+of the background gene list (NS) is similar to the distributrion of DEGs.
+If there is a big difference, it is bad, because we already know that genes with high
+expression in a cell type are likely to be very different ontologies when compared to lower
+expressed genes.
+In the unfiltered pair of violin charts, we see that there is a big difference in the
+distributions indicating that a lot of the enrichment results could be solely due to
+basemean expression levels, not related to the up or down regulation at all.
+When filtering is applied, we see that the difference between DEG and NS distributions is
+smaller.
+
+```{r,viochart}
 
 deg_unfilt <- subset(def_unfilt,padj<0.05)
 ns_unfilt <- subset(def_unfilt,padj>0.05)
@@ -412,6 +447,7 @@ ns_filt <- subset(def_filt,padj>0.05)
 rowmeans_deg_filt <- rowMeans(deg_filt[,7:12])
 rowmeans_ns_filt <- rowMeans(ns_filt[,7:12])
 
+message("Distribution of gene expression levels")
 viodata2 <- list("DEG unfilt"=log10(rowmeans_deg_unfilt+0.01),
   "NS unfilt"=log10(rowmeans_ns_unfilt+0.01),
   "DEG filt"=log10(rowmeans_deg_filt+0.01),
@@ -419,37 +455,48 @@ viodata2 <- list("DEG unfilt"=log10(rowmeans_deg_unfilt+0.01),
 
 vioplot(viodata2,ylab="log10 mean expression",las=2,side="left")
 
+lapply(viodata2,summary)
+
 ```
 
-In this first analysis, we run parallel fora tests, one uses the correct
+### Mistake 2 - example dataset analysis
+
+In this next analysis, we run parallel fora tests, one uses the correct
 background made up of detected genes (bg), while the other one
 uses all genes in the genome (marked with *).
 
+The second euler diagram shown below corresponds to Figure 2C.
+
 ```{r,mistake2,fig.height=3,fig.width=5}
 
-# up dn and bg are defines above
+# up dn and bg are defined above
 all <- unique(gtm$V2)
 
+message("no. genes in each of the lists up, down, bg and all.")
 lapply(list(up,dn,bg,all),length)
 
 fres_up_bg <- fora(pathways=gsets, genes=up, universe=bg, minSize = 5, maxSize = Inf)
 fres_up_bg <- subset(fres_up_bg,padj<0.05)$pathway
+message("no up-regulated pathways with the correct background.")
 length(fres_up_bg)
 
 fres_up_all <- fora(pathways=gsets, genes=up, universe=all, minSize = 5, maxSize = Inf)
 fres_up_all <- subset(fres_up_all,padj<0.05)$pathway
+message("no up-regulated pathways with wg background.")
 length(fres_up_all)
 
 fres_dn_bg <- fora(pathways=gsets, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
 fres_dn_bg <- subset(fres_dn_bg,padj<0.05)$pathway
+message("no down-regulated pathways with the correct background.")
 length(fres_dn_bg)
 
 fres_dn_all <- fora(pathways=gsets, genes=dn, universe=all, minSize = 5, maxSize = Inf)
 fres_dn_all <- subset(fres_dn_all,padj<0.05)$pathway
+message("no down-regulated pathways with wg background.")
 length(fres_dn_all)
 
 v1 <- list("up"=fres_up_bg, "up*"=fres_up_all, "dn"=fres_dn_bg, "dn*"=fres_dn_all)
-
+message("no. significant pathways with correct and incorrect* background with direction specified.")
 par(mar=c(1,1,1,1))
 par(mfrow=c(1,1))
 plot(euler(v1),quantities = list(cex = 2), labels = list(cex = 2))
@@ -457,6 +504,7 @@ plot(euler(v1),quantities = list(cex = 2), labels = list(cex = 2))
 v2 <- list("bg"=union(fres_up_bg,fres_dn_bg),
   "bg*"=union(fres_up_all, fres_dn_all) )
 
+message("no. significant pathways with correct and incorrect* background. Direction not specified.")
 plot(euler(v2),quantities = list(cex = 2), labels = list(cex = 2))
 
 par(mar=c(1,1,1,1))
@@ -470,14 +518,18 @@ par(mar=c(5.1,4.1,4.1,2.1))
 
 ```
 
-Mistake 2 simulation.
-select genes randomly from the genes above the detection threshold (bg list) and compare to
-whole genome background.
+### Mistake 2 - simulation analysis
+
+Here, we select genes randomly from the genes above the detection threshold (bg list) and
+compare to whole genome background.
 
 There are ~444 gene sets significant on average with this approach, as the genes expressed
 in AML3 cells are distinctive compared to the whole genome annotation.
 
-When using the correct background, a mean of 0.16 was obtained.
+When using the correct background, a mean of 0.16 was obtained. This shows that false
+positives can be nearly eliminated by using this detection threshold.
+
+This result corresponds to Figure 2A.
 
 ```{r,mistake2sim,fig.height=6,fig.width=6}
 
@@ -523,7 +575,8 @@ par(mar=c(5.1,4.1,4.1,2.1))
 
 In the simulation, which gene sets falsely come up most?
 
-There's 37 pathways that always come up.
+There's 37 pathways that came up 100/100 simulations.
+This corresponds to Figure 2B.
 
 ```{r,m2sim2,fig.height=6,fig.width=6}
 
@@ -577,6 +630,10 @@ par(mar=c(5.1,4.1,4.1,2.1))
 | Data availability | via DEE2 at accession SRP038101 (human) |
 | Other parameters | Min gene set size of 5 |
 
+This scatterplot shows how prioritising by FDR can lead to missing the gene sets with the
+biggest effect sizes.
+This corresponds to Figure 3.
+
 ```{r,mistake4a}
 
 def2 <- def
@@ -617,14 +674,47 @@ dev.off()
 par(mfrow=c(1,1))
 par(mar=c(5.1,4.1,4.1,2.1))
 
+```
+
+Now, let's take a look at the top results when prioritising with FDR only and with
+enrichment score.
+
+FDR prioritisation emphasises larger and more generic functions.
+
+ES prioritisation emphasises smaller, more specific categories with larger effect sizes.
+
+To prove this, I go back to the DE table and fetch the log2 fold changes.
+
+These tables correspond to Table 1 and 2.
+
+```{r,mistake4a_table}
+
 mres_sig_up <- head(subset(mres$enrichment_result,s.dist>0),10)
 mres_sig_dn <- head(subset(mres$enrichment_result,s.dist<0),10)
 
-mres_sig_up_tbl <- apply(data.frame(mres_sig_up[,1:2],apply(mres_sig_up[,3:5],2,signif,2)),2,as.character)
-mres_sig_dn_tbl <- apply(data.frame(mres_sig_dn[,1:2],apply(mres_sig_dn[,3:5],2,signif,2)),2,as.character)
+# get log2fc values
+mres_sig_up$median_lfc <- sapply(mres_sig_up$set[1:10], function(y) {
+  genes <- gsets[[which(names(gsets) == y)]]
+  gid <- unique(gtnew[match(genes,gtnew$V2),1])
+  lfc <- def2[which(rownames(def2) %in% gid),"log2FoldChange"]
+  return(median(lfc))
+})
+
+mres_sig_dn$median_lfc <- sapply(mres_sig_dn$set[1:10], function(y) {
+  genes <- gsets[[which(names(gsets) == y)]]
+  gid <- unique(gtnew[match(genes,gtnew$V2),1])
+  lfc <- def2[which(rownames(def2) %in% gid),"log2FoldChange"]
+  return(median(lfc))
+})
+
+mres_sig_up_tbl <- apply(data.frame(mres_sig_up[,1:2],
+  apply(mres_sig_up[,3:6],2,signif,2)),2,as.character)
+
+mres_sig_dn_tbl <- apply(data.frame(mres_sig_dn[,1:2],
+  apply(mres_sig_dn[,3:6],2,signif,2)),2,as.character)
 
 mres_sig_up_tbl %>%
-  kbl(caption="Top upregulated pathways when prioritised by FDR",row.names=FALSE) %>%
+  kbl(caption="Top upregulated pathways when prioritised by FDR. ",row.names=FALSE) %>%
   kable_paper("hover", full_width = F)
 
 mres_sig_dn_tbl %>%
@@ -636,8 +726,26 @@ mres <- mitch_calc(x=m,genesets=gsets,minsetsize=5,cores=4,priority="effect")
 mres_es_up <- head(subset(mres$enrichment_result,s.dist>0 & p.adjustANOVA < 0.05),10)
 mres_es_dn <- head(subset(mres$enrichment_result,s.dist<0 & p.adjustANOVA < 0.05),10)
 
-mres_es_up_tbl <- apply(data.frame(mres_es_up[,1:2],apply(mres_es_up[,3:5],2,signif,2)),2,as.character)
-mres_es_dn_tbl <- apply(data.frame(mres_es_dn[,1:2],apply(mres_es_dn[,3:5],2,signif,2)),2,as.character)
+# get log2fc values
+mres_es_up$median_lfc <- sapply(mres_es_up$set[1:10], function(y) {
+  genes <- gsets[[which(names(gsets) == y)]]
+  gid <- unique(gtnew[match(genes,gtnew$V2),1])
+  lfc <- def2[which(rownames(def2) %in% gid),"log2FoldChange"]
+  return(median(lfc))
+})
+
+mres_es_dn$median_lfc <- sapply(mres_es_dn$set[1:10], function(y) {
+  genes <- gsets[[which(names(gsets) == y)]]
+  gid <- unique(gtnew[match(genes,gtnew$V2),1])
+  lfc <- def2[which(rownames(def2) %in% gid),"log2FoldChange"]
+  return(median(lfc))
+})
+
+mres_es_up_tbl <- apply(data.frame(mres_es_up[,1:2],
+  apply(mres_es_up[,3:6],2,signif,2)),2,as.character)
+
+mres_es_dn_tbl <- apply(data.frame(mres_es_dn[,1:2],
+  apply(mres_es_dn[,3:6],2,signif,2)),2,as.character)
 
 mres_es_up_tbl %>%
   kbl(caption="Top upregulated pathways when prioritised by ES (discarding any with FDR>0.05)",row.names=FALSE) %>%
@@ -650,30 +758,26 @@ mres_es_dn_tbl %>%
 m4tbls <- list("esup"=mres_es_up_tbl,"esdn"=mres_es_dn_tbl,"sigup"=mres_sig_up_tbl,"sigdn"=mres_sig_dn_tbl)
 saveRDS(m4tbls,"m4tbls.Rds")
 
-```
 
-Make a scatterplot
+message("Are median log2FC values for ES prioritisation bigger than FDR approach?")
 
-```{r,mistake4b,fig.height=6,fig.width=6}
+message("Are median log2FC values for ES prioritisation (UP)")
+mean(abs(mres_es_up$median_lfc ))
 
-mres2 <- mres$enrichment_result
+message("Are median log2FC values for FDR prioritisation (UP)")
+mean(abs(mres_sig_up$median_lfc ))
 
-sig <- subset(mres2,p.adjustANOVA<0.05)
-plot(abs(mres2$s.dist),-log10(mres2$pANOVA),pch=19,cex=0.6,frame.plot=FALSE,
-  xlab="enrichment score (absolute)", ylab="significance [-log10(p-value)]",
-  xlim=c(0,0.9),ylim=c(0,50), bty="n")
-points(abs(sig$s.dist),-log10(sig$pANOVA),pch=19,cex=0.61,col="red")
+message("ES:FDR ratio (UP)")
+mean(abs(mres_es_up$median_lfc )) / mean(abs(mres_sig_up$median_lfc ))
 
-par(mar=c(5.1,4.1,4.1,2.1))
-unlink("img/4a.png")
-png("img/4a.png", width = 480, height = 480)
-plot(abs(mres2$s.dist),-log10(mres2$pANOVA),pch=19,cex=0.6,frame.plot=FALSE,
-  xlab="enrichment score (absolute)", ylab="significance [-log10(p-value)]",
-  xlim=c(0,0.9),ylim=c(0,50), bty="n")
-points(abs(sig$s.dist),-log10(sig$pANOVA),pch=19,cex=0.61,col="red")
-dev.off()
-par(mfrow=c(1,1))
-par(mar=c(5.1,4.1,4.1,2.1))
+message("Are median log2FC values for ES prioritisation (DOWN)")
+mean(abs(mres_es_dn$median_lfc ))
+
+message("Are median log2FC values for FDR prioritisation (DOWN)")
+mean(abs(mres_sig_dn$median_lfc ))
+
+message("ES:FDR ratio (DOWN)")
+mean(abs(mres_es_dn$median_lfc )) / mean(abs(mres_sig_dn$median_lfc ))
 
 ```
 
@@ -728,6 +832,10 @@ par(mar=c(5.1,4.1,4.1,2.1))
 
 ## Mistake 5 - gene set list size too small or long
 
+ORA is known to have variable results when using gene lists of different length.
+I will vary the foreground gene length from 50 to 7000 and see how many significant hits
+I get.
+
 ```{r,mistake5,fig.height=5,fig.width=7}
 
 up <- rownames(subset(def, log2FoldChange>0 & padj<0.05))
@@ -745,6 +853,7 @@ bg <- sapply(strsplit(bg," "),'[[',1)
 bg <- unique(gtnew[match(bg,gtnew$V1),2])
 bg <- bg[which(!is.na(bg))]
 
+message("Length of up, down and background gene lists. Only for context.")
 lapply(list(up,dn,bg),length)
 
 sizes <- c(50,100,200,300,400,500,750,1000,1500,2000,2500,3000,4000,5000,6000,7000)
@@ -770,7 +879,17 @@ ndns <- unlist(lapply(sizes, function(i) {
 
 df <- data.frame("up"=nups,"dn"=ndns,row.names=sizes)
 df$tot <- df$up + df$dn
-df
+df %>%
+  kbl(caption="Table XX. Number of differentially regulated gene sets when varying the foreground gene list length.") %>%
+  kable_paper("hover", full_width = F)
+
+```
+
+Now to make a line chart of this data.
+The first chart is the whole range of data, and the second is a zoom in to 50 to 500 genes.
+The line chart shown below corresponds to Figure 4.
+
+```{r,mistake5_linechart,fig.height=5,fig.width=7}
 
 plot(sizes,df$up,type="b",col="red",ylab="no. gene sets with FDR<0.05",xlab="gene list length",bty="n")
 lines(sizes,df$dn,type="b",col="blue")
@@ -802,6 +921,12 @@ par(mfrow=c(1,1))
 
 ## Mistake 6 - combining up and downregulated genes into the same test.
 
+Combining up and down into a single test can reduce the number of results significantly.
+This is because gene sets show typically have a predominantly pattern of up or down
+regulation but not both.
+The combined approach discovers only a few unique sets (10 in this case).
+The euler plot shown below corresponds to Figure 5.
+
 ```{r,mistake6a,fig.height=4,fig.width=5}
 
 updn <- unique(c(up,dn))
@@ -809,9 +934,16 @@ updn <- unique(c(up,dn))
 fres_updn_bg <- fora(pathways=gsets, genes=updn, universe=bg, minSize = 5, maxSize = Inf)
 fres_updn_bg <- subset(fres_updn_bg,padj<0.05)$pathway
 
+message("no. significant sets using the combined test:")
 length(fres_updn_bg)
+
+message("no. significant upregulated sets using the separate test:")
 length(fres_up_bg)
+
+message("no. significant downregulated sets using the separate test:")
 length(fres_dn_bg)
+
+message("no. significant sets using the separate tests:")
 length(unique(c(fres_up_bg,fres_dn_bg)))
 
 v1 <- list("up"=fres_up_bg,"dn"=fres_dn_bg,"combined"=fres_updn_bg)
@@ -825,6 +957,12 @@ dev.off()
 ```
 
 ## Mistake 8 - using shallow gene annotations
+
+Here, the idea is to show that the gene set database being used makes a huge difference
+to the quality of the results.
+In particular, the more comprehensive the gene sets, the more comprehensive the
+pathway enrichment will be.
+This corresponds to Table 3.
 
 ```{r,m8a}
 
@@ -850,32 +988,52 @@ d4 <- unlist( lapply(gslist,function(i) { length(unique(unlist(i))) } ))
 
 kegg_up <- fora(pathways=kegg, genes=up, universe=bg, minSize = 5, maxSize = Inf)
 kegg_dn <- fora(pathways=kegg, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
+
+
+message("no. significantly upregulated KEGG pathways")
 nrow(subset(kegg_up,padj<0.05))
+message("no. significantly downregulated KEGG pathways")
 nrow(subset(kegg_dn,padj<0.05))
+message("no. significantly dysregulated KEGG pathways")
 sum(nrow(subset(kegg_up,padj<0.05)), nrow(subset(kegg_dn,padj<0.05) ))
 
 kegg_med_up <- fora(pathways=kegg_med, genes=up, universe=bg, minSize = 5, maxSize = Inf)
 kegg_med_dn <- fora(pathways=kegg_med, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
+message("no. significantly upregulated KEGG medicus pathways")
 nrow(subset(kegg_med_up,padj<0.05))
+message("no. significantly downregulated KEGG medicus pathways")
 nrow(subset(kegg_med_dn,padj<0.05))
+message("no. significantly dysregulated KEGG medicus pathways")
 sum(nrow(subset(kegg_med_up,padj<0.05)), nrow(subset(kegg_med_dn,padj<0.05) ))
 
 reactome_up <- fora(pathways=reactome, genes=up, universe=bg, minSize = 5, maxSize = Inf)
 reactome_dn <- fora(pathways=reactome, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
+message("no. significantly upregulated Reactome pathways")
 nrow(subset(reactome_up,padj<0.05))
+message("no. significantly downregulated Reactome pathways")
 nrow(subset(reactome_dn,padj<0.05))
+message("no. significantly dysregulated Reactome pathways")
 sum(nrow(subset(reactome_up,padj<0.05)), nrow(subset(reactome_dn,padj<0.05) ))
 
 gobp_up <- fora(pathways=gobp, genes=up, universe=bg, minSize = 5, maxSize = Inf)
 gobp_dn <- fora(pathways=gobp, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
+message("no. significantly upregulated GO BP terms")
 nrow(subset(gobp_up,padj<0.05))
+message("no. significantly upregulated GO BP terms")
 nrow(subset(gobp_dn,padj<0.05))
+message("no. significantly dysregulated GO BP terms")
 sum(nrow(subset(gobp_up,padj<0.05)), nrow(subset(gobp_dn,padj<0.05) ))
 
 msdb_up <- fora(pathways=msdb, genes=up, universe=bg, minSize = 5, maxSize = Inf)
 msdb_dn <- fora(pathways=msdb, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
+
+message("no. significantly upregulated MSigDB gene sets")
 nrow(subset(msdb_up,padj<0.05))
+
+message("no. significantly downregulated MSigDB gene sets")
 nrow(subset(msdb_dn,padj<0.05))
+
+message("no. significantly dysregulated MSigDB gene sets")
 sum(nrow(subset(msdb_up,padj<0.05)), nrow(subset(msdb_dn,padj<0.05) ))
 
 up_pw <- c(nrow(subset(kegg_up,padj<0.05)),nrow(subset(kegg_med_up,padj<0.05)),
