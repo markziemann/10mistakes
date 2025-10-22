@@ -340,7 +340,7 @@ m1sim <- mclapply(seeds, function(seed) {
 m1sim <- do.call(rbind,m1sim)
 colnames(m1sim) <- c("p","FDR")
 
-boxplot(m1sim,main="Random gene sets",ylab="no. gene sets meeting \"significance\" threshold <0.05",frame=FALSE)
+boxplot(m1sim,main="Random gene sets (100 repetitions)",ylab="no. gene sets meeting \"significance\" threshold <0.05",frame=FALSE)
 beeswarm(list(mean(m1sim[,1]), mean(m1sim[,2])),add=TRUE,pch=4,cex=2)
 lab1 <- paste("Mean=",signif(mean(m1sim[,1]) , 3),sep="")
 lab2 <- paste("Mean=",signif(mean(m1sim[,2]) , 2),sep="")
@@ -348,7 +348,7 @@ text(c(1.2,2.2), c( mean(m1sim[,1])+5, mean(m1sim[,2])+5 ), labels=c(lab1,lab2) 
 
 unlink("img/1a.png")
 png("img/1a.png", width = 480, height = 480)
-boxplot(m1sim,main="Random gene sets",ylab="no. gene sets meeting \"significance\" threshold <0.05",frame=FALSE)
+boxplot(m1sim,main="Random gene sets (100 repetitions)",ylab="no. gene sets meeting \"significance\" threshold <0.05",frame=FALSE)
 beeswarm(list(mean(m1sim[,1]), mean(m1sim[,2])),add=TRUE,pch=4,cex=2)
 lab1 <- paste("Mean=",signif(mean(m1sim[,1]) , 3),sep="")
 lab2 <- paste("Mean=",signif(mean(m1sim[,2]) , 2),sep="")

@@ -505,4 +505,32 @@ aspects thoroughly, causing mistakes like the above to become widespread.
 Ultimately, responsibility for using best practices in enrichment analysis lies with authors.
 Avoiding these mistakes will have a number of benefits including avoiding wasted resources on unreliable research directions.
 
+# Methods
+
+The example RNA-seq dataset used involves AML3 cells with and without azacytidine treatment
+@lund2014dnmt.
+Read counts were obtained from the DEE2 database using the getDEE2 R package using SRA
+project accession SRP038101 as a query @ziemann2019digital.
+Genes with average expression above 10 counts per sample were considered detected, and
+genes not meeting this criterion were removed from downstream analysis (unless stated).
+Differential expression was conducted using DESeq2 v1.48.1 @love2014differential.
+Human gene symbols were updated to Ensembl 115 @dyer2025ensembl.
+Genes with FDR<0.05 were considered significantly differentially expressed.
+Reactome gene sets were downloaded in GMT format on 02/09/2025 @milacic2024reactome.
+ORA was conducted using the `fora` function belonging to the `fgsea` package
+@korotkevich2016fast.
+
+To demonstrate the importance of FDR control (Mistake 1), random sampling of 1000 detected
+genes was followed with ORA with and without FDR control.
+This was repeated 100 times.
+
+To demonstrate the importance of a suitable background gene list (Mistake 2), random sampling
+of 1000 detected genes as the foreground followed by ORA using either the whole genome
+background or background consisting of detected genes.
+This process was repeated 1000 times.
+
+To demonstrate the importance of using enrichment scores for interpretation of FEA results,
+(Mistake 3 and 4) the mitch package was used for FCS analysis of the differential expression data
+@kaspi2020mitch.
+
 # Bibliography
