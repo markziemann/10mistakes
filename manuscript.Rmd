@@ -563,4 +563,8 @@ Instances of poor presentation (Mistake 9) and methods reproducibility (Mistake 
 were drawn from unpublished notes made during a previous systematic analysis of the
 literature @Wijesooriya2022-we.
 
+Analysis code is available from GitHub (https://github.com/markziemann/10mistakes)
+and the Docker image is available from DockerHub (https://hub.docker.com/repository/docker/mziemann/10mistakes/general).
+These will be archived to Zenodo upon acceptance.
+
 # Bibliography
