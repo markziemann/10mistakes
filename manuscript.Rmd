@@ -516,13 +516,13 @@ Read counts were obtained from the DEE2 database using the getDEE2 R package usi
 project accession SRP038101 as a query @ziemann2019digital.
 Genes with average expression above 10 counts per sample were considered detected, and
 genes not meeting this criterion were removed from downstream analysis (unless stated).
-Differential expression was conducted using DESeq2 v1.48.1 @love2014differential.
+Differential expression was conducted using DESeq2 v1.48.2 @love2014differential.
 Human gene symbols were updated to Ensembl 115 @dyer2025ensembl.
 Genes with FDR<0.05 were considered significantly differentially expressed.
 Reactome gene sets were downloaded in GMT format on 02/09/2025 @milacic2024reactome, and
 these gene sets were used for all subsequent enrichment tests unless otherwise stated.
 All ORA tests were conducted using the `fora` function belonging to the `fgsea` package
-@korotkevich2016fast.
+v1.34.2 @korotkevich2016fast.
 Minimum gene set size was set to 5 for all subsequent enrichment tests.
 Gene sets with FDR<0.05 were considered significantly differentially expressed.
 
@@ -538,7 +538,7 @@ background or background consisting of detected genes.
 This process was repeated 1000 times.
 
 To demonstrate the importance of using enrichment scores for interpretation of FEA results,
-(Mistake 3 and 4) the `mitch` package was used for FCS analysis of the differential
+(Mistake 3 and 4) the `mitch` package v1.20.0 was used for FCS analysis of the differential
 expression data @kaspi2020mitch.
 
 To investigate how foreground gene set size impact the number of ORA results (Mistake 5),
@@ -563,6 +563,8 @@ Instances of poor presentation (Mistake 9) and methods reproducibility (Mistake 
 were drawn from unpublished notes made during a previous systematic analysis of the
 literature @Wijesooriya2022-we.
 
+Analysis was conducted in R 4.5.1 using a Bioconductor Docker image corresponding to
+Bioconductor release 3.21.
 Analysis code is available from GitHub (https://github.com/markziemann/10mistakes)
 and the Docker image is available from DockerHub (https://hub.docker.com/repository/docker/mziemann/10mistakes/general).
 These will be archived to Zenodo upon acceptance.
