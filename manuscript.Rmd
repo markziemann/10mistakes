@@ -252,6 +252,7 @@ These more specific gene sets are in general better candidates for downstream va
 to their explanatory power.
 The scatterplot shown in **Figure 3** shows how focusing on statistical significance only
 could overlook interesting results with larger effect sizes.
+End users should therefore use both prioritisation approaches to interpret their data.
 
 ```{r,m4fig,fig.cap="Figure 3. Scatterplot showing absolute enrichment scores (x-axis) and log-transformed significance values (y-axis). Gene sets with FDR<0.05 are highlighted in red.",echo=FALSE,fig.height=5,fig.width=5}
 
@@ -491,7 +492,7 @@ So why are problems so pervasive in enrichment analysis?
 It's likely a combination of poor researcher training, supervision and peer-review scrutiny.
 The design of tools and (poor) quality of tool documentation might also play a role.
 We also know that poor methods have a type of advantage compared to the more rigorous ones
-due to researcher preferences to present significant findings @smaldino2016natural and reliance upon default settings
+due to researcher preferences to present "significant" findings @smaldino2016natural and reliance upon default settings
 even if they are incorrect [@mubeen2022influence;@Wijesooriya2022-we].
 Problems 2, 3, 5 and 6 appear to be specific to ORA-based tools, and can be avoided entirely by switching to
 FCS tools like GSEA; this has the added benefit of enhanced accuracy in terms of precision and
@@ -528,8 +529,8 @@ Gene sets with FDR<0.05 were considered significantly differentially expressed.
 To demonstrate the importance of FDR control (Mistake 1), random sampling of 1000 detected
 genes was followed with ORA with and without FDR control.
 This was repeated 100 times.
-For comparison of the nominal and FDR corrected results, the up (1667) and down (1923)
-regulated genes underwent ORA using a background consisting of the 13063 detected genes.
+For comparison of the nominal and FDR corrected results, the up (1672) and down (1926)
+regulated genes underwent ORA using a background consisting of the 13168 detected genes.
 
 To demonstrate the importance of a suitable background gene list (Mistake 2), random sampling
 of 1000 detected genes as the foreground followed by ORA using either the whole genome
