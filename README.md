@@ -13,5 +13,44 @@
 9. Bad presentation
 10. Neglecting methods reproducibility
 
-docker run -it -v $PWD:/10mistakes mziemann/10mistakes:latest
+## Contents
 
+* `10mistakes.bib`: Bibliography
+
+* `Dockerfile`: Dockerfile
+
+* `analysis.Rmd`: Main analysis script
+
+* `f1000research.csl`: Citation style file
+
+* `manuscript.Rmd`: Manuscript file
+
+## How to reproduce
+
+Start a container
+
+```
+docker run -it mziemann/10mistakes:latest
+```
+
+Once in the container, pull the latest code.
+
+```
+git pull
+```
+
+Now the two R scripts can be run to conduct the analysis and generate the manuscript.
+
+```
+Rscript -e 'rmarkdown::render("analysis.Rmd")'
+
+Rscript -e 'rmarkdown::render("manuscript.Rmd")'
+```
+
+Copy the data back to the host.
+
+```
+docker cp $(docker ps -alq):/10mistakes docker_data
+```
+
+Now the html files and figures can be inspected in the `docker_data` folder.
