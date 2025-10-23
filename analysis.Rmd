@@ -642,6 +642,11 @@ rownames(def2) <- sapply(strsplit(rownames(def)," "),'[[',1)
 m <- mitch_import(x=def2,DEtype="deseq2",geneTable=gtnew)
 mres <- mitch_calc(x=m,genesets=gsets,minsetsize=5,cores=4,priority="significance")
 
+message("No. significant gene sets")
+nrow(subset(mres$enrichment_result,p.adjustANOVA<0.05))
+message("No. gene sets included")
+nrow(subset(mres$enrichment_result,p.adjustANOVA<1))
+
 mresdf <- mres$enrichment_result
 
 sig <- subset(mresdf,p.adjustANOVA<0.05)
@@ -693,18 +698,18 @@ mres_sig_up <- head(subset(mres$enrichment_result,s.dist>0),10)
 mres_sig_dn <- head(subset(mres$enrichment_result,s.dist<0),10)
 
 # get log2fc values
-mres_sig_up$median_lfc <- sapply(mres_sig_up$set[1:10], function(y) {
+mres_sig_up$mean_lfc <- sapply(mres_sig_up$set[1:10], function(y) {
   genes <- gsets[[which(names(gsets) == y)]]
   gid <- unique(gtnew[match(genes,gtnew$V2),1])
   lfc <- def2[which(rownames(def2) %in% gid),"log2FoldChange"]
-  return(median(lfc))
+  return(mean(lfc))
 })
 
-mres_sig_dn$median_lfc <- sapply(mres_sig_dn$set[1:10], function(y) {
+mres_sig_dn$mean_lfc <- sapply(mres_sig_dn$set[1:10], function(y) {
   genes <- gsets[[which(names(gsets) == y)]]
   gid <- unique(gtnew[match(genes,gtnew$V2),1])
   lfc <- def2[which(rownames(def2) %in% gid),"log2FoldChange"]
-  return(median(lfc))
+  return(mean(lfc))
 })
 
 mres_sig_up_tbl <- apply(data.frame(mres_sig_up[,1:2],
@@ -727,18 +732,18 @@ mres_es_up <- head(subset(mres$enrichment_result,s.dist>0 & p.adjustANOVA < 0.05
 mres_es_dn <- head(subset(mres$enrichment_result,s.dist<0 & p.adjustANOVA < 0.05),10)
 
 # get log2fc values
-mres_es_up$median_lfc <- sapply(mres_es_up$set[1:10], function(y) {
+mres_es_up$mean_lfc <- sapply(mres_es_up$set[1:10], function(y) {
   genes <- gsets[[which(names(gsets) == y)]]
   gid <- unique(gtnew[match(genes,gtnew$V2),1])
   lfc <- def2[which(rownames(def2) %in% gid),"log2FoldChange"]
-  return(median(lfc))
+  return(mean(lfc))
 })
 
-mres_es_dn$median_lfc <- sapply(mres_es_dn$set[1:10], function(y) {
+mres_es_dn$mean_lfc <- sapply(mres_es_dn$set[1:10], function(y) {
   genes <- gsets[[which(names(gsets) == y)]]
   gid <- unique(gtnew[match(genes,gtnew$V2),1])
   lfc <- def2[which(rownames(def2) %in% gid),"log2FoldChange"]
-  return(median(lfc))
+  return(mean(lfc))
 })
 
 mres_es_up_tbl <- apply(data.frame(mres_es_up[,1:2],
@@ -759,25 +764,25 @@ m4tbls <- list("esup"=mres_es_up_tbl,"esdn"=mres_es_dn_tbl,"sigup"=mres_sig_up_t
 saveRDS(m4tbls,"m4tbls.Rds")
 
 
-message("Are median log2FC values for ES prioritisation bigger than FDR approach?")
+message("Are mean log2FC values for ES prioritisation bigger than FDR approach?")
 
-message("Are median log2FC values for ES prioritisation (UP)")
-mean(abs(mres_es_up$median_lfc ))
+message("Are mean log2FC values for ES prioritisation (UP)")
+mean(abs(mres_es_up$mean_lfc ))
 
-message("Are median log2FC values for FDR prioritisation (UP)")
-mean(abs(mres_sig_up$median_lfc ))
+message("Are mean log2FC values for FDR prioritisation (UP)")
+mean(abs(mres_sig_up$mean_lfc ))
 
 message("ES:FDR ratio (UP)")
-mean(abs(mres_es_up$median_lfc )) / mean(abs(mres_sig_up$median_lfc ))
+mean(abs(mres_es_up$mean_lfc )) / mean(abs(mres_sig_up$mean_lfc ))
 
-message("Are median log2FC values for ES prioritisation (DOWN)")
-mean(abs(mres_es_dn$median_lfc ))
+message("Are mean log2FC values for ES prioritisation (DOWN)")
+mean(abs(mres_es_dn$mean_lfc ))
 
-message("Are median log2FC values for FDR prioritisation (DOWN)")
-mean(abs(mres_sig_dn$median_lfc ))
+message("Are mean log2FC values for FDR prioritisation (DOWN)")
+mean(abs(mres_sig_dn$mean_lfc ))
 
 message("ES:FDR ratio (DOWN)")
-mean(abs(mres_es_dn$median_lfc )) / mean(abs(mres_sig_dn$median_lfc ))
+mean(abs(mres_es_dn$mean_lfc )) / mean(abs(mres_sig_dn$mean_lfc ))
 
 ```
 
@@ -929,7 +934,15 @@ The euler plot shown below corresponds to Figure 5.
 
 ```{r,mistake6a,fig.height=4,fig.width=5}
 
+message("No. up genes.")
+length(up)
+
+message("No. down genes.")
+length(dn)
+
+message("No. unique DE genes.")
 updn <- unique(c(up,dn))
+length(updn)
 
 fres_updn_bg <- fora(pathways=gsets, genes=updn, universe=bg, minSize = 5, maxSize = Inf)
 fres_updn_bg <- subset(fres_updn_bg,padj<0.05)$pathway
@@ -956,7 +969,7 @@ dev.off()
 
 ```
 
-## Mistake 8 - using shallow gene annotations
+## Mistake 7 - using shallow gene annotations
 
 Here, the idea is to show that the gene set database being used makes a huge difference
 to the quality of the results.
@@ -1057,7 +1070,7 @@ saveRDS(m8tbl,"m8tbl.Rds")
 
 ```
 
-## Mistake 9 - outated gene sets
+## Mistake 8 - outated gene sets
 
 ```{r,outdated}
 

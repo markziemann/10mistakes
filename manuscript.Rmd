@@ -228,16 +228,16 @@ non-significant pathways **(Table 1 and Table 2)**.
 m4 <- readRDS("m4tbls.Rds")
 
 mytbl <- m4[[3]]
-mytbl <- mytbl[,c(1,2,3,5,4)]
-colnames(mytbl) <- c("Gene set","Set Size","p-value","FDR","ES")
+mytbl <- mytbl[,c(1,2,3,5,4,6)]
+colnames(mytbl) <- c("Gene set","Set Size","p-value","FDR","ES","Mean Log2FC")
 
 mytbl |>
   kbl(caption="Table 1. Top upregulated pathways when prioritised by FDR. This emphasises larger and more generic functions.",row.names=FALSE) |>
   kable_paper("hover", full_width = F)
 
 mytbl <- m4[[1]]
-mytbl <- mytbl[,c(1,2,3,5,4)]
-colnames(mytbl) <- c("Gene set","Set Size","p-value","FDR","ES")
+mytbl <- mytbl[,c(1,2,3,5,4,6)]
+colnames(mytbl) <- c("Gene set","Set Size","p-value","FDR","ES","Mean Log2FC")
 
 mytbl |>
   kbl(caption="Table 2. Top upregulated pathways when prioritised by ES. Pathways with FDR>0.05 were excluded. This emphasises smaller, more specific categories with larger effect sizes.",row.names=FALSE) |>
@@ -245,11 +245,14 @@ mytbl |>
 
 ```
 
-P-value prioritisation emphasises generic functions with really large gene sets, while
-enrichment score prioritisation highlights much smaller gene sets with highly specific
-functions, where each member gene is showing a relatively bigger change in expression (**Figure 3**).
+P-value prioritisation (**Table 1**) emphasises generic functions with really large gene
+sets and moderate fold changes, while enrichment score prioritisation (**Table 2**)
+highlights smaller gene sets with highly specific functions, where member genes have bigger
+fold changes.
 These more specific gene sets are in general better candidates for downstream validation due
 to their explanatory power.
+The scatterplot shown in **Figure 3** shows how focusing on statistical significance only
+could overlook interesting results with larger effect sizes.
 
 ```{r,m4fig,fig.cap="Figure 3. Scatterplot showing absolute enrichment scores (x-axis) and log-transformed significance values (y-axis). Gene sets with FDR<0.05 are highlighted in red.",echo=FALSE,fig.height=5,fig.width=5}
 
@@ -346,10 +349,10 @@ are loaded with previously published data sets that we can reanalyse with new pa
 databases and software tools to eke out further insights.
 When the data is several years old, we should use the processed data with caution, as many
 gene names may have since changes.
-For example, Illumina’s EPIC DNA Methylation microarray was released in 2016, and in the
-following eight years, 3,253 of 22,588 gene names on the chip have changed (14.4%)
-@Ziemann2024-be, meaning that those genes wouldn’t be recognised by the pathway
-enrichment software.
+For example, as previously demonstrated, Illumina’s EPIC DNA Methylation microarray was
+released in 2016, and in the following eight years, 3,253 of 22,588 gene names on the chip
+have changed (14.4%) @Ziemann2024-be, meaning that those genes wouldn’t be recognised by
+the pathway enrichment software.
 To update defunct gene symbols, the HGNChelper R package can help @Oh2020-ku, and it
 has the benefit of fixing gene symbols ruined by Excel autocorrect, which are unfortunately
 common in GEO @Ziemann2016-hp.
@@ -516,13 +519,18 @@ genes not meeting this criterion were removed from downstream analysis (unless s
 Differential expression was conducted using DESeq2 v1.48.1 @love2014differential.
 Human gene symbols were updated to Ensembl 115 @dyer2025ensembl.
 Genes with FDR<0.05 were considered significantly differentially expressed.
-Reactome gene sets were downloaded in GMT format on 02/09/2025 @milacic2024reactome.
-ORA was conducted using the `fora` function belonging to the `fgsea` package
+Reactome gene sets were downloaded in GMT format on 02/09/2025 @milacic2024reactome, and
+these gene sets were used for all subsequent enrichment tests unless otherwise stated.
+All ORA tests were conducted using the `fora` function belonging to the `fgsea` package
 @korotkevich2016fast.
+Minimum gene set size was set to 5 for all subsequent enrichment tests.
+Gene sets with FDR<0.05 were considered significantly differentially expressed.
 
 To demonstrate the importance of FDR control (Mistake 1), random sampling of 1000 detected
 genes was followed with ORA with and without FDR control.
 This was repeated 100 times.
+For comparison of the nominal and FDR corrected results, the up (1667) and down (1923)
+regulated genes underwent ORA using a background consisting of the 13063 detected genes.
 
 To demonstrate the importance of a suitable background gene list (Mistake 2), random sampling
 of 1000 detected genes as the foreground followed by ORA using either the whole genome
@@ -530,7 +538,29 @@ background or background consisting of detected genes.
 This process was repeated 1000 times.
 
 To demonstrate the importance of using enrichment scores for interpretation of FEA results,
-(Mistake 3 and 4) the mitch package was used for FCS analysis of the differential expression data
-@kaspi2020mitch.
+(Mistake 3 and 4) the `mitch` package was used for FCS analysis of the differential
+expression data @kaspi2020mitch.
+
+To investigate how foreground gene set size impact the number of ORA results (Mistake 5),
+the top N significant up- and down-regulated genes were selected for ORA compared to the
+background consisting of detected genes, where N was varied between 50 and 7000.
+
+To demonstrate the effect of combining up and down regulated genes into a single test
+(Mistake 6), we took all unique genes with FDR<0.05 (n=3950) as the foreground for an ORA
+test, and compared these results to the separate approach (n=1667,1923 up and
+downregulated genes respectively).
+
+To show the effect of using shallow gene annotations (Mistake 7), various gene set
+libraries were extracted from the MSigDB Collection (msigdb.v2025.1.Hs.symbols.gmt)
+@liberzon2015molecular.
+These gene set libraries were each used for ORA tests.
+
+To show the effect of using old gene sets (Mistake 8), the Reactome gene sets were extracted
+from archived MSigDB Collections going back to 2010.
+These were compared to the most recent Reactome release (02/09/2025).
+
+Instances of poor presentation (Mistake 9) and methods reproducibility (Mistake 10)
+were drawn from unpublished notes made during a previous systematic analysis of the
+literature @Wijesooriya2022-we.
 
 # Bibliography
