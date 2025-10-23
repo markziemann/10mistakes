@@ -71,7 +71,7 @@ published articles using the method.
 
 Using an example RNA-seq dataset and simulation analysis, we provide evidence to show just how
 impactful these mistakes are.
-Details of the analysis are provided in the Supplementary Material.
+Details of the this analysis are provided in the Methods and Supplementary Material.
 
 ```{r,setup,echo=FALSE}
 
@@ -95,12 +95,11 @@ A low p-value (eg: p<0.05) suggests the observed result would be unlikely from r
 suggesting a real effect.
 However, as gene set libraries can contain thousands of categories, we could expect 5% of the
 gene sets to meet the p<0.05 threshold with random data.
-In the example dataset, we randomly selected 1000 genes that met the detection threshold and submitted
+In the example dataset (see Methods below), we randomly selected 1000 genes that met the detection threshold and submitted
 these to ORA with gene sets from Reactome.
-Of the 1840 Reactomes with five or more members detected, we obtained a mean of 51.6 hits (p<0.05)
+Of the 1840 Reactomes with five or more members detected, on average we obtained a mean of 51.6 hits (p<0.05; 100 repeats)
 with these random genes (**Figure 1A**), proving that reporting raw p-values is bound to yield many
 false positives, in this case at a rate of 2.8%.
-
 There are a variety of p-value correction methods to reduce the risk of false positives @Tilford2009-kh,
 including approaches from Sidak @Ury01021976, Holm-Bonferroni @holm1979simple and Benjamini-Hochberg
 @benjamini1995controlling.
@@ -111,7 +110,7 @@ After applying FDR adjustment to the results of the random gene sets (**Figure 1
 the mean number of significant hits (FDR adjusted p<0.05) is 0.16, effectively eliminating false
 positives.
 
-In the example dataset (AML3 cells treated with azacitidine), omitting FDR correction leads to the
+In the example dataset (AML3 cells with and without azacitidine treatment), omitting FDR correction leads to the
 identification of 696 Reactomes with p<0.05, of which 345 are likely false positives (~49.6%)
 (**Figure 1B**).
 Omitting p-value correction could lead to half of the enrichment results being false, which is why it
@@ -139,7 +138,7 @@ Every omics analysis has its limitations.
 In the world of gene expression, microarrays can only measure genes it has been designed to assay.
 RNA-seq has certain genes that are poorly detected as a result of sequence similarity or GC bias.
 Biological differences also play a big part in what is detected @Timmons2015-yb.
-Out of the 78,691 human genes annotated in GENCODE's latest release (v49), typically only 12-20k are
+Out of the 78,691 human genes annotated in Ensembl's latest release (v115), typically only 12-20k are
 expressed at detectable levels with RNA-seq in any one tissue.
 In the example dataset based on an earlier Ensembl release (v90) that involves 58,302 annotated genes,
 most are silent.
@@ -162,15 +161,15 @@ Meanwhile, if we use a custom background gene list composed of genes meeting the
 threshold, we should expect on average 0.16 genesets with FDR<0.05, practically eliminating false
 positives.
 Many of these false positives are highly reproducible (**Figure 2B**), and as many of them are
-related to relevant cell functions like cell cycle, immune function and signalling, they have the
+related to cancer-relevant cell functions like cell cycle, immune function and signalling, they have the
 potential to mislead readers.
 
 Now coming back to the example dataset, we did ORA with a whole genome background and separately with
 the custom background of detected genes.
-The whole genome background gave a much larger number of significant gene sets (1279) in contrast
+The whole genome background gave a much larger number of "significant" gene sets (1269) in contrast
 to the custom background analysis (351) (**Figure 2C**).
 The overlap between them was just 347, giving a Jaccard statistic of 0.27.
-In other words, without the right background gene list, up to 72% of results could be false positives.
+In other words, without the right background gene list, up to 73% of results could be false positives.
 
 ```{r,2a,fig.cap="Figure 2A. Impact of background list on the number of significant gene sets. 100 simulations.",echo=FALSE,fig.height=4,fig.width=4}
 
