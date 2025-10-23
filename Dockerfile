@@ -13,7 +13,7 @@ RUN apt-get update \
 RUN R -e 'install.packages(c("kableExtra","vioplot","gplots","eulerr","rmdformats","RhpcBLASctl"))'
 
 # Install required Bioconductor package
-RUN R -e 'BiocManager::install(c("getDEE2","DESeq2","fgsea","clusterProfiler","mitch"))'
+RUN R -e 'BiocManager::install(c("getDEE2","DESeq2","fgsea","mitch"))'
 
 # Clone the repository that contains the research code and execute it
 RUN git clone https://github.com/markziemann/10mistakes.git
