@@ -1152,6 +1152,19 @@ saveRDS(m8tbl,"m8tbl.Rds")
 
 ## Mistake 8 - outated gene sets
 
+Here, we want to show how the depth of the gene set library increases over time.
+To achieve this, I downloaded all the Reactome gene sets that were available in
+MSigDB going back to 2010.
+I also included the most recent gene set library from Reactome directly - the
+one we used above.
+There are a few ways to show the gene set library size including number of gene
+sets, mean set size, total number of annotations, and number of unique genes
+included.
+The charts below show that the number of gene sets increases over time, and
+so does the total number of annotations, and the gene coverage.
+For simplicity, in the article we just show the number of gene sets.
+This corresponds to Figure 6.
+
 ```{r,outdated}
 
 par(mar=c(5.1,5.1,4.1,2.1))
