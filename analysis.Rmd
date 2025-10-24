@@ -986,6 +986,17 @@ lines(sizes,df$dn,type="b",col="blue")
 dev.off()
 par(mfrow=c(1,1))
 
+unlink("img/5m.pdf")
+pdf("img/5m.pdf", width = 7, height = 5)
+par(mfrow=c(1,2))
+plot(sizes,df$up,type="b",col="red",ylab="no. gene sets with FDR<0.05",xlab="gene list length",bty="n")
+lines(sizes,df$dn,type="b",col="blue")
+plot(sizes,df$up,type="b",col="red",ylab="no. gene sets with FDR<0.05",xlab="gene list length",
+  xlim=c(0,500), ylim=c(0,125),bty="n")
+lines(sizes,df$dn,type="b",col="blue")
+dev.off()
+par(mfrow=c(1,1))
+
 ```
 
 ## Mistake 6 - combining up and downregulated genes into the same test.
@@ -1028,6 +1039,11 @@ plot(euler(v1),quantities = list(cex = 2), labels = list(cex = 2))
 
 unlink("img/6m. png")
 png("img/6m.png", width = 480, height = 300)
+plot(euler(v1),quantities = list(cex = 2), labels = list(cex = 2))
+dev.off()
+
+unlink("img/6m. pdf")
+pdf("img/6m.pdf", width = 5, height = 4)
 plot(euler(v1),quantities = list(cex = 2), labels = list(cex = 2))
 dev.off()
 
@@ -1167,6 +1183,13 @@ lapply(seq(0,2500,500),function(h) { abline(h=h,lty=2,col="gray") })
 
 unlink("img/9m.png")
 png("img/9m.png", width = 480, height = 300)
+barplot(nogs,las=2,ylim=c(0,2500),ylab="no. gene sets",main="Reactome gene sets over time",
+  border=NA,col="darkgray")
+lapply(seq(0,2500,500),function(h) { abline(h=h,lty=2,col="lightgray") })
+dev.off()
+
+unlink("img/9m.pdf")
+pdf("img/9m.pdf", width = 5, height = 4)
 barplot(nogs,las=2,ylim=c(0,2500),ylab="no. gene sets",main="Reactome gene sets over time",
   border=NA,col="darkgray")
 lapply(seq(0,2500,500),function(h) { abline(h=h,lty=2,col="lightgray") })
