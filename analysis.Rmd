@@ -24,7 +24,6 @@ suppressPackageStartupMessages({
   library("getDEE2")
   library("DESeq2")
   library("kableExtra")
-  library("clusterProfiler")
   library("eulerr")
   library("gplots")
   library("mitch")
