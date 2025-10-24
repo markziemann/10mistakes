@@ -71,7 +71,7 @@ published articles using the method.
 
 Using an example RNA-seq dataset and simulation analysis, we provide evidence to show just how
 impactful these mistakes are.
-Details of the this analysis are provided in the Methods and Supplementary Material.
+Details of this analysis are provided in the Methods and Supplementary Material.
 
 ```{r,setup,echo=FALSE}
 
@@ -185,7 +185,7 @@ grid.raster(mypng, x=0.5, y=0.5, width=1)
 
 ```
 
-```{r,2c,fig.cap="Figure 2C. Impact of background list on the number of significant gene sets. Example dataset. The correct background based on the implementation of detection threshold is labelled 'bg', while the incorrect whole genome background is lebelled 'bg*'.",echo=FALSE,fig.height=3,fig.width=3}
+```{r,2c,fig.cap="Figure 2C. Impact of background list on the number of significant gene sets. Example dataset. The correct background based on the implementation of detection threshold is labelled 'bg', while the incorrect whole genome background is labelled 'bg*'.",echo=FALSE,fig.height=3,fig.width=3}
 
 mypng = readPNG('img/2c.png')
 grid.raster(mypng, x=0.5, y=0.5, width=1)
@@ -266,8 +266,8 @@ grid.raster(mypng, x=0.5, y=.5, width=1)
 It’s a common misconception that only differentially expressed genes that meet the FDR
 threshold should be submitted to an enrichment test, but this simply isn’t true.
 So long as you’re using proper FDR control of your pathways (See #1 above), you can select
-genes in any arbitrary way your like.
-The caveat here is that enrichment tests (like hypergeometric method) have size ranges of
+genes in any arbitrary way you like.
+The caveat here is that enrichment tests (like the hypergeometric method) have size ranges of
 input gene lists that work best.
 We tested different input gene list sizes in ORA and found that 2500 yielded the most (456
 with FDR<0.05), while sizes 200 and less yielded very few significant pathways (**Figure 4**).
@@ -325,7 +325,7 @@ selecting the database to query.
 There are many options to consider, both proprietary and open source.
 When choosing, consider whether the database contains the gene sets that you a priori
 suspect will be altered in the profile you’re looking at.
-Secondly consider the breadth and depth of the pathway library, this will be where the
+Secondly, consider the breadth and depth of the pathway library, this will be where the
 unexpected discoveries may occur, and it pays to use a comprehensive one to capture as many
 aspects of your data as possible.
 To demonstrate this, see how KEGG legacy and KEGG Medicus seem tiny when compared to Reactome,
@@ -348,7 +348,7 @@ One great thing about working with omics data is that data repositories like GEO
 are loaded with previously published data sets that we can reanalyse with new pathway
 databases and software tools to eke out further insights.
 When the data is several years old, we should use the processed data with caution, as many
-gene names may have since changes.
+gene names may have since changed.
 For example, as previously demonstrated, Illumina’s EPIC DNA Methylation microarray was
 released in 2016, and in the following eight years, 3,253 of 22,588 gene names on the chip
 have changed (14.4%) @Ziemann2024-be, meaning that those genes wouldn’t be recognised by
@@ -389,9 +389,9 @@ Excessive use of tools and databases can make the results difficult to interpret
 @lin2019indoxyl.
 
 We've also noticed cases of outright confusing, incomplete and simply wrong data
-presentatation choices that you should avoid:
+presentation choices that you should avoid:
 
-1. The number of selected genes in category is often shown as evidence of enrichment,
+1. The number of selected genes in a category is often shown as evidence of enrichment,
 [@zhao2019itraq; @li2019candidate;@sariman2019investigation;@bhatia2019long],
 but this can be misleading because this is one of four numbers that goes into calculating
 a fold enrichment score.
@@ -429,7 +429,7 @@ of enrichment analysis including;
 
 * how genes were selected or scored,
 
-* the tool used, and it's version,
+* the tool used, and its version,
 
 * the options or parameters applied,
 
@@ -462,7 +462,7 @@ with what's shown in the results [@li2019spag5;@tong2019combined].
 
 In addition to including the methodological details mentioned above, authors could also
 provide gene profile data and/or gene lists used for enrichment analysis as supplementary
-files, or better still, providing full reproducibility and transparancy with the five
+files, or better still, provide full reproducibility and transparency with the five
 pillars framework @ziemann2023five.
 
 # Other issues
@@ -472,7 +472,7 @@ have been flagged as potential problems.
 First, the length of genes is known to impact the ease at which they are detected and so correction of
 gene length has been suggested to improve enrichment results [@mi2012length;@mandelboum2019recurrent].
 Second, many FEA tests use genes as the sampling unit and do not take into consideration or model biological
-variation which could yield inrealistic significance values @goeman2007analyzing.
+variation which could yield unrealistic significance values @goeman2007analyzing.
 Third, the size of gene sets, even though they represent similar biology, can disproportionately impact significance
 scores and complicate interpretation [@karp2021pathway;@mubeen2022influence].
 Fourth, tight correlation between genes' expression within a pathway could exacerbate false positive rates
@@ -482,7 +482,7 @@ Fifth, slight differences in the implementation of ORA tests can impact results 
 Lastly, some web-based FEA tools lack longevity.
 For example, DAVID 6.8 [@huang2009systematic;@Sherman2022-kg] has been used for over 10,000 publications but has
 since 2022 been taken offline leaving those articles in an irreproducible state.
-As web-based tools appear to be most popular option for FEA [@xie2021popularity;@Wijesooriya2022-we],
+As web-based tools appear to be the most popular option for FEA [@xie2021popularity;@Wijesooriya2022-we],
 we should advocate using tools which allow preservation/archiving of the tool as a Docker image (eg: @Ge2020-lr),
 which could enable reproducibility into the future @perkel2020challenge.
 
@@ -500,7 +500,7 @@ recall [@kaspi2020mitch;@ziemann2024two].
 Although learning and running FCS tools is more difficult and time-consuming, the benefits to the quality of results
 are substantial.
 
-The deluge of manuscripts in genomics and other fields places increasing burden on a limited pool of competant,
+The deluge of manuscripts in genomics and other fields places increasing burden on a limited pool of competent,
 voluntary peer-reviewers to a point where editors are struggling to maintain the peer-review system as we know it
 @adam2025peer.
 As studies become ever more multi-disciplinary, this makes it more difficult for editors to cover all the technical
@@ -541,7 +541,7 @@ To demonstrate the importance of using enrichment scores for interpretation of F
 (Mistake 3 and 4) the `mitch` package v1.20.0 was used for FCS analysis of the differential
 expression data @kaspi2020mitch.
 
-To investigate how foreground gene set size impact the number of ORA results (Mistake 5),
+To investigate how foreground gene set size impacts the number of ORA results (Mistake 5),
 the top N significant up- and down-regulated genes were selected for ORA compared to the
 background consisting of detected genes, where N was varied between 50 and 7000.
 
