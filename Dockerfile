@@ -10,7 +10,7 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 # Install required CRAN packages
-RUN R -e 'install.packages(c("kableExtra","vioplot","gplots","eulerr","rmdformats","RhpcBLASctl"))'
+RUN R -e 'install.packages(c("kableExtra","vioplot","gplots","eulerr","rmdformats","RhpcBLASctl","png"))'
 
 # Install required Bioconductor package
 RUN R -e 'BiocManager::install(c("getDEE2","DESeq2","fgsea","mitch"))'
