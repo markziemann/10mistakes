@@ -36,7 +36,7 @@ docker run -it mziemann/10mistakes:latest
 Once in the container, pull the latest code.
 
 ```
-git pull
+git stash && git pull
 ```
 
 Now the two R scripts can be run to conduct the analysis and generate the manuscript.
