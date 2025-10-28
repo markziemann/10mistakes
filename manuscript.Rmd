@@ -44,7 +44,7 @@ We provide practical advice on their mitigation.
 
 # Background
 
-PubMed searches indicate keywords like "pathway analysis" and "enrichment analysis" appear in title
+PubMed searches indicate keywords like "pathway analysis" and "enrichment analysis" appear in titles
 or abstracts of approximately 10,000 articles per year, and that the number of articles matching these
 keywords has increased by a factor of 5.4 between 2014 and 2024.
 The purpose of FEA is to understand whether gene categories are collectively
@@ -201,7 +201,7 @@ grid.raster(mypng, x=0.5, y=0.5, width=1)
 
 # 3. Using a tool that doesn’t report enrichment scores 
 
-FDR values can tell us whether something is statiscally significant, but it doesn’t directly
+FDR values can tell us whether something is statistically significant, but it doesn’t directly
 indicate whether there will be any biological impact [@sullivan2012using;@schober2018statistical].
 For that, we need some measure of effect size.
 In enrichment analysis, we can use an enrichment score as a proxy measure of effect size.
@@ -261,7 +261,7 @@ The scatterplot shown in **Figure 3** shows how focusing on statistical signific
 could overlook interesting results with larger effect sizes.
 End users should therefore use both prioritisation approaches to interpret their data.
 
-```{r,m4fig,fig.cap="Figure 3. Scatterplot showing absolute enrichment scores (x-axis) and log-transformed significance values (y-axis) for each detected pathways. Gene sets with FDR<0.05 are highlighted in red.",echo=FALSE,fig.height=5,fig.width=5}
+```{r,m4fig,fig.cap="Figure 3. Scatterplot showing absolute enrichment scores (x-axis) and log-transformed significance values (y-axis) for each detected pathway. Gene sets with FDR<0.05 are highlighted in red.",echo=FALSE,fig.height=5,fig.width=5}
 
 mypng = readPNG('img/3a.png')
 grid.raster(mypng, x=0.5, y=.5, width=1)
