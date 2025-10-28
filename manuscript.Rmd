@@ -276,7 +276,7 @@ So long as you’re using proper FDR control of your pathways (See #1 above), yo
 genes in any arbitrary way you like.
 The caveat here is that enrichment tests (like the hypergeometric method) have size ranges of
 input gene lists that work best.
-We tested different input gene list sizes in ORA and found that 2500 yielded the most (456
+We tested different input gene list sizes in ORA and found that 2500 yielded the most (455
 with FDR<0.05), while sizes 200 and less yielded very few significant pathways (**Figure 4**).
 In the range of 300-1000, there’s a steep increase in the number of significant pathways, and
 after that the gradient reduces.
@@ -301,10 +301,10 @@ up- and down-regulated gene lists, instead opting to submit the combined list fo
 This isn’t necessarily an error, as it tests the hypothesis that some pathways are
 “dysregulated”, a mix of up- and down-regulated genes, that appear at an elevated rate.
 The combined approach can miss a lot of results as compared to the separate approach.
-According to the results of our example analysis, the separate approach identified 355
-pathways and the combined approach found only 149, that’s 58% fewer (see **Figure 5**).
+According to the results of our example analysis, the separate approach identified 351
+pathways and the combined approach found only 166, that’s 53% fewer (see **Figure 5**).
 The combined approach could uniquely identify some pathways, but this is relatively few.
-In the example dataset, only 2.2% of results were identified exclusively with the combined
+In the example dataset, only 2.8% of results were identified exclusively with the combined
 test.
 
 The reason behind this is two-fold.
@@ -316,7 +316,7 @@ In a typical differential expression experiment after a stimulus, this results i
 that are predominantly up or down regulated, but rarely a mix of up and down.
 Due to this phenomenon, the up and down lists each have relatively strong enrichments, but
 they are diluted when combined @Hong2014-yn.
-Based on this, failing to report data of the separate approach could leave you 58% fewer
+Based on this, failing to report data of the separate approach could leave you with 53% fewer
 results, and an incomplete picture of what's happening at the molecular level.
 
 ```{r,6m,fig.cap="Figure 5. Combining up and downregulated genes into one ORA test yields far fewer results.",echo=FALSE,fig.height=3,fig.width=5}
@@ -545,7 +545,7 @@ To demonstrate the importance of FDR control (Mistake 1), random sampling of 100
 genes was followed with ORA with and without FDR control.
 This was repeated 100 times.
 For comparison of the nominal and FDR corrected results, the up (1672) and down (1926)
-regulated genes underwent ORA using a background consisting of the 13168 detected genes.
+regulated genes underwent ORA using a background consisting of the 13,068 detected genes.
 
 To demonstrate the importance of a suitable background gene list (Mistake 2), random sampling
 of 1000 detected genes as the foreground followed by ORA using either the whole genome
