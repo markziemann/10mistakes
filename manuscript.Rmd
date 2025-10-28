@@ -283,6 +283,7 @@ If you want to avoid making arbitrary thresholds (which seem to annoy reviewers)
 suggest using an FCS method like GSEA instead that calculates enrichment from all detected
 genes.
 
+
 ```{r,5m,fig.cap="Figure 4. Effect of gene list size on number of significant pathways. Up-regulated in red, down-regulated in blue.",echo=FALSE,fig.height=4.5,fig.width=7}
 
 mypng = readPNG('img/5m.png')
@@ -431,7 +432,8 @@ could, in theory or in actuality, be exactly repeated."
 There are several crucial pieces of information required in order to enable reproducibility
 of enrichment analysis including;
 
-* how genes were selected or scored,
+* how genes were selected or scored - especially whether up or down-regulated genes were considered
+separately or combined,
 
 * the tool used, and its version,
 
