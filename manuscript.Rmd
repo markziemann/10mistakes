@@ -65,6 +65,9 @@ Recommendations on correct application of pathway enrichment have been previousl
 [@Tilford2009-kh; @Tipney2010-sy; @Chicco2022-aa; @Zhao2023-av], yet we and others continue to
 observe blatant mistakes and methodological deficiencies appearing in peer-reviewed publications at
 an alarming rate [@Timmons2015-yb; @Wijesooriya2022-we].
+Such methodological and interpretation errors are known to "snowball" - a process where an initial
+flawed research study can create cascading problems for scientific reliability @liu2023misuse.
+
 The purpose of this opinion article is to share what our group has learned about successful FEA over
 the past 15 years having authored several articles using it and critically examining hundreds of
 published articles using the method.
@@ -421,6 +424,10 @@ edges aren't described @bandi2019hepatic.
 [@xu2019sirt2; @di2019genome].
 
 7. Confusion around which tool was used for each figure and panel (eg: @jin2019expression).
+
+Such misinterpretation and data presentation problems can also occur when a tool is used without
+understanding the statistical basis of inference @liu2023misuse, so it is crucial that users
+take the time to familiarise themselves with the tool's documentation and recommendations.
 
 # 10. Neglecting methods reproducibility
 
