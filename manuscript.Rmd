@@ -95,6 +95,10 @@ A low p-value (eg: p<0.05) suggests the observed result would be unlikely from r
 suggesting a real effect.
 However, as gene set libraries can contain thousands of categories, we could expect 5% of the
 gene sets to meet the p<0.05 threshold with random data.
+Therefore, we almost always get many "significant" results just by chance.
+This leads to the multiple testing problem whereby uncorrected p-values lead to high rates of false
+positives.
+
 In the example dataset (see Methods below), we randomly selected 1000 genes that met the detection threshold and submitted
 these to ORA with gene sets from Reactome.
 Of the 1840 Reactomes with five or more members detected, on average we obtained a mean of 51.6 hits (p<0.05; 100 repeats)
