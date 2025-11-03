@@ -1038,31 +1038,46 @@ dev.off()
 Combining up and down into a single test can reduce the number of results significantly.
 This is because gene sets show typically have a predominantly pattern of up or down
 regulation but not both.
-The combined approach discovers only a few unique sets (10 in this case).
+Gene list length is 750 due to findings for mistake 5.
+The combined approach discovers only a few unique sets.
 The euler plot shown below corresponds to Figure 5.
 
 ```{r,mistake6a,fig.height=4,fig.width=5}
 
+up <- head(rownames(subset(def, log2FoldChange>0)),752)
+up <- sapply(strsplit(up," "),'[[',1)
+up <- unique(gtnew[match(up,gtnew$V1),2])
+up <- up[which(!is.na(up))]
 message("No. up genes.")
 length(up)
 
+dn <- head(rownames(subset(def, log2FoldChange<0)),750)
+dn <- sapply(strsplit(dn," "),'[[',1)
+dn <- unique(gtnew[match(dn,gtnew$V1),2])
+dn <- dn[which(!is.na(dn))]
 message("No. down genes.")
 length(dn)
 
 message("No. unique DE genes.")
-updn <- unique(c(up,dn))
+updn <- head(rownames(def),751)
+updn <- sapply(strsplit(updn," "),'[[',1)
+updn <- unique(gtnew[match(updn,gtnew$V1),2])
+updn <- updn[which(!is.na(updn))]
 length(updn)
 
+message("no. significant sets using the combined test:")
 fres_updn_bg <- fora(pathways=gsets, genes=updn, universe=bg, minSize = 5, maxSize = Inf)
 fres_updn_bg <- subset(fres_updn_bg,padj<0.05)$pathway
-
-message("no. significant sets using the combined test:")
 length(fres_updn_bg)
 
 message("no. significant upregulated sets using the separate test:")
+fres_up_bg <- fora(pathways=gsets, genes=up, universe=bg, minSize = 5, maxSize = Inf)
+fres_up_bg <- subset(fres_up_bg,padj<0.05)$pathway
 length(fres_up_bg)
 
 message("no. significant downregulated sets using the separate test:")
+fres_dn_bg <- fora(pathways=gsets, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
+fres_dn_bg <- subset(fres_dn_bg,padj<0.05)$pathway
 length(fres_dn_bg)
 
 message("no. significant sets using the separate tests:")
