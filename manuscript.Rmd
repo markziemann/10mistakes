@@ -13,7 +13,7 @@ bibliography: 10mistakes.bib
 csl: f1000research.csl
 ---
 
-<strong>Anusuiya Bora<sup>1,2</sup> & Mark Ziemann<sup>1,2*</sup></strong>
+<strong>Anusuiya Bora<sup>1,2</sup>, Matthew McKenzie<sup>1</sup> & Mark Ziemann<sup>1,2*</sup></strong>
 
 1. Deakin University, School of Life and Environmental Sciences, Geelong, Australia.
 
@@ -24,9 +24,10 @@ csl: f1000research.csl
 | Author | ORCID |
 | --- | --- |
 | Anusuiya Bora | 0009-0006-2908-1352 |
+| Matthew McKenzie | 0000-0001-7508-1800 |
 | Mark Ziemann | 0000-0002-7688-6974 |
 
-Target journal: F1000 Research
+Target journal: Nature Methods
 
 # Abstract
 
@@ -149,8 +150,8 @@ Out of the 78,691 human genes annotated in Ensembl's latest release (v115), typi
 expressed at detectable levels with RNA-seq in any one tissue.
 In the example dataset based on an earlier Ensembl release (v90) that involves 58,302 annotated genes,
 most are silent.
-For example, 45,134 recorded a mean <10 reads per sample across the six samples.
-Only 13,168 genes met this detection threshold.
+For example, 45,134 recorded a mean <10 reads per sample across the six samples, with
+only 13,168 genes meeting this detection threshold.
 Although 77.4% of genes are discarded at this step, they account for a miniscule 0.2% of reads.
 Filtering poorly detected genes gives a slight boost to differential gene identification
 @sha2015effect, but it is most crucial in defining the background gene list for subsequent enrichment
@@ -158,23 +159,22 @@ analysis.
 Genes with very low expression are unlikely to be biologically relevant in the context being studied
 and should be excluded from the background.
 
-Using a simulation approach we can demonstrate the consequence of omitting a background on an RNA-seq
+Using a simulation approach, we can demonstrate the consequence of omitting a background gene list on an RNA-seq
 experiment.
-By drawing a random set of 1000 genes from among the ones with expression above 10 reads per sample
-on average in the AML3 example dataset and using an enrichment test (hypergeometric) that uses the
-whole genome annotation as a background we see that on average we should expect 444 gene sets
-reaching the FDR<0.05 significance level (**Figure 2A**).
-Meanwhile, if we use a custom background gene list composed of genes meeting the 10 reads per sample
-threshold, we should expect on average 0.16 gene sets with FDR<0.05, practically eliminating false
+By drawing a random set of 1000 genes in the AML3 example dataset with expression above 10 reads per sample
+on average and using an enrichment test (hypergeometric) that uses the
+whole genome annotation as a background, we see 444 gene sets
+reaching the FDR<0.05 significance level on average (**Figure 2A**).
+Alternatively, if we use a custom background gene list composed of genes meeting the 10 reads per sample
+threshold, we expect 0.16 gene sets with FDR<0.05, practically eliminating false
 positives.
-Many of these false positives are highly reproducible (**Figure 2B**), and as many of them are
-related to cancer-relevant cell functions like cell cycle, immune function and signalling, they have the
+These false positives are highly reproducible (**Figure 2B**), and as many of them are
+cancer-relevant pathways like cell cycle and immune signalling, they have the
 potential to mislead readers.
 
-Now coming back to the example dataset, we did ORA with a whole genome background and separately with
-the custom background of detected genes.
-The whole genome background gave a much larger number of "significant" gene sets (1269) in contrast
-to the custom background analysis (351) (**Figure 2C**).
+Performing ORA with azacitidine-responsive genes with the whole genome background gave a much
+larger number of "significant" gene sets (1269) in contrast to the custom background analysis
+(351) (**Figure 2C**).
 The overlap between them was just 347, giving a Jaccard statistic of 0.27.
 In other words, without the right background gene list, up to 73% of results could be false positives.
 
@@ -207,15 +207,15 @@ For that, we need some measure of effect size.
 In enrichment analysis, we can use an enrichment score as a proxy measure of effect size.
 For rank-based tools like GSEA, the enrichment score varies from -1  to +1 denoting the
 distribution of genes in a gene set relative to all other genes @Subramanian2005-bd.
-A score of 1.0 would mean that X genes in the set are the X most upregulated, while if a
-value is close to 0, it means the distribution of genes is close to what you might get by
-random chance.
+For a gene set composed of 15 genes, a score of 1.0 would mean that these 15 genes are the
+top 15 upregulated, while if a value is close to 0, it means the distribution of genes is
+close to what you might get by random chance.
 For over-representation methods like DAVID, the fold enrichment score is often quoted, which
-is the odds ratio of genes of a gene set in the list as compared to the background @Tilford2009-kh.
+is the odds ratio of genes of a gene set in the foreground list as compared to the background @Tilford2009-kh.
 Unfortunately, DAVID doesn’t provide the fold enrichment scores in the main results page,
 they are only available in the table for download.
-Many other common tools don’t even calculate the enrichment scores (looking at you
-clusterProfiler), which leaves researchers in the dark about their effect sizes.
+Many other common tools don’t provide enrichment scores (for example
+clusterProfiler), which leaves researchers with no information about their effect sizes.
 Tools that do provide enrichment scores include ShinyGO (web) @Ge2020-lr, GSEA @Subramanian2005-bd
 and fgsea (fora) @Korotkevich2021-xm.
 
@@ -223,7 +223,7 @@ and fgsea (fora) @Korotkevich2021-xm.
 
 Pathway enrichment analysis can return hundreds of significant results, which can be
 confusing to interpret.
-Many tools by default will sort the results by significance, but this can lead you to
+Many tools by default will sort the results by significance, but this can lead users to
 prioritise pathways that are very large but where each gene is only slightly dysregulated.
 To demonstrate this, see the results from a typical pathway enrichment analysis result with
 p-value prioritisation and with enrichment score (ES) prioritisation after removal of
@@ -251,11 +251,11 @@ mytbl |>
 
 ```
 
-P-value prioritisation (**Table 1**) emphasises generic functions with really large gene
+P-value prioritisation (**Table 1**) emphasises generic functions with large gene
 sets and moderate fold changes, while enrichment score prioritisation (**Table 2**)
 highlights smaller gene sets with highly specific functions, where member genes have bigger
 fold changes.
-These more specific gene sets are in general better candidates for downstream validation due
+These more specific gene sets are (generally) better candidates for downstream validation due
 to their explanatory power.
 The scatterplot shown in **Figure 3** shows how focusing on statistical significance only
 could overlook interesting results with larger effect sizes.
@@ -271,23 +271,35 @@ grid.raster(mypng, x=0.5, y=.5, width=1)
 # 5. Using gene lists that are too large or too small for ORA 
 
 It’s a common misconception that only differentially expressed genes that meet the FDR
-threshold should be submitted to an enrichment test, but this simply isn’t true.
+threshold should be submitted to an enrichment test.
 Tarca and colleagues suggest a heuristic that selects the top 1% of genes if there are none
 that meet the standard significance cut-off @tarca2013comparison.
-As long as you’re using proper FDR control of your pathways (See #1 above), the selection
+If proper FDR control of enrichment results is applied (See #1 above), then gene selection
 criteria can be flexible.
-The caveat here is that enrichment tests (like the hypergeometric method) have size ranges of
+The caveat is that enrichment tests (like the hypergeometric method) have size ranges of
 input gene lists that work best.
 We tested different input gene list sizes in ORA and found that 2500 yielded the most (455
-with FDR<0.05), while sizes 200 and less yielded very few significant pathways (**Figure 4**).
-In the range of 300-1000, there’s a steep increase in the number of significant pathways, and
-after that the gradient reduces.
-This suggests a sweet spot around 1000, which in our example is 7.6% of the 13,168 genes
-detected.
-If you want to avoid making arbitrary thresholds (which seem to annoy reviewers) then we’d
-suggest using an FCS method like GSEA instead that calculates enrichment from all detected
-genes.
+with FDR<0.05), while lists of 200 and fewer yielded very few (**Figure 4**).
+In the range of 300-1000, there’s a steep increase in the number of significant pathways,
+with the gradient reducing with more than 1000 genes.
+This result indicates that using a larger gene list of up to 2500 genes would be better, but
+the main downside is that these additional results are for gene sets with smaller enrichment
+scores.
+For example, for significantly downregulated pathways at a gene set size of 100, fold
+enrichment scores were 16.9 on average, and at a size of 2500, fold enrichment scores were
+2.5.
+Users may wish to prespecify a fold enrichment score that they consider biologically relevant
+(3-5 seems reasonable), and then tune their analysis to capture the most statistically
+significant enrichments above this score.
+In the example dataset, the number of gene sets meeting this minimum fold enrichment score
+appeared to peak with a gene set size of 700 for the upregulated genes, and 800 for
+downregulated genes (**Figure 4**), which corresponds to 5-6% of all detected genes.
 
+This suggests that a gene list size of 700-800 genes, of 5-6% of all those detected would
+be reasonable for a differential expression study.
+Nevertheless some users may want to avoid setting seemingly arbitrary thresholds - in that
+case, using an FCS method like GSEA instead that calculates enrichment from all detected
+genes would be recommended.
 
 ```{r,5m,fig.cap="Figure 4. Effect of gene list size on number of significant pathways. Up-regulated in red, down-regulated in blue.",echo=FALSE,fig.height=4.5,fig.width=7}
 

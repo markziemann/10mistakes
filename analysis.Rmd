@@ -743,6 +743,7 @@ dev.off()
 par(mfrow=c(1,1))
 par(mar=c(5.1,4.1,4.1,2.1))
 
+
 ```
 
 Now, let's take a look at the top results when prioritising with FDR only and with
@@ -925,7 +926,7 @@ bg <- bg[which(!is.na(bg))]
 message("Length of up, down and background gene lists. Only for context.")
 lapply(list(up,dn,bg),length)
 
-sizes <- c(50,100,200,300,400,500,750,1000,1500,2000,2500,3000,4000,5000,6000,7000)
+sizes <- c(50,100,200,300,400,500,600,700,800,900,1000,1500,2000,2500,3000,4000,5000,6000,7000)
 
 fup <- nrow(subset(fora(pathways=gsets, genes=up, universe=bg, minSize = 5, maxSize = Inf),padj<0.05))
 fdn <- nrow(subset(fora(pathways=gsets, genes=dn, universe=bg, minSize = 5, maxSize = Inf),padj<0.05))
@@ -952,48 +953,83 @@ df %>%
   kbl(caption="Table XX. Number of differentially regulated gene sets when varying the foreground gene list length.") %>%
   kable_paper("hover", full_width = F)
 
+
+dn_fes <- lapply(sizes, function(i) {
+  ids <- rownames(subset(def2, log2FoldChange<0))
+  ids <- head(ids,i)
+  genes <- unique(gtnew[match(ids,gtnew$V1),2])
+  fres <- fora(pathways=gsets, genes=genes, universe=bg, minSize = 5, maxSize = Inf)
+  subset(fres,padj<0.05)$foldEnrichment
+})
+
+up_fes <- lapply(sizes, function(i) {
+  ids <- rownames(subset(def2, log2FoldChange>0))
+  ids <- head(ids,i)
+  genes <- unique(gtnew[match(ids,gtnew$V1),2])
+  fres <- fora(pathways=gsets, genes=genes, universe=bg, minSize = 5, maxSize = Inf)
+  subset(fres,padj<0.05)$foldEnrichment
+})
+
+fes_df <- data.frame(sapply(up_fes,mean),sapply(dn_fes,mean))
+rownames(fes_df) <- sizes
+fes_df %>%
+  kbl(caption="Table XX. Mean enrichment scores of differentially regulated gene sets when varying the foreground gene list length.") %>%
+  kable_paper("hover", full_width = F)
+
+nups3 <- unlist(lapply(up_fes,function(x) { length(which(x>=3)) }))
+ndns3 <- unlist(lapply(dn_fes,function(x) { length(which(x>=3)) }))
+df3 <- data.frame("up3"=nups3,"dn3"=ndns3,row.names=sizes)
+df3$tot3 <- df3$up3 + df3$dn3
+df3 %>%
+  kbl(caption="Table XX. No differentially regulated gene sets meeting the FES threshold of 3 when varying the foreground gene list length.") %>%
+  kable_paper("hover", full_width = F)
+
 ```
 
 Now to make a line chart of this data.
 The first chart is the whole range of data, and the second is a zoom in to 50 to 500 genes.
 The line chart shown below corresponds to Figure 4.
 
-```{r,mistake5_linechart,fig.height=6,fig.width=6}
+```{r,mistake5_linechart,fig.height=7,fig.width=6}
 
 plot(1:nrow(df),df$up,type="b",col="red", pch=19, las=1,
   ylab="no. gene sets with FDR<0.05",xlab="gene list length",
   bty="n",xaxt = "n")
 axis(1, at = 1:nrow(df), labels=sizes, cex.axis=1,las=2)
 lines(1:nrow(df),df$dn,type="b",col="blue",pch=19)
-legend("topleft", legend=c("Up", "Down"),
-       col=c("red", "blue"), lty=1, cex=1,pch=19)
+lines(1:nrow(df3),df3$dn3,type="b",col="lightblue",pch=19)
+lines(1:nrow(df3),df3$up3,type="b",col="pink",pch=19)
+legend("topleft", legend=c("Up", "Down","Up,FES>3","Down,FES>3"),
+       col=c("red", "blue","pink","lightblue"), lty=1, cex=1,pch=19)
 grid()
 
 unlink("img/5m.png")
-png("img/5m.png", width = 480, height = 480)
+png("img/5m.png", width = 540, height = 480)
 plot(1:nrow(df),df$up,type="b",col="red", pch=19, las=1,
   ylab="no. gene sets with FDR<0.05",xlab="gene list length",
   bty="n",xaxt = "n")
 axis(1, at = 1:nrow(df), labels=sizes, cex.axis=1,las=2)
 lines(1:nrow(df),df$dn,type="b",col="blue",pch=19)
-legend("topleft", legend=c("Up", "Down"),
-       col=c("red", "blue"), lty=1, cex=1,pch=19)
+lines(1:nrow(df3),df3$dn3,type="b",col="lightblue",pch=19)
+lines(1:nrow(df3),df3$up3,type="b",col="pink",pch=19)
+legend("topleft", legend=c("Up", "Down","Up,FES>3","Down,FES>3"),
+       col=c("red", "blue","pink","lightblue"), lty=1, cex=1,pch=19)
 grid()
 dev.off()
 
 unlink("img/5m.pdf")
-pdf("img/5m.pdf", width = 5, height = 5)
+pdf("img/5m.pdf", width = 7, height = 5)
 plot(1:nrow(df),df$up,type="b",col="red", pch=19, las=1,
   ylab="no. gene sets with FDR<0.05",xlab="gene list length",
   bty="n",xaxt = "n")
 axis(1, at = 1:nrow(df), labels=sizes, cex.axis=1,las=2)
 lines(1:nrow(df),df$dn,type="b",col="blue",pch=19)
-legend("topleft", legend=c("Up", "Down"),
-       col=c("red", "blue"), lty=1, cex=1,pch=19)
+lines(1:nrow(df3),df3$dn3,type="b",col="lightblue",pch=19)
+lines(1:nrow(df3),df3$up3,type="b",col="pink",pch=19)
+legend("topleft", legend=c("Up", "Down","Up,FES>3","Down,FES>3"),
+       col=c("red", "blue","pink","lightblue"), lty=1, cex=1,pch=19)
 grid()
 dev.off()
-
-blah()
 
 ```
 
