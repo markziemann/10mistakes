@@ -707,7 +707,7 @@ plot(abs(mresdf$s.dist),-log10(mresdf$pANOVA),
 points(abs(sig$s.dist),-log10(sig$pANOVA),
   pch=19,cex=1,col="red")
 points(c(0.35,0.8),c(42,8),cex=17,pch=0)
-text(c(0.35,0.8),c(42,8),c("generic, boring","specific,\ninteresting"))
+text(c(0.35,0.8),c(42,8),c("generic","specific"))
 
 par(mar=c(5.1,4.1,4.1,2.1))
 unlink("img/3a.png")
@@ -721,7 +721,7 @@ plot(abs(mresdf$s.dist),-log10(mresdf$pANOVA),
 points(abs(sig$s.dist),-log10(sig$pANOVA),
   pch=19,cex=1,col="red")
 points(c(0.35,0.8),c(41,8),cex=17,pch=0)
-text(c(0.35,0.8),c(41,8),c("generic, boring","specific,\ninteresting"))
+text(c(0.35,0.8),c(41,8),c("generic","specific"))
 dev.off()
 par(mfrow=c(1,1))
 par(mar=c(5.1,4.1,4.1,2.1))
@@ -738,7 +738,7 @@ plot(abs(mresdf$s.dist),-log10(mresdf$pANOVA),
 points(abs(sig$s.dist),-log10(sig$pANOVA),
   pch=19,cex=1,col="red")
 points(c(0.35,0.8),c(41,8),cex=17,pch=0)
-text(c(0.35,0.8),c(41,8),c("generic, boring","specific,\ninteresting"))
+text(c(0.35,0.8),c(41,8),c("generic","specific"))
 dev.off()
 par(mfrow=c(1,1))
 par(mar=c(5.1,4.1,4.1,2.1))

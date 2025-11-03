@@ -310,14 +310,15 @@ grid.raster(mypng, x=0.5, y=.5, width=1)
 
 # 6. Combining up and down-regulated genes in the same ORA test 
 
-In some articles we’ve read, we noticed that authors didn’t conduct separate ORA tests for
+In some articles, we noticed that authors didn’t conduct separate ORA tests for
 up- and down-regulated gene lists, instead opting to submit the combined list for ORA.
 This isn’t necessarily an error, as it tests the hypothesis that some pathways are
-“dysregulated”, a mix of up- and down-regulated genes, that appear at an elevated rate.
-The combined approach can miss a lot of results as compared to the separate approach.
+“dysregulated”; a mix of up- and down-regulated genes which appear at an elevated rate.
+However, this combined approach can miss many enriched gene sets when compared to the
+separate approach.
 According to the results of our example analysis, the separate approach identified 351
-pathways and the combined approach found only 166, that’s 53% fewer (see **Figure 5**).
-The combined approach could uniquely identify some pathways, but this is relatively few.
+pathways compared to the combined approach that found only 166 (53% fewer; **Figure 5**).
+The combined approach does uniquely identify some pathways, but this is relatively few.
 In the example dataset, only 2.8% of results were identified exclusively with the combined
 test.
 
@@ -330,8 +331,9 @@ In a typical differential expression experiment after a stimulus, this results i
 that are predominantly up or down regulated, but rarely a mix of up and down.
 Due to this phenomenon, the up and down lists each have relatively strong enrichments, but
 they are diluted when combined @Hong2014-yn.
-Based on this, failing to report data of the separate approach could leave you with 53% fewer
-results, and an incomplete picture of what's happening at the molecular level.
+Based on this, failing to report data using the separate approach could result in 53%
+fewer identified gene sets, and an incomplete picture of what's happening at the molecular
+level.
 
 ```{r,6m,fig.cap="Figure 5. Combining up and downregulated genes into one ORA test yields far fewer results.",echo=FALSE,fig.height=3,fig.width=5}
 
@@ -342,15 +344,15 @@ grid.raster(mypng, x=0.5, y=.5, width=1)
 
 # 7. Using shallow gene annotations 
 
-One of the most important decisions you’ll make when doing a pathway enrichment analysis is
-selecting the database to query.
+One of the most important decisions for pathway enrichment analysis is selecting the
+database to query.
 There are many options to consider, both proprietary and open source.
-When choosing, consider whether the database contains the gene sets that you a priori
-suspect will be altered in the profile you’re looking at.
-Secondly, consider the breadth and depth of the pathway library, this will be where the
-unexpected discoveries may occur, and it pays to use a comprehensive one to capture as many
-aspects of your data as possible.
-To demonstrate this, see how KEGG legacy and KEGG Medicus seem tiny when compared to Reactome,
+When choosing, users should consider whether the database contains the gene sets that they
+a priori suspect will be altered.
+Secondly, consider the breadth and depth of the pathway library; this will be where the
+unexpected discoveries may occur and it pays to use a comprehensive library to capture as many
+aspects of the dataset as possible.
+To demonstrate this, note how KEGG legacy and KEGG Medicus seem tiny when compared to Reactome,
 which is itself dwarfed by Gene Ontology’s Biological Process (GOBP; Table 3).
 Consequently, the results obtained for the example dataset are substantially richer for
 Reactome and GOBP as compared to KEGG libraries.
@@ -366,29 +368,28 @@ m8 |>
 
 # 8. Using outdated gene identifiers and gene sets 
 
-One great thing about working with omics data is that data repositories like GEO @clough2024ncbi
-are loaded with previously published data sets that we can reanalyse with new pathway
-databases and software tools to eke out further insights.
-When the data is several years old, we should use the processed data with caution, as many
-gene names may have since changed.
-For example, as previously demonstrated, Illumina’s EPIC DNA Methylation microarray was
-released in 2016, and in the following eight years, 3,253 of 22,588 gene names on the chip
-have changed (14.4%) @Ziemann2024-be, meaning that those genes wouldn’t be recognised by
-the pathway enrichment software.
-To update defunct gene symbols, the HGNChelper R package can help @Oh2020-ku, and it
-has the benefit of fixing gene symbols ruined by Excel autocorrect, which are unfortunately
+Data repositories like GEO @clough2024ncbi contain thousands of previously published data
+sets that we can reanalyse with new pathway databases and software tools to gain further
+insights.
+However, when the data is several years old, we should use it with caution, as many
+gene names may have changed.
+For example, Illumina’s EPIC DNA Methylation microarray was released in 2016, and in the
+following eight years, 3,253 of 22,588 gene names on the chip have changed (14.4%)
+@Ziemann2024-be.
+Therefore, these genes wouldn’t be recognised by the pathway enrichment software.
+To update defunct gene symbols, the HGNChelper R package can help @Oh2020-ku, also having
+the benefit of fixing gene symbols corrupted by Excel autocorrect, which are unfortunately
 common in GEO @Ziemann2016-hp.
 Persistent gene identifiers like Ensembl (eg: ENSG00000180096) and HGNC (eg: HGNC:2879)
-are less likely to change over time and would therefore be preferable over gene symbols
+are less likely to change over time and are therefore preferable over gene symbols
 (eg: *SEPTIN1*) for FEA.
 
 The depth of pathway databases increases every year as annotation consortia continue
 assimilating functional information from the literature, and this impacts the
 quality of results and the conclusions that can be derived @wadi2016impact.
-Sometimes these databases undergo large updates, as shown by the chart of Reactome growth below
+These databases will undergo undergo large updates, as shown by the chart of Reactome below
 (**Figure 6**).
-To be certain you have the best possible gene annotation for your analysis, it’s always best
-to download the newest version.
+Therefore it’s always best to download and use the newest available version of the gene set.
 
 ```{r,9m,fig.cap="Figure 6. The number of Reactome gene sets grows over time. Gene sets were downloaded from the MSigDB website, except The last bar which represents the latest gene sets downloaded directly from Reactome, not yet incorporated into MSigDB.",echo=FALSE,fig.height=3,fig.width=5}
 
@@ -403,15 +404,15 @@ When discussing FEA with colleagues, it is often said that the method is used to
 "filler"; data and charts used to "pad out" articles that would otherwise be too short or
 lack the normal number of figures.
 For FEA, a general rule of thumb is to only show the charts and data that are relevant to
-assessing aims and hypotheses, and contribute to the conclusions.
+assessing aims and hypotheses, and which contribute to the conclusions.
 While others have recommended using multiple FEA tools @Chicco2022-aa, we'd suggest limiting
 the amount of data shown in an article to just one FEA method and one or two gene set
 databases (eg: Reactome, transcription factor target genes).
 Excessive use of tools and databases can make the results difficult to interpret, as in
 @lin2019indoxyl.
 
-We've also noticed cases of outright confusing, incomplete and simply wrong data
-presentation choices that you should avoid:
+We've also noticed cases of confusing, incomplete or incorrect data
+presentation choices that should be avoided:
 
 1. The number of selected genes in a category is often shown as evidence of enrichment,
 [@zhao2019itraq; @li2019candidate;@sariman2019investigation;@bhatia2019long],
@@ -434,10 +435,10 @@ edges aren't described @bandi2019hepatic.
 [@boyko2019reference;@lou2019high;@shi2019physiological;@li2019identification;
 @li2019candidate].
 
-6. FEA mentioned in the abstract but no data shown in the main article
+6. FEA mentioned in the abstract but no data shown in the main article or supplement
 [@xu2019sirt2; @di2019genome].
 
-7. Confusion around which tool was used for each figure and panel (eg: @jin2019expression).
+7. Confusion around which tool was used for each figure and panel [eg: @jin2019expression].
 
 Such misinterpretation and data presentation problems can also occur when a tool is used without
 understanding the statistical basis of inference @liu2023misuse, so it is crucial that users
@@ -470,9 +471,9 @@ separately or combined,
 
 A systematic literature analysis published in 2022 found insufficient background description
 in 95% of articles describing ORA tests, and p-value correction was insufficiently
-described in 57% of articles, suggesting that enrichment analysis generally suffers from an
-atrocious lack of methods reproducibility @Wijesooriya2022-we.
-Indeed, this literature analysis turned up some memorably poor methodological descriptions
+described in 57% of articles, suggesting that enrichment analysis generally suffers from a
+lack of methods reproducibility @Wijesooriya2022-we.
+Indeed, this literature analysis identified some inadequate methodological descriptions
 including:
 
 >"GO and KEGG enrichment analysis were performed on the DEGs by perl scripts in house."
@@ -494,46 +495,46 @@ pillars framework @ziemann2023five.
 
 # Other issues
 
-There are several more subtle issues not covered in depth here but are worth mentioning because they
+There are several more subtle issues not covered in depth here but are worth mentioning as they
 have been flagged as potential problems.
 First, the length of genes is known to impact the ease at which they are detected and so correction of
 gene length has been suggested to improve enrichment results [@mi2012length;@mandelboum2019recurrent].
-Second, many FEA tests use genes as the sampling unit and do not take into consideration or model biological
+Second, many FEA tests use genes as the sampling unit and do not take into consideration (or model) biological
 variation which could yield unrealistic significance values @goeman2007analyzing.
 Third, the size of gene sets, even though they represent similar biology, can disproportionately impact significance
 scores and complicate interpretation [@karp2021pathway;@mubeen2022influence].
-Fourth, tight correlation between genes' expression within a pathway could exacerbate false positive rates
+Fourth, tight correlation between each gene's expression within a pathway could exacerbate false positive rates
 [@gatti2010heading; @wu2012camera].
 Fifth, slight differences in the implementation of ORA tests can impact results in some circumstances
 @ziemann2024two.
 Lastly, some web-based FEA tools lack longevity.
-For example, DAVID 6.8 [@huang2009systematic;@Sherman2022-kg] has been used for over 10,000 publications but has
-since 2022 been taken offline leaving those articles in an irreproducible state.
+For example, DAVID 6.8 [@huang2009systematic;@Sherman2022-kg] has been used for over 10,000 publications but
+since 2022 has been taken offline, leaving these articles irreproducible.
 As web-based tools appear to be the most popular option for FEA [@xie2021popularity;@Wijesooriya2022-we],
-we should advocate using tools which allow preservation/archiving of the tool as a Docker image (eg: @Ge2020-lr),
-which could enable reproducibility into the future @perkel2020challenge.
+we should advocate preservation/archiving of the tool as a Docker image [eg: @Ge2020-lr],
+to enable reproducibility into the future @perkel2020challenge.
 
 # Conclusion
 
 So why are problems so pervasive in enrichment analysis?
 It's likely a combination of poor researcher training, supervision and peer-review scrutiny.
-The design of tools and (poor) quality of tool documentation might also play a role.
-We also know that poor methods have a type of advantage compared to the more rigorous ones
+The design of tools and (low) quality of tool documentation might also play a role.
+We also know that inadequate methods have a type of advantage compared to the more rigorous ones
 due to researcher preferences to present "significant" findings @smaldino2016natural and reliance upon default settings
 even if they are incorrect [@mubeen2022influence;@Wijesooriya2022-we].
 Problems 2, 3, 5 and 6 appear to be specific to ORA-based tools, and can be avoided entirely by switching to
-FCS tools like GSEA; this has the added benefit of enhanced accuracy in terms of precision and
+FCS tools like GSEA; which has the added benefit of enhanced accuracy in terms of precision and
 recall [@kaspi2020mitch;@ziemann2024two].
 Although learning and running FCS tools is more difficult and time-consuming, the benefits to the quality of results
 are substantial.
 
-The deluge of manuscripts in genomics and other fields places increasing burden on a limited pool of competent,
-voluntary peer-reviewers to a point where editors are struggling to maintain the peer-review system as we know it
-@adam2025peer.
-As studies become ever more multi-disciplinary, this makes it more difficult for editors to cover all the technical
-aspects thoroughly, causing mistakes like the above to become widespread.
+The deluge of manuscripts in genomics and other fields places an increasing burden on a limited pool of competent,
+voluntary peer-reviewers to a point where editors are struggling to maintain high quality,
+consistent peer-review @adam2025peer.
+As studies become ever more multi-disciplinary, is is increasingly difficult for editors to
+cover all the technical aspects thoroughly, causing mistakes like the above to become widespread.
 Ultimately, responsibility for using best practices in enrichment analysis lies with authors.
-Avoiding these mistakes will have a number of benefits including avoiding wasted resources on unreliable research directions.
+Avoiding these mistakes will have many benefits, including avoiding wasted resources on unreliable research directions.
 
 # Methods
 
@@ -575,8 +576,8 @@ the top N significant up- and down-regulated genes were selected for ORA compare
 background consisting of detected genes, where N was varied between 50 and 7000.
 
 To demonstrate the effect of combining up and down regulated genes into a single test
-(Mistake 6), we took all unique genes with FDR<0.05 (n=3950) as the foreground for an ORA
-test, and compared these results to the separate approach (n=1667,1923 up and
+(Mistake 6), all unique genes with FDR<0.05 (n=3950) were used as the foreground for an ORA
+test, and compared with results from the separate approach (n=1667,1923 up and
 downregulated genes respectively).
 
 To show the effect of using shallow gene annotations (Mistake 7), various gene set
