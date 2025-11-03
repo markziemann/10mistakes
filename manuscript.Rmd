@@ -10,7 +10,7 @@ output:
     fig_width: 5
     fig_height: 5
 bibliography: 10mistakes.bib
-csl: f1000research.csl
+csl: nat-meth.csl
 ---
 
 <strong>Anusuiya Bora<sup>1,2</sup>, Matthew McKenzie<sup>1</sup> & Mark Ziemann<sup>1,2*</sup></strong>
