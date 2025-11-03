@@ -295,7 +295,7 @@ In the example dataset, the number of gene sets meeting this minimum fold enrich
 appeared to peak with a gene set size of 700 for the upregulated genes, and 800 for
 downregulated genes (**Figure 4**), which corresponds to 5-6% of all detected genes.
 
-This suggests that a gene list size of 700-800 genes, of 5-6% of all those detected would
+This suggests that a gene list size of 700-800 genes, or 5-6% of all those detected would
 be reasonable for a differential expression study.
 Nevertheless some users may want to avoid setting seemingly arbitrary thresholds - in that
 case, using an FCS method like GSEA instead that calculates enrichment from all detected
@@ -387,7 +387,7 @@ are less likely to change over time and are therefore preferable over gene symbo
 The depth of pathway databases increases every year as annotation consortia continue
 assimilating functional information from the literature, and this impacts the
 quality of results and the conclusions that can be derived @wadi2016impact.
-These databases will undergo undergo large updates, as shown by the chart of Reactome below
+These databases can undergo large updates, as shown by the chart of Reactome growth over time
 (**Figure 6**).
 Therefore it’s always best to download and use the newest available version of the gene set.
 
@@ -523,7 +523,7 @@ We also know that inadequate methods have a type of advantage compared to the mo
 due to researcher preferences to present "significant" findings @smaldino2016natural and reliance upon default settings
 even if they are incorrect [@mubeen2022influence;@Wijesooriya2022-we].
 Problems 2, 3, 5 and 6 appear to be specific to ORA-based tools, and can be avoided entirely by switching to
-FCS tools like GSEA; which has the added benefit of enhanced accuracy in terms of precision and
+FCS tools like GSEA, which has the added benefit of enhanced accuracy in terms of precision and
 recall [@kaspi2020mitch;@ziemann2024two].
 Although learning and running FCS tools is more difficult and time-consuming, the benefits to the quality of results
 are substantial.
