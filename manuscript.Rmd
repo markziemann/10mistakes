@@ -100,34 +100,33 @@ suggesting a real effect.
 However, as gene set libraries can contain thousands of categories, we could expect 5% of the
 gene sets to meet the p<0.05 threshold with random data.
 Therefore, we almost always get many "significant" results just by chance.
-This leads to the multiple testing problem whereby uncorrected p-values lead to high rates of false
-positives.
+This leads to the multiple testing problem whereby uncorrected p-values lead to high rates of
+false positives.
 
-In the example dataset (see Methods below), we randomly selected 1000 genes that met the detection threshold and submitted
-these to ORA with gene sets from Reactome.
-Of the 1840 Reactomes with five or more members detected, on average we obtained a mean of 51.6 hits (p<0.05; 100 repeats)
-with these random genes (**Figure 1A**), proving that reporting raw p-values is bound to yield many
-false positives, in this case at a rate of 2.8%.
-There are a variety of p-value correction methods to reduce the risk of false positives @Tilford2009-kh,
-including approaches from Sidak @Ury01021976, Holm-Bonferroni @holm1979simple and Benjamini-Hochberg
-@benjamini1995controlling.
-The Benjamini-Hochberg method, also called the false discovery rate (FDR) method, appears to be the
-most widely used in genomics to adjust p-values, but it has been critiqued as being overly
-conservative when a larger fraction of tests are not null @storey2003statistical.
-After applying FDR adjustment to the results of the random gene sets (**Figure 1A**), we see that
-the mean number of significant hits (FDR adjusted p<0.05) is 0.16, effectively eliminating false
+In the example dataset (see Methods below), we randomly selected 1000 genes that met the
+detection threshold and submitted these to ORA with gene sets from Reactome.
+Of the 1840 Reactomes with five or more members detected, on average we obtained a mean of
+51.6 hits (p<0.05; 100 repeats) with these random genes (**Figure 1A**), proving that
+reporting raw p-values is bound to yield many false positives, in this case at a rate of 2.8%.
+There are a variety of p-value correction methods to reduce the risk of false positives
+@Tilford2009-kh, including approaches from Sidak @Ury01021976, Holm-Bonferroni @holm1979simple
+and Benjamini-Hochberg @benjamini1995controlling.
+The Benjamini-Hochberg method, also called the false discovery rate (FDR) method, appears to
+be the most widely used in genomics to adjust p-values, but it has been critiqued as being
+overly conservative when a larger fraction of tests are not null @storey2003statistical.
+After applying FDR adjustment to the results of the random gene sets (**Figure 1A**), the
+mean number of significant hits (FDR adjusted p<0.05) is 0.16, effectively eliminating false
 positives.
 
 In the example dataset (AML3 cells with and without azacitidine treatment), there were 3598
 differentially expressed genes, with 1672 up- and 1926 down-regulated.
 The top 1000 up- and down-regulated genes by p-value were selected for separate ORA tests.
-Omitting FDR correction leads to the
-identification of 696 Reactomes with p<0.05, of which 345 are likely false positives (~49.6%)
-(**Figure 1B**).
-Omitting p-value correction could lead to half of the enrichment results being false, which is why it
-is number one on our list.
-Most enrichment analysis packages provide adjusted p-values, so if the tool you're using doesn't, then
-it is time for a change.
+Omitting FDR correction led to the identification of 627 Reactomes with p<0.05, of which 317
+are likely false positives (50.6%) (**Figure 1B**).
+Omitting p-value correction could lead to half of the enrichment results being false, which
+is why it is number one on our list.
+Most enrichment analysis packages provide adjusted p-values, so if the tool you're using
+doesn't, then it is time for a change.
 
 ```{r,1a,fig.cap="Figure 1A. FDR control reduces false positives.",echo=FALSE,fig.height=4,fig.width=4}
 
@@ -176,10 +175,10 @@ cancer-relevant pathways like cell cycle and immune signalling, they have the
 potential to mislead readers.
 
 Performing ORA with azacitidine-responsive genes with the whole genome background gave a much
-larger number of "significant" gene sets (1269) in contrast to the custom background analysis
-(351) (**Figure 2C**).
-The overlap between them was just 347, giving a Jaccard statistic of 0.27.
-In other words, without the right background gene list, up to 73% of results could be false positives.
+larger number of "significant" gene sets (1047) in contrast to the custom background analysis
+(310) (**Figure 2C**), giving a Jaccard statistic of 0.30.
+In other words, without the right background gene list, up to 70% of results could be false
+positives.
 
 ```{r,2a,fig.cap="Figure 2A. Impact of background list on the number of significant gene sets. 100 simulations.",echo=FALSE,fig.height=4,fig.width=4}
 
@@ -319,10 +318,10 @@ This isn’t necessarily an error, as it tests the hypothesis that some pathways
 “dysregulated”; a mix of up- and down-regulated genes which appear at an elevated rate.
 However, this combined approach can miss many enriched gene sets when compared to the
 separate approach.
-According to the results of our example analysis, the separate approach identified 351
-pathways compared to the combined approach that found only 166 (53% fewer; **Figure 5**).
+According to the results of our example analysis, the separate approach identified 289
+pathways compared to the combined approach that found only 53 (84% fewer; **Figure 5**).
 The combined approach does uniquely identify some pathways, but this is relatively few.
-In the example dataset, only 2.8% of results were identified exclusively with the combined
+In the example dataset, only 2.0% (6) of gene sets were identified exclusively with the combined
 test.
 
 The reason behind this is two-fold.
@@ -334,8 +333,8 @@ In a typical differential expression experiment after a stimulus, this results i
 that are predominantly up or down regulated, but rarely a mix of up and down.
 Due to this phenomenon, the up and down lists each have relatively strong enrichments, but
 they are diluted when combined @Hong2014-yn.
-Based on this, failing to report data using the separate approach could result in 53%
-fewer identified gene sets, and an incomplete picture of what's happening at the molecular
+Based on this, failing to report data using the separate approach could result in fewer
+identified gene sets, and an incomplete picture of what's happening at the molecular
 level.
 
 ```{r,6m,fig.cap="Figure 5. Combining up and downregulated genes into one ORA test yields far fewer results.",echo=FALSE,fig.height=3,fig.width=5}
@@ -562,13 +561,21 @@ Gene sets with FDR<0.05 were considered significantly differentially expressed.
 To demonstrate the importance of FDR control (Mistake 1), random sampling of 1000 detected
 genes was followed with ORA with and without FDR control.
 This was repeated 100 times.
-For comparison of the nominal and FDR corrected results, the up (1672) and down (1926)
-regulated genes underwent ORA using a background consisting of the 13,068 detected genes.
+For comparison of the nominal and FDR corrected results, the top 1000 up- and 1000
+down-regulated genes by p-value altered by azacitidine treatment underwent separate ORA tests
+using a background consisting of the 13,063 detected genes.
+The number of significant gene sets (FDR<0.05) from each test were combined for visualisation
+using an Euler diagram.
 
 To demonstrate the importance of a suitable background gene list (Mistake 2), random sampling
 of 1000 detected genes as the foreground followed by ORA using either the whole genome
 background or background consisting of detected genes.
-This process was repeated 1000 times.
+This process was repeated 100 times.
+To show the effect of incorrect background on the azacitidine gene profile, 1000 up- and
+1000 down-regulated genes selected by p-value underwent ORA using a background including
+55,503 genes present in the genome annotation.
+These results were compared to those generated using a background consisting of the 13,063
+detected genes using an Euler diagram.
 
 To demonstrate the importance of using enrichment scores for interpretation of FEA results,
 (Mistake 3 and 4) the `mitch` package v1.20.0 was used for FCS analysis of the differential
@@ -579,18 +586,20 @@ the top N significant up- and down-regulated genes were selected for ORA compare
 background consisting of detected genes, where N was varied between 50 and 7000.
 
 To demonstrate the effect of combining up and down regulated genes into a single test
-(Mistake 6), all unique genes with FDR<0.05 (n=3950) were used as the foreground for an ORA
-test, and compared with results from the separate approach (n=1667,1923 up and
-downregulated genes respectively).
+(Mistake 6), the top significant 750 genes irrespective of fold change direction were used
+as the foreground for an ORA test, and compared with results from the separate approach
+with 750 up- and 750 down-regulated genes respectively.
 
 To show the effect of using shallow gene annotations (Mistake 7), various gene set
 libraries were extracted from the MSigDB Collection (msigdb.v2025.1.Hs.symbols.gmt)
 @liberzon2015molecular.
-These gene set libraries were each used for ORA tests.
+These gene set libraries were each used for ORA tests with foreground lists of 750 genes as
+above.
 
-To show the effect of using old gene sets (Mistake 8), the Reactome gene sets were extracted
-from archived MSigDB Collections going back to 2010.
-These were compared to the most recent Reactome release (02/09/2025).
+To show the difference in size of old gene sets (Mistake 8), Reactome gene sets were
+extracted from archived MSigDB Collections going back to 2010.
+These were compared to the most recent Reactome release (02/09/2025) obtained directly from
+the Reactome website.
 
 Instances of poor presentation (Mistake 9) and methods reproducibility (Mistake 10)
 were drawn from unpublished notes made during a previous systematic analysis of the

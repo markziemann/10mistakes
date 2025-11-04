@@ -266,7 +266,6 @@ bg <- sapply(strsplit(bg," "),'[[',1)
 bg <- unique(gtnew[match(bg,gtnew$V1),2])
 bg <- bg[which(!is.na(bg))]
 
-blah()
 message("length of up, down and background sets")
 lapply(list(up,dn,bg),length)
 
@@ -1111,6 +1110,13 @@ This corresponds to Table 3.
 
 ```{r,m8a}
 
+message("no. up genes for ORA test")
+length(up)
+message("no. dn genes for ORA test")
+length(dn)
+message("no. BG genes for ORA test")
+length(bg)
+
 msdb <- gmtPathways("ref/msigdb/msigdb.v2025.1.Hs.symbols.gmt")
 kegg <- msdb[grep("KEGG",names(msdb))]
 kegg_med <- msdb[grep("KEGG_MED",names(msdb))]
@@ -1133,7 +1139,6 @@ d4 <- unlist( lapply(gslist,function(i) { length(unique(unlist(i))) } ))
 
 kegg_up <- fora(pathways=kegg, genes=up, universe=bg, minSize = 5, maxSize = Inf)
 kegg_dn <- fora(pathways=kegg, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
-
 
 message("no. significantly upregulated KEGG pathways")
 nrow(subset(kegg_up,padj<0.05))
