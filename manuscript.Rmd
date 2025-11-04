@@ -45,33 +45,34 @@ We provide practical advice on their mitigation.
 
 # Background
 
-PubMed searches indicate keywords like "pathway analysis" and "enrichment analysis" appear in titles
-or abstracts of approximately 10,000 articles per year, and that the number of articles matching these
-keywords has increased by a factor of 5.4 between 2014 and 2024.
+PubMed searches indicate keywords like "pathway analysis" and "enrichment analysis" appear in
+titles or abstracts of approximately 10,000 articles per year, and that the number of articles
+matching these keywords has increased by a factor of 5.4 between 2014 and 2024.
 The purpose of FEA is to understand whether gene categories are collectively
 differentially represented in the molecular profile at hand, and involves querying hundreds or
 thousands of functional categories representing gene pathways or ontologies.
-There are a variety of methods for FEA, but the main two are over-representation analysis (ORA) and
-functional class scoring (FCS) @Khatri2012-yq.
-ORA involves selecting genes based on a hard cut-off followed by a test of enrichment (e.g.: Fisher's
-exact test) as compared to a background list @Tavazoie1999-as.
+There are a variety of methods for FEA, but the main two are over-representation analysis
+(ORA) and functional class scoring (FCS) @Khatri2012-yq.
+ORA involves selecting genes based on a hard cut-off followed by a test of enrichment (e.g.:
+Fisher's exact test) as compared to a background list @Tavazoie1999-as.
 Popular ORA tools include websites like DAVID @Sherman2022-kg and software packages like
 ClusterProfiler @Wu2021-mg.
-FCS involves ranking all detected genes followed by a test to assess whether the distribution of scores
-deviates towards the up- or down-regulated directions.
-GSEA @Subramanian2005-bd is a stand-alone FCS software with a graphical user interface, and there
-are several command-line implementations such as fgsea @Korotkevich2021-xm.
+FCS involves ranking all detected genes followed by a test to assess whether the distribution
+of scores deviates towards the up- or down-regulated directions.
+GSEA @Subramanian2005-bd is a stand-alone FCS software with a graphical user interface, and
+there are several command-line implementations such as fgsea @Korotkevich2021-xm.
 
 Recommendations on correct application of pathway enrichment have been previously published
 [@Tilford2009-kh; @Tipney2010-sy; @Chicco2022-aa; @Zhao2023-av], yet we and others continue to
-observe blatant mistakes and methodological deficiencies appearing in peer-reviewed publications at
-an alarming rate [@Timmons2015-yb; @Wijesooriya2022-we].
-Such methodological and interpretation errors are known to "snowball" - a process where an initial
-flawed research study can create cascading problems for scientific reliability @liu2023misuse.
+observe blatant mistakes and methodological deficiencies appearing in peer-reviewed
+publications at an alarming rate [@Timmons2015-yb; @Wijesooriya2022-we].
+Such methodological and interpretation errors are known to "snowball" - a process where an
+initial flawed research study can create cascading problems for scientific reliability
+@liu2023misuse.
 
-The purpose of this opinion article is to share what our group has learned about successful FEA over
-the past 15 years having authored several articles using it and critically examining hundreds of
-published articles using the method.
+The purpose of this opinion article is to share what our group has learned about successful
+FEA over the past 15 years having authored several articles using it and critically examining
+hundreds of published articles using the method.
 
 Using an example RNA-seq dataset and simulation analysis, we provide evidence to show just how
 impactful these mistakes are.
