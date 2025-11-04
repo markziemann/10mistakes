@@ -118,7 +118,10 @@ After applying FDR adjustment to the results of the random gene sets (**Figure 1
 the mean number of significant hits (FDR adjusted p<0.05) is 0.16, effectively eliminating false
 positives.
 
-In the example dataset (AML3 cells with and without azacitidine treatment), omitting FDR correction leads to the
+In the example dataset (AML3 cells with and without azacitidine treatment), there were 3598
+differentially expressed genes, with 1672 up- and 1926 down-regulated.
+The top 1000 up- and down-regulated genes by p-value were selected for separate ORA tests.
+Omitting FDR correction leads to the
 identification of 696 Reactomes with p<0.05, of which 345 are likely false positives (~49.6%)
 (**Figure 1B**).
 Omitting p-value correction could lead to half of the enrichment results being false, which is why it
