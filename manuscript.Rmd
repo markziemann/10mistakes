@@ -298,7 +298,7 @@ downregulated genes (**Figure 4**), which corresponds to 5-6% of all detected ge
 
 This suggests that a gene list size of 700-800 genes, or 5-6% of all those detected would
 be reasonable for a differential expression study.
-Nevertheless some users may want to avoid setting seemingly arbitrary thresholds - in that
+Nevertheless, some users may want to avoid setting seemingly arbitrary thresholds - in that
 case, using an FCS method like GSEA instead that calculates enrichment from all detected
 genes would be recommended.
 
@@ -390,7 +390,7 @@ assimilating functional information from the literature, and this impacts the
 quality of results and the conclusions that can be derived @wadi2016impact.
 These databases can undergo large updates, as shown by the chart of Reactome growth over time
 (**Figure 6**).
-Therefore it’s always best to download and use the newest available version of the gene sets.
+Therefore, it’s always best to download and use the newest available version of the gene sets.
 
 ```{r,9m,fig.cap="Figure 6. The number of Reactome gene sets grows over time. Gene sets were downloaded from the MSigDB website, except The last bar which represents the latest gene sets downloaded directly from Reactome, not yet incorporated into MSigDB.",echo=FALSE,fig.height=3,fig.width=5}
 
@@ -532,7 +532,7 @@ are substantial.
 The deluge of manuscripts in genomics and other fields places an increasing burden on a limited pool of competent,
 voluntary peer-reviewers to a point where editors are struggling to maintain high quality,
 consistent peer-review @adam2025peer.
-As studies become ever more multi-disciplinary, is is increasingly difficult for editors to
+As studies become ever more multi-disciplinary, it is increasingly difficult for editors to
 cover all the technical aspects thoroughly, causing mistakes like the above to become widespread.
 Ultimately, responsibility for using best practices in enrichment analysis lies with authors.
 Avoiding these mistakes will have many benefits, including avoiding wasted resources on unreliable research directions.
