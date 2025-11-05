@@ -72,7 +72,7 @@ initial flawed research study can create cascading problems for scientific relia
 
 The purpose of this opinion article is to share what our group has learned about successful
 FEA over the past 15 years having authored several articles using it and critically examining
-hundreds of published articles using the method.
+hundreds of published articles describing the use of FEA.
 
 Using an example RNA-seq dataset and simulation analysis, we provide evidence to show just how
 impactful these mistakes are.
@@ -162,15 +162,14 @@ analysis.
 Genes with very low expression are unlikely to be biologically relevant in the context being studied
 and should be excluded from the background.
 
-Using a simulation approach, we can demonstrate the consequence of omitting a background gene list on an RNA-seq
-experiment.
-By drawing a random set of 1000 genes in the AML3 example dataset with expression above 10 reads per sample
-on average and using an enrichment test (hypergeometric) that uses the
-whole genome annotation as a background, we see 444 gene sets
-reaching the FDR<0.05 significance level on average (**Figure 2A**).
-Alternatively, if we use a custom background gene list composed of genes meeting the 10 reads per sample
-threshold, we expect 0.16 gene sets with FDR<0.05, practically eliminating false
-positives.
+Using a simulation approach, we can demonstrate the consequence of omitting a custom background gene
+list on an RNA-seq experiment.
+By drawing a random set of 1000 genes in the AML3 example dataset with expression above 10 reads per
+sample on average and using an enrichment test (hypergeometric) that uses the whole genome
+annotation as a background, we see 444 gene sets reaching the FDR<0.05 significance level on average
+(**Figure 2A**).
+Alternatively, if we use a custom background gene list composed of genes meeting the 10 reads per
+sample threshold, we expect 0.16 gene sets with FDR<0.05, practically eliminating false positives.
 These false positives are highly reproducible (**Figure 2B**), and as many of them are
 cancer-relevant pathways like cell cycle and immune signalling, they have the
 potential to mislead readers.
@@ -208,7 +207,7 @@ FDR values can tell us whether something is statistically significant, but it do
 indicate whether there will be any biological impact [@sullivan2012using;@schober2018statistical].
 For that, we need some measure of effect size.
 In enrichment analysis, we can use an enrichment score as a proxy measure of effect size.
-For rank-based tools like GSEA, the enrichment score varies from -1  to +1 denoting the
+For rank-based tools like GSEA, the enrichment score varies from -1  to +1, denoting the
 distribution of genes in a gene set relative to all other genes @Subramanian2005-bd.
 For a gene set composed of 15 genes, a score of 1.0 would mean that these 15 genes are the
 top 15 upregulated, while if a value is close to 0, it means the distribution of genes is
@@ -217,8 +216,8 @@ For over-representation methods like DAVID, the fold enrichment score is often q
 is the odds ratio of genes of a gene set in the foreground list as compared to the background @Tilford2009-kh.
 Unfortunately, DAVID doesn’t provide the fold enrichment scores in the main results page,
 they are only available in the table for download.
-Many other common tools don’t provide enrichment scores (for example
-clusterProfiler), which leaves researchers with no information about their effect sizes.
+Many other common tools don’t provide enrichment scores (for example clusterProfiler), which
+leaves researchers with no information about their effect sizes.
 Tools that do provide enrichment scores include ShinyGO (web) @Ge2020-lr, GSEA @Subramanian2005-bd
 and fgsea (fora) @Korotkevich2021-xm.
 
@@ -286,16 +285,15 @@ with FDR<0.05), while lists of 200 and fewer yielded very few (**Figure 4**).
 In the range of 300-1000, there’s a steep increase in the number of significant pathways,
 with the gradient reducing with more than 1000 genes.
 This result indicates that using a larger gene list of up to 2500 genes would be better, but
-the main downside is that these additional results are for gene sets with smaller enrichment
-scores.
-For example, for significantly downregulated pathways at a gene set size of 100, fold
-enrichment scores were 16.9 on average, and at a size of 2500, fold enrichment scores were
-2.5.
+the main downside is that these additional statistically significant results correspond to
+relatively small enrichment scores.
+For example, significantly downregulated pathways at a gene set size of 100, mean fold
+enrichment scores were 16.9, and at a size of 2500, they were 2.5.
 Users may wish to prespecify a fold enrichment score that they consider biologically relevant
 (3-5 seems reasonable), and then tune their analysis to capture the most statistically
 significant enrichments above this score.
-In the example dataset, the number of gene sets meeting this minimum fold enrichment score
-appeared to peak with a gene set size of 700 for the upregulated genes, and 800 for
+In the example dataset, the number of gene sets meeting a minimum fold enrichment score
+of 3 appeared to peak with a gene set size of 700 for the upregulated genes, and 800 for
 downregulated genes (**Figure 4**), which corresponds to 5-6% of all detected genes.
 
 This suggests that a gene list size of 700-800 genes, or 5-6% of all those detected would
@@ -392,7 +390,7 @@ assimilating functional information from the literature, and this impacts the
 quality of results and the conclusions that can be derived @wadi2016impact.
 These databases can undergo large updates, as shown by the chart of Reactome growth over time
 (**Figure 6**).
-Therefore it’s always best to download and use the newest available version of the gene set.
+Therefore it’s always best to download and use the newest available version of the gene sets.
 
 ```{r,9m,fig.cap="Figure 6. The number of Reactome gene sets grows over time. Gene sets were downloaded from the MSigDB website, except The last bar which represents the latest gene sets downloaded directly from Reactome, not yet incorporated into MSigDB.",echo=FALSE,fig.height=3,fig.width=5}
 
@@ -564,7 +562,7 @@ genes was followed with ORA with and without FDR control.
 This was repeated 100 times.
 For comparison of the nominal and FDR corrected results, the top 1000 up- and 1000
 down-regulated genes by p-value altered by azacitidine treatment underwent separate ORA tests
-using a background consisting of the 13,063 detected genes.
+using a background consisting of the 13,063 detected genes with gene symbols.
 The number of significant gene sets (FDR<0.05) from each test were combined for visualisation
 using an Euler diagram.
 
