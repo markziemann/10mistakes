@@ -518,8 +518,8 @@ par(mar=c(1,1,1,1))
 par(mfrow=c(1,1))
 plot(euler(v1),quantities = list(cex = 2), labels = list(cex = 2))
 
-v2 <- list("bg"=union(fres_up_bg,fres_dn_bg),
-  "bg*"=union(fres_up_all, fres_dn_all) )
+v2 <- list("correct background"=union(fres_up_bg,fres_dn_bg),
+  "incorrect background"=union(fres_up_all, fres_dn_all) )
 
 message("no. significant pathways with correct and incorrect* background. Direction not specified.")
 plot(euler(v2),quantities = list(cex = 2), labels = list(cex = 2))
