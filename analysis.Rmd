@@ -115,10 +115,14 @@ text(cmdscale(dist(t(mx))), labels=colnames(mx) )
 
 ## Differential expression analysis
 
-I will be using DESeq2 for DE analysis, the count matrix is prefiltered using
-a detection threshold of 10 reads per sample across all samples.
+We will be using DESeq2 for DE analysis.
+
+The count matrix is prefiltered using a detection threshold of 10 reads per sample across all samples.
 All genes that meet the detection threshold will comprise the background list.
-The first 6 rows of the count matrix are shows.
+
+We will also repeat this without a detection threshold.
+
+The first 6 rows of the count matrix are shown.
 
 ```{r,de1}
 
@@ -411,6 +415,8 @@ length(rowmeans[which(rowmeans<10)]) / length(rowmeans)
 message("Proportion of genes above the detection threshold.")
 ( 1- sum(rowmeans[which(rowmeans>=10)]) / sum(rowmeans) ) * 100
 
+blah()
+# UNFILT
 unfilt <- x$GeneCounts
 
 message("Run deseq2 for differential expression with and without filtering.")
@@ -421,6 +427,25 @@ vsd_unfilt <- vst(dds_unfilt, blind=FALSE)
 zz_unfilt <-cbind(as.data.frame(z_unfilt),unfilt)
 def_unfilt <-as.data.frame(zz_unfilt[order(zz_unfilt$pvalue),])
 
+message("No significant genes without filtering low genes")
+nrow(subset(def_unfilt,padj<0.05))
+
+sigf <- subset(def_unfilt,padj<=0.05)
+DET=nrow(def_unfilt)
+NSIG=nrow(sigf)
+NUP=nrow(subset(sigf,log2FoldChange>0))
+NDN=nrow(subset(sigf,log2FoldChange<0))
+HEADER=paste(DET,"detected genes;",NSIG,"w/FDR<0.05;",NUP,"up;",NDN,"down")
+plot(log10(def_unfilt$baseMean) ,def_unfilt$log2FoldChange,
+  cex=0.6,pch=19,col="darkgray",
+  main="5-azacitidine treatment in AML3 cells",
+  xlab="log10(basemean)",ylab="log2(fold change)")
+points(log10(sigf$baseMean) ,sigf$log2FoldChange,
+  cex=0.6,pch=19,col="red")
+mtext(HEADER)
+
+# FILT
+
 filt <- unfilt[which(rowMeans(unfilt)>=10),]
 dds_filt <- DESeqDataSetFromMatrix(countData = filt , colData = ss, design = ~ trt )
 res_filt <- DESeq(dds_filt)
@@ -429,11 +454,101 @@ vsd_filt <- vst(dds_filt, blind=FALSE)
 zz_filt <-cbind(as.data.frame(z_filt),filt)
 def_filt <-as.data.frame(zz_filt[order(zz_filt$pvalue),])
 
-message("No significant genes without filtering low genes")
-nrow(subset(def_unfilt,padj<0.05))
-
 message("No significant genes with filtering low genes")
 nrow(subset(def_filt,padj<0.05))
+
+sigf <- subset(def_filt,padj<=0.05)
+DET=nrow(def_filt)
+NSIG=nrow(sigf)
+NUP=nrow(subset(sigf,log2FoldChange>0))
+NDN=nrow(subset(sigf,log2FoldChange<0))
+HEADER=paste(DET,"detected genes;",NSIG,"w/FDR<0.05;",NUP,"up;",NDN,"down")
+plot(log10(def_filt$baseMean) ,def_filt$log2FoldChange,
+  cex=0.6,pch=19,col="darkgray",
+  main="5-azacitidine treatment in AML3 cells",
+  xlab="log10(basemean)",ylab="log2(fold change)")
+points(log10(sigf$baseMean) ,sigf$log2FoldChange,
+  cex=0.6,pch=19,col="red")
+mtext(HEADER)
+
+```
+
+Now generate the PDF version of the charts.
+
+```{r,smearpdf}
+
+unlink("img/smears.pdf")
+pdf("img/smears.pdf", width = 8, height = 5)
+par(mfrow=c(1,2))
+
+sigf <- subset(def_unfilt,padj<=0.05)
+DET=nrow(def_unfilt)
+NSIG=nrow(sigf)
+NUP=nrow(subset(sigf,log2FoldChange>0))
+NDN=nrow(subset(sigf,log2FoldChange<0))
+HEADER=paste(DET,"included genes;",NSIG,"w/FDR<0.05;",NUP,"up;",NDN,"down")
+plot(log10(def_unfilt$baseMean) ,def_unfilt$log2FoldChange,
+  cex=0.6,pch=19,col="darkgray",
+  main="Unfiltered",
+  xlab="log10(basemean)",ylab="log2(fold change)")
+points(log10(sigf$baseMean) ,sigf$log2FoldChange,
+  cex=0.6,pch=19,col="red")
+mtext(HEADER,cex=0.75)
+abline(v=1,lwd=2,lty=2,col="blue")
+
+sigf <- subset(def_filt,padj<=0.05)
+DET=nrow(def_filt)
+NSIG=nrow(sigf)
+NUP=nrow(subset(sigf,log2FoldChange>0))
+NDN=nrow(subset(sigf,log2FoldChange<0))
+HEADER=paste(DET,"included genes;",NSIG,"w/FDR<0.05;",NUP,"up;",NDN,"down")
+plot(log10(def_filt$baseMean) ,def_filt$log2FoldChange,
+  cex=0.6,pch=19,col="darkgray",
+  main="Filtered",
+  xlab="log10(basemean)",ylab="log2(fold change)")
+points(log10(sigf$baseMean) ,sigf$log2FoldChange,
+  cex=0.6,pch=19,col="red")
+mtext(HEADER,cex=0.75)
+
+dev.off()
+
+```
+
+Now have a look at the number of genes that are statistically significant below the detection threshold.
+Less than 1% of genes are under the detection threshold are significant.
+In any case they are unlikely to be detected as significant using qPCR.
+
+```{r,classification1}
+
+LOW=length( which(def_unfilt$baseMean<10 ) )
+LOW
+
+LOWSIG=length( which(def_unfilt$baseMean<10 & def_unfilt$padj < 0.05) )
+LOWSIG
+
+LOW - LOWSIG
+LOWSIG / LOW
+LOWSIG / LOW  * 100
+
+log10basemean <- log10(def_unfilt$baseMean+0.01)
+par(mfrow=c(2,1))
+hist(log10basemean,xlab="log10(baseMean)")
+
+vals <- seq(-2,4)
+vres <- lapply(vals, function(i) {
+  lev0=i
+  lev1=i+1
+  fdr <- def_unfilt[which(log10basemean >= lev0 & log10basemean < lev1 ),"padj"]
+  fdr[is.na(fdr)] <- 1
+  fdr<0.05
+})
+
+lapply(vres,table)
+sigproportions <- unlist(lapply(vres,function(x) { length(which(x==TRUE)) / length(x) } ))
+plot(vals+0.5,sigproportions,xlim=c(-2,5),bty="none",
+  ylab="proportion of genes with FDR<0.05",
+  xlab="log10(baseMean) bin")
+grid()
 
 ```
 
