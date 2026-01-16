@@ -472,6 +472,16 @@ points(log10(sigf$baseMean) ,sigf$log2FoldChange,
   cex=0.6,pch=19,col="red")
 mtext(HEADER)
 
+plot(log10(def_unfilt$baseMean),abs(def_unfilt$lfcSE),
+  xlab="log10(baseMean)",ylab="log2FC standard error",
+  pch=19,cex=0.5,col="black")
+sigf <- subset(def_unfilt,padj<=0.05)
+points(log10(sigf$baseMean) ,sigf$lfcSE,
+  cex=0.5,pch=19,col="red")
+abline(v=1,col="blue",lwd=2,lty=2)
+abline(v=log10(5),col="blue",lwd=2,lty=2)
+
+
 ```
 
 Now generate the PDF version of the charts.
