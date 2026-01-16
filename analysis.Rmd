@@ -415,7 +415,6 @@ length(rowmeans[which(rowmeans<10)]) / length(rowmeans)
 message("Proportion of genes above the detection threshold.")
 ( 1- sum(rowmeans[which(rowmeans>=10)]) / sum(rowmeans) ) * 100
 
-blah()
 # UNFILT
 unfilt <- x$GeneCounts
 
@@ -435,7 +434,7 @@ DET=nrow(def_unfilt)
 NSIG=nrow(sigf)
 NUP=nrow(subset(sigf,log2FoldChange>0))
 NDN=nrow(subset(sigf,log2FoldChange<0))
-HEADER=paste(DET,"detected genes;",NSIG,"w/FDR<0.05;",NUP,"up;",NDN,"down")
+HEADER=paste(DET,"included genes;",NSIG,"w/FDR<0.05;",NUP,"up;",NDN,"down")
 plot(log10(def_unfilt$baseMean) ,def_unfilt$log2FoldChange,
   cex=0.6,pch=19,col="darkgray",
   main="5-azacitidine treatment in AML3 cells",
@@ -443,6 +442,8 @@ plot(log10(def_unfilt$baseMean) ,def_unfilt$log2FoldChange,
 points(log10(sigf$baseMean) ,sigf$log2FoldChange,
   cex=0.6,pch=19,col="red")
 mtext(HEADER)
+abline(v=1,lwd=2,lty=2,col="blue")
+abline(v=log10(5),lwd=2,lty=2,col="blue")
 
 # FILT
 
@@ -462,7 +463,7 @@ DET=nrow(def_filt)
 NSIG=nrow(sigf)
 NUP=nrow(subset(sigf,log2FoldChange>0))
 NDN=nrow(subset(sigf,log2FoldChange<0))
-HEADER=paste(DET,"detected genes;",NSIG,"w/FDR<0.05;",NUP,"up;",NDN,"down")
+HEADER=paste(DET,"included genes;",NSIG,"w/FDR<0.05;",NUP,"up;",NDN,"down")
 plot(log10(def_filt$baseMean) ,def_filt$log2FoldChange,
   cex=0.6,pch=19,col="darkgray",
   main="5-azacitidine treatment in AML3 cells",
@@ -491,10 +492,10 @@ plot(log10(def_unfilt$baseMean) ,def_unfilt$log2FoldChange,
   cex=0.6,pch=19,col="darkgray",
   main="Unfiltered",
   xlab="log10(basemean)",ylab="log2(fold change)")
+abline(v=1,lwd=2,lty=2,col="blue")
 points(log10(sigf$baseMean) ,sigf$log2FoldChange,
   cex=0.6,pch=19,col="red")
 mtext(HEADER,cex=0.75)
-abline(v=1,lwd=2,lty=2,col="blue")
 
 sigf <- subset(def_filt,padj<=0.05)
 DET=nrow(def_filt)
@@ -532,6 +533,7 @@ LOWSIG / LOW  * 100
 
 log10basemean <- log10(def_unfilt$baseMean+0.01)
 par(mfrow=c(2,1))
+par(mar=c(4.1,4.1,2.1,0.5))
 hist(log10basemean,xlab="log10(baseMean)")
 
 vals <- seq(-2,4)
@@ -545,10 +547,121 @@ vres <- lapply(vals, function(i) {
 
 lapply(vres,table)
 sigproportions <- unlist(lapply(vres,function(x) { length(which(x==TRUE)) / length(x) } ))
-plot(vals+0.5,sigproportions,xlim=c(-2,5),bty="none",
+plot(vals+0.5,sigproportions,xlim=c(-2,5),cex=1.3,bty="none",
   ylab="proportion of genes with FDR<0.05",
   xlab="log10(baseMean) bin")
 grid()
+
+```
+
+It is interesting that genes with high expression are over-represented.
+
+Let's see if adding a log2FC threshold improves it by flattening the curve.
+
+There is a big difference caused by adding the log2FC filter. At a value of 1.0, genes with middle
+expression are over-represented.
+
+At a value of 0.35 it looks better, but middle expressed genes are still over-represented compared to
+highly expressed genes.
+
+```{r,classification2}
+
+par(mfrow=c(2,1))
+par(mar=c(4.1,4.1,2.1,0.5))
+hist(log10basemean,xlab="log10(baseMean)")
+
+vals <- seq(-2,4)
+vres <- lapply(vals, function(i) {
+  lev0=i
+  lev1=i+1
+  y <- def_unfilt[which(log10basemean >= lev0 & log10basemean < lev1 ),c("log2FoldChange","padj")]
+  y$padj[is.na(y$padj)] <- 1
+  abs(y$log2FoldChange)>=1 & y$padj < 0.05
+})
+
+lapply(vres,table)
+sigproportions <- unlist(lapply(vres,function(x) { length(which(x==TRUE)) / length(x) } ))
+plot(vals+0.5,sigproportions,cex=1.3,bty="none",
+  xlim=c(-2,5),
+  ylab="proportion of genes with FDR<0.05",
+  xlab="log10(baseMean) bin")
+grid()
+
+
+par(mfrow=c(2,1))
+par(mar=c(4.1,4.1,2.1,0.5))
+hist(log10basemean,xlab="log10(baseMean)")
+
+vals <- seq(-2,4)
+vres <- lapply(vals, function(i) {
+  lev0=i
+  lev1=i+1
+  y <- def_unfilt[which(log10basemean >= lev0 & log10basemean < lev1 ),c("log2FoldChange","padj")]
+  y$padj[is.na(y$padj)] <- 1
+  abs(y$log2FoldChange)>=0.35 & y$padj < 0.05
+})
+
+lapply(vres,table)
+sigproportions <- unlist(lapply(vres,function(x) { length(which(x==TRUE)) / length(x) } ))
+plot(vals+0.5,sigproportions,cex=1.3,bty="none",
+  xlim=c(-2,5),
+  ylab="proportion of genes with FDR<0.05",
+  xlab="log10(baseMean) bin")
+grid()
+
+```
+
+Run enrichment tests to see whether certain baseline expression levels are over-represented.
+
+```{r,selection1}
+
+gl6 <- sapply(strsplit(names(which(rowMeans(mx)>10000 ))," "),"[[",1)
+gl5 <- sapply(strsplit(names(which(rowMeans(mx)>1000 & rowMeans(mx)<=10000))," "),"[[",1)
+gl4 <- sapply(strsplit(names(which(rowMeans(mx)>100 & rowMeans(mx)<=1000 ))," "),"[[",1)
+gl3 <- sapply(strsplit(names(which(rowMeans(mx)>10 & rowMeans(mx)<=100 ))," "),"[[",1)
+gl2 <- sapply(strsplit(names(which(rowMeans(mx)>1 & rowMeans(mx)<=10 ))," "),"[[",1)
+gl1 <- sapply(strsplit(names(which(rowMeans(mx)>0 & rowMeans(mx)<=1 ))," "),"[[",1)
+gl0 <- sapply(strsplit(names(which(rowMeans(mx)==0 ))," "),"[[",1)
+
+gl_gsets <- list("GL0"=gl0,"GL1"=gl1,"GL2"=gl2,"GL3"=gl3,"GL4"=gl4,"GL5"=gl5,"GL6"=gl6)
+
+lapply(gl_gsets,length)
+
+glup <- head(rownames(subset(def_filt,padj<0.05 & log2FoldChange > 0)),750)
+gldn <- head(rownames(subset(def_filt,padj<0.05 & log2FoldChange < 0)),750)
+glbg <- rownames(def_filt)
+
+gl_res_up <- fora(pathways=gl_gsets, genes=glup, universe=glbg, minSize = 5, maxSize = Inf)
+gl_res_dn <- fora(pathways=gl_gsets, genes=gldn, universe=glbg, minSize = 5, maxSize = Inf)
+
+gl_res_up %>%
+  kbl(caption="Enrichment of up genes with basemean levels",row.names=FALSE) %>%
+  kable_paper("hover", full_width = F)
+
+gl_res_dn %>%
+  kbl(caption="Enrichment of down genes with basemean levels",row.names=FALSE) %>%
+  kable_paper("hover", full_width = F)
+
+glstat <- def_filt$stat
+
+names(glstat) <- rownames(def_filt)
+
+fgseaRes <- fgsea(pathways = gl_gsets,
+                  stats    = glstat,
+                  minSize  = 5,
+                  maxSize  = 50000,
+                  nPermSimple = 1000)
+
+head(fgseaRes[order(pval), ]) %>%
+  kbl(caption="FGSEA enrichment of genes with basemean levels",row.names=FALSE) %>%
+  kable_paper("hover", full_width = F)
+
+library(mitch)
+yy <- mitch_import(def_filt,"deseq2")
+yy_res <- mitch_calc(yy,gl_gsets,priority="significance",cores=8)
+yy_res$enrichment_result %>%
+  kbl(caption="Mitch enrichment of down genes with basemean levels",row.names=FALSE) %>%
+  kable_paper("hover", full_width = F)
 
 ```
 
