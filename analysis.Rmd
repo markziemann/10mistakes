@@ -150,14 +150,14 @@ Make a smear plot.
 
 ```{r,smearplot}
 
-sigf <- subset(def,padj<=0.05)
+sigf <- subset(def,padj<=0.01)
 
 DET=nrow(mxf)
 NSIG=nrow(sigf)
 NUP=nrow(subset(sigf,log2FoldChange>0))
 NDN=nrow(subset(sigf,log2FoldChange<0))
 
-HEADER=paste(DET,"detected genes;",NSIG,"w/FDR<0.05;",NUP,"up;",NDN,"down")
+HEADER=paste(DET,"detected genes;",NSIG,"w/FDR<0.01;",NUP,"up;",NDN,"down")
 
 plot(log10(def$baseMean) ,def$log2FoldChange,
   cex=0.6,pch=19,col="darkgray",
@@ -255,12 +255,12 @@ This corresponds to the results shown in Figure 1B.
 
 ```{r,mistake1,fig.height=3,fig.width=5}
 
-up <- head(rownames(subset(def, log2FoldChange>0 & padj<0.05)),1004)
+up <- head(rownames(subset(def, log2FoldChange>0 & padj<0.01)),1004)
 up <- sapply(strsplit(up," "),'[[',1)
 up <- unique(gtnew[match(up,gtnew$V1),2])
 up <- up[which(!is.na(up))]
 
-dn <- head(rownames(subset(def, log2FoldChange<0 & padj<0.05)),1001)
+dn <- head(rownames(subset(def, log2FoldChange<0 & padj<0.01)),1001)
 dn <- sapply(strsplit(dn," "),'[[',1)
 dn <- unique(gtnew[match(dn,gtnew$V1),2])
 dn <- dn[which(!is.na(dn))]
@@ -278,22 +278,22 @@ fres_up <- fora(pathways=gsets, genes=up, universe=bg, minSize = 5, maxSize = In
 message("number of gene sets in the results")
 nrow(fres_up)
 
-message("number of up-regulated gene sets with FDR<0.05")
-nrow(subset(fres_up,padj<0.05))
-message("number of up-regulated gene sets with p<0.05")
-nrow(subset(fres_up,pval<0.05))
+message("number of up-regulated gene sets with FDR<0.01")
+nrow(subset(fres_up,padj<0.01))
+message("number of up-regulated gene sets with p<0.01")
+nrow(subset(fres_up,pval<0.01))
 
-fres_up_fdr <- subset(fres_up,padj<0.05)$pathway
-fres_up_nom <- subset(fres_up,pval<0.05)$pathway
+fres_up_fdr <- subset(fres_up,padj<0.01)$pathway
+fres_up_nom <- subset(fres_up,pval<0.01)$pathway
 
 fres_dn <- fora(pathways=gsets, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
-message("number of down-regulated gene sets with FDR<0.05")
-nrow(subset(fres_dn,padj<0.05))
-message("number of down-regulated gene sets with p<0.05")
-nrow(subset(fres_dn,pval<0.05))
+message("number of down-regulated gene sets with FDR<0.01")
+nrow(subset(fres_dn,padj<0.01))
+message("number of down-regulated gene sets with p<0.01")
+nrow(subset(fres_dn,pval<0.01))
 
-fres_dn_fdr <- subset(fres_dn,padj<0.05)$pathway
-fres_dn_nom <- subset(fres_dn,pval<0.05)$pathway
+fres_dn_fdr <- subset(fres_dn,padj<0.01)$pathway
+fres_dn_nom <- subset(fres_dn,pval<0.01)$pathway
 
 v1 <- list("up p"=fres_up_nom, "up FDR"=fres_up_fdr,
   "dn p"=fres_dn_nom, "dn FDR"=fres_dn_fdr)
@@ -331,8 +331,8 @@ Here, we can prove they are false positives by randomly selecting 1000
 genes from the list of detected ones, and testing them for enrichment.
 
 When doing enrichment analysis of a random list of 1000 genes, we got an
-average of 51.6 pathways with p<0.05, while after p-value correction,
-that number was just 0.16 with FDR<0.05.
+average of 51.6 pathways with p<0.01, while after p-value correction,
+that number was just 0.16 with FDR<0.01.
 This correponds to the data shown in Figure 1A.
 
 ```{r,mistake1_sim,fig.height=6,fig.width=6}
@@ -343,15 +343,15 @@ m1sim <- mclapply(seeds, function(seed) {
   set.seed(seed)
   rand <- sample(x=bg,size=1000,replace=FALSE)
   fres_rand <- fora(pathways=gsets, genes=rand, universe=bg, minSize = 5, maxSize = Inf)
-  nom <- nrow(subset(fres_rand,pval<0.05))
-  fdr <- nrow(subset(fres_rand,padj<0.05))
+  nom <- nrow(subset(fres_rand,pval<0.01))
+  fdr <- nrow(subset(fres_rand,padj<0.01))
   c(nom,fdr)
 },mc.cores=8)
 
 m1sim <- do.call(rbind,m1sim)
-colnames(m1sim) <- c("p","FDR")
+colnames(m1sim) <- c("p<0.01","FDR<0.01")
 
-boxplot(m1sim,main="Random gene sets (100 repetitions)",ylab="no. gene sets meeting \"significance\" threshold <0.05",frame=FALSE)
+boxplot(m1sim,main="Random gene sets (100 repetitions)",ylab="no. gene sets meeting \"significance\" threshold <0.01",frame=FALSE)
 beeswarm(list(mean(m1sim[,1]), mean(m1sim[,2])),add=TRUE,pch=4,cex=2)
 lab1 <- paste("Mean=",signif(mean(m1sim[,1]) , 3),sep="")
 lab2 <- paste("Mean=",signif(mean(m1sim[,2]) , 2),sep="")
@@ -359,7 +359,7 @@ text(c(1.2,2.2), c( mean(m1sim[,1])+5, mean(m1sim[,2])+5 ), labels=c(lab1,lab2) 
 
 unlink("img/1a.png")
 png("img/1a.png", width = 480, height = 480)
-boxplot(m1sim,main="Random gene sets (100 repetitions)",ylab="no. gene sets meeting \"significance\" threshold <0.05",frame=FALSE)
+boxplot(m1sim,main="Random gene sets (100 repetitions)",ylab="no. gene sets meeting \"significance\" threshold <0.01",frame=FALSE)
 beeswarm(list(mean(m1sim[,1]), mean(m1sim[,2])),add=TRUE,pch=4,cex=2)
 lab1 <- paste("Mean=",signif(mean(m1sim[,1]) , 3),sep="")
 lab2 <- paste("Mean=",signif(mean(m1sim[,2]) , 2),sep="")
@@ -369,7 +369,7 @@ par(mfrow=c(1,1))
 
 unlink("img/1a.pdf")
 pdf("img/1a.pdf", width = 5, height = 5)
-boxplot(m1sim,main="Random gene sets (100 repetitions)",ylab="no. gene sets meeting \"significance\" threshold <0.05",frame=FALSE)
+boxplot(m1sim,main="Random gene sets (100 repetitions)",ylab="no. gene sets meeting \"significance\" threshold <0.01",frame=FALSE)
 beeswarm(list(mean(m1sim[,1]), mean(m1sim[,2])),add=TRUE,pch=4,cex=2)
 lab1 <- paste("Mean=",signif(mean(m1sim[,1]) , 3),sep="")
 lab2 <- paste("Mean=",signif(mean(m1sim[,2]) , 2),sep="")
@@ -392,7 +392,7 @@ Will try FORA.
 | Statistical test used | hypergeometric |
 | P-value correction for multiple comparisons | FDR method |
 | Background list | Genes with >=10 reads per sample on average across all samples |
-| Gene Selection | DESeq2 FDR<0.05 and log2FC>0 or log2FC<0 |
+| Gene Selection | DESeq2 FDR<0.01 and log2FC>0 or log2FC<0 |
 | Data availability | via DEE2 at accession SRP038101 (human) |
 | Other parameters | Min gene set size of 5 |
 
@@ -427,14 +427,14 @@ zz_unfilt <-cbind(as.data.frame(z_unfilt),unfilt)
 def_unfilt <-as.data.frame(zz_unfilt[order(zz_unfilt$pvalue),])
 
 message("No significant genes without filtering low genes")
-nrow(subset(def_unfilt,padj<0.05))
+nrow(subset(def_unfilt,padj<0.01))
 
-sigf <- subset(def_unfilt,padj<=0.05)
+sigf <- subset(def_unfilt,padj<=0.01)
 DET=nrow(def_unfilt)
 NSIG=nrow(sigf)
 NUP=nrow(subset(sigf,log2FoldChange>0))
 NDN=nrow(subset(sigf,log2FoldChange<0))
-HEADER=paste(DET,"included genes;",NSIG,"w/FDR<0.05;",NUP,"up;",NDN,"down")
+HEADER=paste(DET,"included genes;",NSIG,"w/FDR<0.01;",NUP,"up;",NDN,"down")
 plot(log10(def_unfilt$baseMean) ,def_unfilt$log2FoldChange,
   cex=0.6,pch=19,col="darkgray",
   main="5-azacitidine treatment in AML3 cells",
@@ -456,14 +456,14 @@ zz_filt <-cbind(as.data.frame(z_filt),filt)
 def_filt <-as.data.frame(zz_filt[order(zz_filt$pvalue),])
 
 message("No significant genes with filtering low genes")
-nrow(subset(def_filt,padj<0.05))
+nrow(subset(def_filt,padj<0.01))
 
-sigf <- subset(def_filt,padj<=0.05)
+sigf <- subset(def_filt,padj<=0.01)
 DET=nrow(def_filt)
 NSIG=nrow(sigf)
 NUP=nrow(subset(sigf,log2FoldChange>0))
 NDN=nrow(subset(sigf,log2FoldChange<0))
-HEADER=paste(DET,"included genes;",NSIG,"w/FDR<0.05;",NUP,"up;",NDN,"down")
+HEADER=paste(DET,"included genes;",NSIG,"w/FDR<0.01;",NUP,"up;",NDN,"down")
 plot(log10(def_filt$baseMean) ,def_filt$log2FoldChange,
   cex=0.6,pch=19,col="darkgray",
   main="5-azacitidine treatment in AML3 cells",
@@ -475,7 +475,7 @@ mtext(HEADER)
 plot(log10(def_unfilt$baseMean),abs(def_unfilt$lfcSE),
   xlab="log10(baseMean)",ylab="log2FC standard error",
   pch=19,cex=0.5,col="black")
-sigf <- subset(def_unfilt,padj<=0.05)
+sigf <- subset(def_unfilt,padj<=0.01)
 points(log10(sigf$baseMean) ,sigf$lfcSE,
   cex=0.5,pch=19,col="red")
 abline(v=1,col="blue",lwd=2,lty=2)
@@ -492,12 +492,12 @@ unlink("img/smears.pdf")
 pdf("img/smears.pdf", width = 8, height = 5)
 par(mfrow=c(1,2))
 
-sigf <- subset(def_unfilt,padj<=0.05)
+sigf <- subset(def_unfilt,padj<=0.01)
 DET=nrow(def_unfilt)
 NSIG=nrow(sigf)
 NUP=nrow(subset(sigf,log2FoldChange>0))
 NDN=nrow(subset(sigf,log2FoldChange<0))
-HEADER=paste(DET,"included genes;",NSIG,"w/FDR<0.05;",NUP,"up;",NDN,"down")
+HEADER=paste(DET,"included genes;",NSIG,"w/FDR<0.01;",NUP,"up;",NDN,"down")
 plot(log10(def_unfilt$baseMean) ,def_unfilt$log2FoldChange,
   cex=0.6,pch=19,col="darkgray",
   main="Unfiltered",
@@ -507,12 +507,12 @@ points(log10(sigf$baseMean) ,sigf$log2FoldChange,
   cex=0.6,pch=19,col="red")
 mtext(HEADER,cex=0.75)
 
-sigf <- subset(def_filt,padj<=0.05)
+sigf <- subset(def_filt,padj<=0.01)
 DET=nrow(def_filt)
 NSIG=nrow(sigf)
 NUP=nrow(subset(sigf,log2FoldChange>0))
 NDN=nrow(subset(sigf,log2FoldChange<0))
-HEADER=paste(DET,"included genes;",NSIG,"w/FDR<0.05;",NUP,"up;",NDN,"down")
+HEADER=paste(DET,"included genes;",NSIG,"w/FDR<0.01;",NUP,"up;",NDN,"down")
 plot(log10(def_filt$baseMean) ,def_filt$log2FoldChange,
   cex=0.6,pch=19,col="darkgray",
   main="Filtered",
@@ -534,7 +534,7 @@ In any case they are unlikely to be detected as significant using qPCR.
 LOW=length( which(def_unfilt$baseMean<10 ) )
 LOW
 
-LOWSIG=length( which(def_unfilt$baseMean<10 & def_unfilt$padj < 0.05) )
+LOWSIG=length( which(def_unfilt$baseMean<10 & def_unfilt$padj < 0.01) )
 LOWSIG
 
 LOW - LOWSIG
@@ -552,13 +552,13 @@ vres <- lapply(vals, function(i) {
   lev1=i+1
   fdr <- def_unfilt[which(log10basemean >= lev0 & log10basemean < lev1 ),"padj"]
   fdr[is.na(fdr)] <- 1
-  fdr<0.05
+  fdr<0.01
 })
 
 lapply(vres,table)
 sigproportions <- unlist(lapply(vres,function(x) { length(which(x==TRUE)) / length(x) } ))
 plot(vals+0.5,sigproportions,xlim=c(-2,5),cex=1.3,bty="none",
-  ylab="proportion of genes with FDR<0.05",
+  ylab="proportion of genes with FDR<0.01",
   xlab="log10(baseMean) bin")
 grid()
 
@@ -586,14 +586,14 @@ vres <- lapply(vals, function(i) {
   lev1=i+1
   y <- def_unfilt[which(log10basemean >= lev0 & log10basemean < lev1 ),c("log2FoldChange","padj")]
   y$padj[is.na(y$padj)] <- 1
-  abs(y$log2FoldChange)>=1 & y$padj < 0.05
+  abs(y$log2FoldChange)>=1 & y$padj < 0.01
 })
 
 lapply(vres,table)
 sigproportions <- unlist(lapply(vres,function(x) { length(which(x==TRUE)) / length(x) } ))
 plot(vals+0.5,sigproportions,cex=1.3,bty="none",
   xlim=c(-2,5),
-  ylab="proportion of genes with FDR<0.05",
+  ylab="proportion of genes with FDR<0.01",
   xlab="log10(baseMean) bin")
 grid()
 
@@ -608,14 +608,14 @@ vres <- lapply(vals, function(i) {
   lev1=i+1
   y <- def_unfilt[which(log10basemean >= lev0 & log10basemean < lev1 ),c("log2FoldChange","padj")]
   y$padj[is.na(y$padj)] <- 1
-  abs(y$log2FoldChange)>=0.35 & y$padj < 0.05
+  abs(y$log2FoldChange)>=0.35 & y$padj < 0.01
 })
 
 lapply(vres,table)
 sigproportions <- unlist(lapply(vres,function(x) { length(which(x==TRUE)) / length(x) } ))
 plot(vals+0.5,sigproportions,cex=1.3,bty="none",
   xlim=c(-2,5),
-  ylab="proportion of genes with FDR<0.05",
+  ylab="proportion of genes with FDR<0.01",
   xlab="log10(baseMean) bin")
 grid()
 
@@ -637,8 +637,8 @@ gl_gsets <- list("GL0"=gl0,"GL1"=gl1,"GL2"=gl2,"GL3"=gl3,"GL4"=gl4,"GL5"=gl5,"GL
 
 lapply(gl_gsets,length)
 
-glup <- head(rownames(subset(def_filt,padj<0.05 & log2FoldChange > 0)),750)
-gldn <- head(rownames(subset(def_filt,padj<0.05 & log2FoldChange < 0)),750)
+glup <- head(rownames(subset(def_filt,padj<0.01 & log2FoldChange > 0)),750)
+gldn <- head(rownames(subset(def_filt,padj<0.01 & log2FoldChange < 0)),750)
 glbg <- rownames(def_filt)
 
 gl_res_up <- fora(pathways=gl_gsets, genes=glup, universe=glbg, minSize = 5, maxSize = Inf)
@@ -688,16 +688,16 @@ smaller.
 
 ```{r,viochart}
 
-deg_unfilt <- subset(def_unfilt,padj<0.05)
-ns_unfilt <- subset(def_unfilt,padj>0.05)
+deg_unfilt <- subset(def_unfilt,padj<0.01)
+ns_unfilt <- subset(def_unfilt,padj>0.01)
 
 rowmeans_deg_unfilt <- rowMeans(deg_unfilt[,7:12])
 rowmeans_ns_unfilt <- rowMeans(ns_unfilt[,7:12])
 
 viodata <- list("DEG"=log10(rowmeans_deg_unfilt+0.01),"NS"=log10(rowmeans_ns_unfilt+0.01))
 
-deg_filt <- subset(def_filt,padj<0.05)
-ns_filt <- subset(def_filt,padj>0.05)
+deg_filt <- subset(def_filt,padj<0.01)
+ns_filt <- subset(def_filt,padj>0.01)
 
 rowmeans_deg_filt <- rowMeans(deg_filt[,7:12])
 rowmeans_ns_filt <- rowMeans(ns_filt[,7:12])
@@ -731,22 +731,22 @@ message("no. genes in each of the lists up, down, bg and all.")
 lapply(list(up,dn,bg,all),length)
 
 fres_up_bg <- fora(pathways=gsets, genes=up, universe=bg, minSize = 5, maxSize = Inf)
-fres_up_bg <- subset(fres_up_bg,padj<0.05)$pathway
+fres_up_bg <- subset(fres_up_bg,padj<0.01)$pathway
 message("no up-regulated pathways with the correct background.")
 length(fres_up_bg)
 
 fres_up_all <- fora(pathways=gsets, genes=up, universe=all, minSize = 5, maxSize = Inf)
-fres_up_all <- subset(fres_up_all,padj<0.05)$pathway
+fres_up_all <- subset(fres_up_all,padj<0.01)$pathway
 message("no up-regulated pathways with wg background.")
 length(fres_up_all)
 
 fres_dn_bg <- fora(pathways=gsets, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
-fres_dn_bg <- subset(fres_dn_bg,padj<0.05)$pathway
+fres_dn_bg <- subset(fres_dn_bg,padj<0.01)$pathway
 message("no down-regulated pathways with the correct background.")
 length(fres_dn_bg)
 
 fres_dn_all <- fora(pathways=gsets, genes=dn, universe=all, minSize = 5, maxSize = Inf)
-fres_dn_all <- subset(fres_dn_all,padj<0.05)$pathway
+fres_dn_all <- subset(fres_dn_all,padj<0.01)$pathway
 message("no down-regulated pathways with wg background.")
 length(fres_dn_all)
 
@@ -802,8 +802,8 @@ m2sim <- mclapply(seeds, function(seed) {
   rand <- sample(x=bg,size=1000,replace=FALSE)
   sim_all <- fora(pathways=gsets, genes=rand, universe=all, minSize = 5, maxSize = Inf)
   sim_bg <- fora(pathways=gsets, genes=rand, universe=bg, minSize = 5, maxSize = Inf)
-  sig_all <- nrow(subset(sim_all,padj<0.05))
-  sig_bg <- nrow(subset(sim_bg,padj<0.05))
+  sig_all <- nrow(subset(sim_all,padj<0.01))
+  sig_bg <- nrow(subset(sim_bg,padj<0.01))
   c(sig_all,sig_bg)
 },mc.cores=8)
 
@@ -812,7 +812,7 @@ colnames(m2sim) <- c("Whole genome background","Correct background")
 
 par(mar=c(5.1,4.1,4.1,2.1))
 
-boxplot(m2sim,main="Random gene sets drawn from BG",ylab="no. gene sets FDR<0.05",frame=FALSE)
+boxplot(m2sim,main="Random gene sets drawn from BG",ylab="no. gene sets FDR<0.01",frame=FALSE)
 mtext("100 simulations")
 beeswarm(list(mean(m2sim[,1]), mean(m2sim[,2])),add=TRUE,pch=4,cex=2)
 lab1 <- paste("Mean=",signif(mean(m2sim[,1]) , 3),sep="")
@@ -822,7 +822,7 @@ text(c(1.2,2.2), c( mean(m2sim[,1])+15, mean(m2sim[,2])+15 ), labels=c(lab1,lab2
 par(mar=c(5.1,4.1,4.1,2.1))
 unlink("img/2a.png")
 png("img/2a.png", width = 480, height = 480)
-boxplot(m2sim,main="Random gene sets drawn from BG",ylab="no. gene sets FDR<0.05",frame=FALSE)
+boxplot(m2sim,main="Random gene sets drawn from BG",ylab="no. gene sets FDR<0.01",frame=FALSE)
 mtext("100 simulations")
 beeswarm(list(mean(m2sim[,1]), mean(m2sim[,2])),add=TRUE,pch=4,cex=2)
 lab1 <- paste("Mean=",signif(mean(m2sim[,1]) , 3),sep="")
@@ -834,7 +834,7 @@ par(mfrow=c(1,1))
 par(mar=c(5.1,4.1,4.1,2.1))
 unlink("img/2a.pdf")
 pdf("img/2a.pdf", width = 5, height = 5)
-boxplot(m2sim,main="Random gene sets drawn from BG",ylab="no. gene sets FDR<0.05",frame=FALSE)
+boxplot(m2sim,main="Random gene sets drawn from BG",ylab="no. gene sets FDR<0.01",frame=FALSE)
 mtext("100 simulations")
 beeswarm(list(mean(m2sim[,1]), mean(m2sim[,2])),add=TRUE,pch=4,cex=2)
 lab1 <- paste("Mean=",signif(mean(m2sim[,1]) , 3),sep="")
@@ -858,7 +858,7 @@ m2simpw <- mclapply(seeds, function(seed) {
   set.seed(seed)
   rand <- sample(x=bg,size=1000,replace=FALSE)
   sim_all <- fora(pathways=gsets, genes=rand, universe=all, minSize = 5, maxSize = Inf)
-  sig_all <- subset(sim_all,padj<0.05)$pathway
+  sig_all <- subset(sim_all,padj<0.01)$pathway
   return(sig_all)
 },mc.cores=8)
 
@@ -930,13 +930,13 @@ m <- mitch_import(x=def2,DEtype="deseq2",geneTable=gtnew)
 mres <- mitch_calc(x=m,genesets=gsets,minsetsize=5,cores=4,priority="significance")
 
 message("No. significant gene sets")
-nrow(subset(mres$enrichment_result,p.adjustANOVA<0.05))
+nrow(subset(mres$enrichment_result,p.adjustANOVA<0.01))
 message("No. gene sets included")
 nrow(subset(mres$enrichment_result,p.adjustANOVA<1))
 
 mresdf <- mres$enrichment_result
 
-sig <- subset(mresdf,p.adjustANOVA<0.05)
+sig <- subset(mresdf,p.adjustANOVA<0.01)
 
 plot(abs(mresdf$s.dist),-log10(mresdf$pANOVA),
   main="enrichment scores versus significance",
@@ -1033,8 +1033,8 @@ mres_sig_dn_tbl %>%
 
 mres <- mitch_calc(x=m,genesets=gsets,minsetsize=5,cores=4,priority="effect")
 
-mres_es_up <- head(subset(mres$enrichment_result,s.dist>0 & p.adjustANOVA < 0.05),10)
-mres_es_dn <- head(subset(mres$enrichment_result,s.dist<0 & p.adjustANOVA < 0.05),10)
+mres_es_up <- head(subset(mres$enrichment_result,s.dist>0 & p.adjustANOVA < 0.01),10)
+mres_es_dn <- head(subset(mres$enrichment_result,s.dist<0 & p.adjustANOVA < 0.01),10)
 
 # get log2fc values
 mres_es_up$mean_lfc <- sapply(mres_es_up$set[1:10], function(y) {
@@ -1058,11 +1058,11 @@ mres_es_dn_tbl <- apply(data.frame(mres_es_dn[,1:2],
   apply(mres_es_dn[,3:6],2,signif,2)),2,as.character)
 
 mres_es_up_tbl %>%
-  kbl(caption="Top upregulated pathways when prioritised by ES (discarding any with FDR>0.05)",row.names=FALSE) %>%
+  kbl(caption="Top upregulated pathways when prioritised by ES (discarding any with FDR>0.01)",row.names=FALSE) %>%
   kable_paper("hover", full_width = F)
 
 mres_es_dn_tbl %>%
-  kbl(caption="Top upregulated pathways when prioritised by ES (discarding any with FDR>0.05)",row.names=FALSE) %>%
+  kbl(caption="Top upregulated pathways when prioritised by ES (discarding any with FDR>0.01)",row.names=FALSE) %>%
   kable_paper("hover", full_width = F)
 
 m4tbls <- list("esup"=mres_es_up_tbl,"esdn"=mres_es_dn_tbl,"sigup"=mres_sig_up_tbl,"sigdn"=mres_sig_dn_tbl)
@@ -1148,12 +1148,12 @@ I get.
 
 ```{r,mistake5,fig.height=6,fig.width=6}
 
-up <- rownames(subset(def, log2FoldChange>0 & padj<0.05))
+up <- rownames(subset(def, log2FoldChange>0 & padj<0.01))
 up <- sapply(strsplit(up," "),'[[',1)
 up <- unique(gtnew[match(up,gtnew$V1),2])
 up <- up[which(!is.na(up))]
 
-dn <- rownames(subset(def, log2FoldChange<0 & padj<0.05))
+dn <- rownames(subset(def, log2FoldChange<0 & padj<0.01))
 dn <- sapply(strsplit(dn," "),'[[',1)
 dn <- unique(gtnew[match(dn,gtnew$V1),2])
 dn <- dn[which(!is.na(dn))]
@@ -1168,15 +1168,15 @@ lapply(list(up,dn,bg),length)
 
 sizes <- c(50,100,200,300,400,500,600,700,800,900,1000,1500,2000,2500,3000,4000,5000,6000,7000)
 
-fup <- nrow(subset(fora(pathways=gsets, genes=up, universe=bg, minSize = 5, maxSize = Inf),padj<0.05))
-fdn <- nrow(subset(fora(pathways=gsets, genes=dn, universe=bg, minSize = 5, maxSize = Inf),padj<0.05))
+fup <- nrow(subset(fora(pathways=gsets, genes=up, universe=bg, minSize = 5, maxSize = Inf),padj<0.01))
+fdn <- nrow(subset(fora(pathways=gsets, genes=dn, universe=bg, minSize = 5, maxSize = Inf),padj<0.01))
 
 nups <- unlist(lapply(sizes, function(i) {
   ids <- rownames(subset(def2, log2FoldChange>0))
   ids <- head(ids,i)
   genes <- unique(gtnew[match(ids,gtnew$V1),2])
   fres <- fora(pathways=gsets, genes=genes, universe=bg, minSize = 5, maxSize = Inf)
-  nrow(subset(fres,padj<0.05))
+  nrow(subset(fres,padj<0.01))
 }))
 
 ndns <- unlist(lapply(sizes, function(i) {
@@ -1184,7 +1184,7 @@ ndns <- unlist(lapply(sizes, function(i) {
   ids <- head(ids,i)
   genes <- unique(gtnew[match(ids,gtnew$V1),2])
   fres <- fora(pathways=gsets, genes=genes, universe=bg, minSize = 5, maxSize = Inf)
-  nrow(subset(fres,padj<0.05))
+  nrow(subset(fres,padj<0.01))
 }))
 
 df <- data.frame("up"=nups,"dn"=ndns,row.names=sizes)
@@ -1199,7 +1199,7 @@ dn_fes <- lapply(sizes, function(i) {
   ids <- head(ids,i)
   genes <- unique(gtnew[match(ids,gtnew$V1),2])
   fres <- fora(pathways=gsets, genes=genes, universe=bg, minSize = 5, maxSize = Inf)
-  subset(fres,padj<0.05)$foldEnrichment
+  subset(fres,padj<0.01)$foldEnrichment
 })
 
 up_fes <- lapply(sizes, function(i) {
@@ -1207,7 +1207,7 @@ up_fes <- lapply(sizes, function(i) {
   ids <- head(ids,i)
   genes <- unique(gtnew[match(ids,gtnew$V1),2])
   fres <- fora(pathways=gsets, genes=genes, universe=bg, minSize = 5, maxSize = Inf)
-  subset(fres,padj<0.05)$foldEnrichment
+  subset(fres,padj<0.01)$foldEnrichment
 })
 
 fes_df <- data.frame(sapply(up_fes,mean),sapply(dn_fes,mean))
@@ -1233,7 +1233,7 @@ The line chart shown below corresponds to Figure 4.
 ```{r,mistake5_linechart,fig.height=7,fig.width=6}
 
 plot(1:nrow(df),df$up,type="b",col="red", pch=19, las=1,
-  ylab="no. gene sets with FDR<0.05",xlab="gene list length",
+  ylab="no. gene sets with FDR<0.01",xlab="gene list length",
   bty="n",xaxt = "n")
 axis(1, at = 1:nrow(df), labels=sizes, cex.axis=1,las=2)
 lines(1:nrow(df),df$dn,type="b",col="blue",pch=19)
@@ -1246,7 +1246,7 @@ grid()
 unlink("img/5m.png")
 png("img/5m.png", width = 540, height = 480)
 plot(1:nrow(df),df$up,type="b",col="red", pch=19, las=1,
-  ylab="no. gene sets with FDR<0.05",xlab="gene list length",
+  ylab="no. gene sets with FDR<0.01",xlab="gene list length",
   bty="n",xaxt = "n")
 axis(1, at = 1:nrow(df), labels=sizes, cex.axis=1,las=2)
 lines(1:nrow(df),df$dn,type="b",col="blue",pch=19)
@@ -1260,7 +1260,7 @@ dev.off()
 unlink("img/5m.pdf")
 pdf("img/5m.pdf", width = 7, height = 5)
 plot(1:nrow(df),df$up,type="b",col="red", pch=19, las=1,
-  ylab="no. gene sets with FDR<0.05",xlab="gene list length",
+  ylab="no. gene sets with FDR<0.01",xlab="gene list length",
   bty="n",xaxt = "n")
 axis(1, at = 1:nrow(df), labels=sizes, cex.axis=1,las=2)
 lines(1:nrow(df),df$dn,type="b",col="blue",pch=19)
@@ -1307,17 +1307,17 @@ length(updn)
 
 message("no. significant sets using the combined test:")
 fres_updn_bg <- fora(pathways=gsets, genes=updn, universe=bg, minSize = 5, maxSize = Inf)
-fres_updn_bg <- subset(fres_updn_bg,padj<0.05)$pathway
+fres_updn_bg <- subset(fres_updn_bg,padj<0.01)$pathway
 length(fres_updn_bg)
 
 message("no. significant upregulated sets using the separate test:")
 fres_up_bg <- fora(pathways=gsets, genes=up, universe=bg, minSize = 5, maxSize = Inf)
-fres_up_bg <- subset(fres_up_bg,padj<0.05)$pathway
+fres_up_bg <- subset(fres_up_bg,padj<0.01)$pathway
 length(fres_up_bg)
 
 message("no. significant downregulated sets using the separate test:")
 fres_dn_bg <- fora(pathways=gsets, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
-fres_dn_bg <- subset(fres_dn_bg,padj<0.05)$pathway
+fres_dn_bg <- subset(fres_dn_bg,padj<0.01)$pathway
 length(fres_dn_bg)
 
 message("no. significant sets using the separate tests:")
@@ -1379,58 +1379,58 @@ kegg_up <- fora(pathways=kegg, genes=up, universe=bg, minSize = 5, maxSize = Inf
 kegg_dn <- fora(pathways=kegg, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
 
 message("no. significantly upregulated KEGG pathways")
-nrow(subset(kegg_up,padj<0.05))
+nrow(subset(kegg_up,padj<0.01))
 message("no. significantly downregulated KEGG pathways")
-nrow(subset(kegg_dn,padj<0.05))
+nrow(subset(kegg_dn,padj<0.01))
 message("no. significantly dysregulated KEGG pathways")
-sum(nrow(subset(kegg_up,padj<0.05)), nrow(subset(kegg_dn,padj<0.05) ))
+sum(nrow(subset(kegg_up,padj<0.01)), nrow(subset(kegg_dn,padj<0.01) ))
 
 kegg_med_up <- fora(pathways=kegg_med, genes=up, universe=bg, minSize = 5, maxSize = Inf)
 kegg_med_dn <- fora(pathways=kegg_med, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
 message("no. significantly upregulated KEGG medicus pathways")
-nrow(subset(kegg_med_up,padj<0.05))
+nrow(subset(kegg_med_up,padj<0.01))
 message("no. significantly downregulated KEGG medicus pathways")
-nrow(subset(kegg_med_dn,padj<0.05))
+nrow(subset(kegg_med_dn,padj<0.01))
 message("no. significantly dysregulated KEGG medicus pathways")
-sum(nrow(subset(kegg_med_up,padj<0.05)), nrow(subset(kegg_med_dn,padj<0.05) ))
+sum(nrow(subset(kegg_med_up,padj<0.01)), nrow(subset(kegg_med_dn,padj<0.01) ))
 
 reactome_up <- fora(pathways=reactome, genes=up, universe=bg, minSize = 5, maxSize = Inf)
 reactome_dn <- fora(pathways=reactome, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
 message("no. significantly upregulated Reactome pathways")
-nrow(subset(reactome_up,padj<0.05))
+nrow(subset(reactome_up,padj<0.01))
 message("no. significantly downregulated Reactome pathways")
-nrow(subset(reactome_dn,padj<0.05))
+nrow(subset(reactome_dn,padj<0.01))
 message("no. significantly dysregulated Reactome pathways")
-sum(nrow(subset(reactome_up,padj<0.05)), nrow(subset(reactome_dn,padj<0.05) ))
+sum(nrow(subset(reactome_up,padj<0.01)), nrow(subset(reactome_dn,padj<0.01) ))
 
 gobp_up <- fora(pathways=gobp, genes=up, universe=bg, minSize = 5, maxSize = Inf)
 gobp_dn <- fora(pathways=gobp, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
 message("no. significantly upregulated GO BP terms")
-nrow(subset(gobp_up,padj<0.05))
+nrow(subset(gobp_up,padj<0.01))
 message("no. significantly upregulated GO BP terms")
-nrow(subset(gobp_dn,padj<0.05))
+nrow(subset(gobp_dn,padj<0.01))
 message("no. significantly dysregulated GO BP terms")
-sum(nrow(subset(gobp_up,padj<0.05)), nrow(subset(gobp_dn,padj<0.05) ))
+sum(nrow(subset(gobp_up,padj<0.01)), nrow(subset(gobp_dn,padj<0.01) ))
 
 msdb_up <- fora(pathways=msdb, genes=up, universe=bg, minSize = 5, maxSize = Inf)
 msdb_dn <- fora(pathways=msdb, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
 
 message("no. significantly upregulated MSigDB gene sets")
-nrow(subset(msdb_up,padj<0.05))
+nrow(subset(msdb_up,padj<0.01))
 
 message("no. significantly downregulated MSigDB gene sets")
-nrow(subset(msdb_dn,padj<0.05))
+nrow(subset(msdb_dn,padj<0.01))
 
 message("no. significantly dysregulated MSigDB gene sets")
-sum(nrow(subset(msdb_up,padj<0.05)), nrow(subset(msdb_dn,padj<0.05) ))
+sum(nrow(subset(msdb_up,padj<0.01)), nrow(subset(msdb_dn,padj<0.01) ))
 
-up_pw <- c(nrow(subset(kegg_up,padj<0.05)),nrow(subset(kegg_med_up,padj<0.05)),
-  nrow(subset(reactome_up,padj<0.05)), nrow(subset(gobp_up,padj<0.05)),
-  nrow(subset(msdb_up,padj<0.05)) )
+up_pw <- c(nrow(subset(kegg_up,padj<0.01)),nrow(subset(kegg_med_up,padj<0.01)),
+  nrow(subset(reactome_up,padj<0.01)), nrow(subset(gobp_up,padj<0.01)),
+  nrow(subset(msdb_up,padj<0.01)) )
 
-dn_pw <- c(nrow(subset(kegg_dn,padj<0.05)), nrow(subset(kegg_med_dn,padj<0.05)),
-  nrow(subset(reactome_dn,padj<0.05)), nrow(subset(gobp_dn,padj<0.05)),
-  nrow(subset(msdb_dn,padj<0.05)) )
+dn_pw <- c(nrow(subset(kegg_dn,padj<0.01)), nrow(subset(kegg_med_dn,padj<0.01)),
+  nrow(subset(reactome_dn,padj<0.01)), nrow(subset(gobp_dn,padj<0.01)),
+  nrow(subset(msdb_dn,padj<0.01)) )
 
 m8tbl <- data.frame(d1,d2,d3,d4,up_pw, dn_pw)
 
@@ -1438,7 +1438,7 @@ colnames(m8tbl) <- c("No. gene sets","Total no. annotations","Median gene set si
   "No. genes with ≥1 annotation","Up-regulated","Down-regulated")
 
 m8tbl %>%
-  kbl(caption="Table XX. Gene set metrics, and number of significantly differentially regulated pathways (FDR<0.05).") %>%
+  kbl(caption="Table XX. Gene set metrics, and number of significantly differentially regulated pathways (FDR<0.01).") %>%
   kable_paper("hover", full_width = F)
 
 saveRDS(m8tbl,"m8tbl.Rds")
