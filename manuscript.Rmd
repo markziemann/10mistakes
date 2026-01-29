@@ -61,7 +61,7 @@ There are a variety of methods for FEA, but two main methods are over-representa
 ORA involves selecting genes based on a hard cut-off followed by a test of enrichment (e.g.:
 Fisher’s exact test) as compared to a background list @Tavazoie1999-as.
 Popular ORA web tools include DAVID @Sherman2022-kg, g:Profiler @Kolberg2023-pe and
-Enrichr @Kuleshov2016-ch, while ClusterProfiler Wu2021-mg is popular for R based analysis.
+Enrichr @Kuleshov2016-ch, while ClusterProfiler @Wu2021-mg is popular for R based analysis.
 FCS involves ranking all detected genes followed by a test to assess whether the distribution
 of scores deviates towards the up- or down-regulated directions.
 GSEA @Subramanian2005-bd is a stand-alone FCS software with a graphical user interface, and
