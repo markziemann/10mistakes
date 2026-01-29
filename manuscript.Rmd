@@ -149,17 +149,13 @@ in Box 1.
 | Box 1. Recommendations for setting a detection threshold to define the background list from various omics data. |
 | --- |
 | Proteomics: Missing values are common. Consider keeping proteins detected in ≥50% of samples.
-
 RNA-seq, scRNA-seq, ChIP-Seq and ATAC-seq: Various valid approaches:
 * Mean read count of 10 across all samples.
 * Mean reads per million threshold of 1.0 across all samples.
 * Read counts of 10 or more in ≥50% of samples.
 * Mean reads per million threshold of 1.0 in ≥50% of samples.
-
 Microarray gene expression and DNA methylation: Discard known problematic probes. Include all genes with probes that pass quality control filtering. 
-
-Genomics (eg: variant searches): All annotated genes could be used unless there are reasons to believe that some are not detected (eg: due to extreme GC content). This can be checked using sequence depth tools.
-|
+Genomics (eg: variant searches): All annotated genes could be used unless there are reasons to believe that some are not detected (eg: due to extreme GC content). This can be checked using sequence depth tools.|
 
 # 3. Using a tool that does not report enrichment scores
 
