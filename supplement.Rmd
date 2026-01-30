@@ -314,9 +314,14 @@ m8 |>
 # 8. Using outdated gene identifiers and gene sets 
 
 The size of Reactome pathway database growth over time is shown in Figure 6.
-It shows a constant growth and occasional big increases between versions.
-Therefore, it is always best to download and use the newest available version of pathway
-gene sets.
+It shows a constant growth from 430 pathways in 2010 to 2159 pathways in 2025.
+In contrast, in this period, the size of KEGG has not changed, remaining static at 186
+annotated pathways.
+ORA users should be aware that static pathway databases like KEGG won’t contain pathways
+related to newly discovered and annotated molecular pathways as compared to more actively
+updated databases like Reactome.
+Figure 6 also shows that Reactome underwent two big increases between versions, therefore,
+users should download and use the newest available version of pathway gene sets.
 
 ```{r,9m,fig.cap="Figure 6. The number of Reactome gene sets grows over time. Gene sets were downloaded from the MSigDB website, except The last bar which represents the latest gene sets downloaded directly from Reactome, not yet incorporated into MSigDB.",echo=FALSE,fig.height=3,fig.width=5}
 

@@ -1462,7 +1462,37 @@ This corresponds to Figure 6.
 
 ```{r,outdated}
 
+blah()
+
 par(mar=c(5.1,5.1,4.1,2.1))
+
+kegg_files <- list.files("ref/msigdb/kegg/",full.names=TRUE)
+kegg_files <- kegg_files[c(6:20,4:5,1:3)]
+
+keggs <- lapply(kegg_files,gmtPathways)
+
+names(keggs) <- c("2010_09","2012_09","2013_05","2015_04","2016_01","2016_09","2017_04",
+  "2017_10","2018_07","2019_08","2020_03","2020_09","2021_03","2021_04","2022_01","2022_09",
+  "2023_03","2023_10","2024_08","2025_06")
+
+# analyse kegg 2010 and 2025 - no change
+# number of gene sets
+nogs <- unlist(lapply(keggs,length))
+nogs
+
+# total no annotations
+tot_anno <- unlist(lapply(keggs,function(gs) {
+  length(unlist(gs))
+}))
+tot_anno
+
+# gene coverage
+gene_coverage <- unlist(lapply(keggs,function(gs) {
+  length(unique(unlist(gs)))
+}))
+gene_coverage
+
+# now analyse Reactome
 
 reactome_files <- list.files("ref/msigdb/reactome/",full.names=TRUE)
 reactome_files <- reactome_files[c(6:20,1:5)]
