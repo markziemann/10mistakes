@@ -392,4 +392,18 @@ crucial methodological deficiencies for ORA and FCS analyses.
 | **ORA:** I need you to carefully examine how pathway enrichment analysis was conducted in this scientific article. I need you to focus on the Methods section, but information can also be found in other sections. Please answer the following questions separately, so that the output data can be collated into a table. If authors did not provide any details in the article, then please write ‘not described’. 1. What tool was used for pathway enrichment analysis? 2. Was a tool version number provided? 3. What gene set library was queried (eg: GO, KEGG, Reactome or other)?  4. How was the foreground gene list selected for pathway enrichment analysis? 5. Was a background gene list defined for pathway enrichment analysis? 6. What statistical test was used for enrichment analysis? 7. Was false discovery rate correction used to control the number of false positives in the pathway enrichment analysis? |
 | **FCS:** I need you to carefully examine how pathway enrichment analysis was conducted in this scientific article. I need you to focus on the Methods section, but information can also be found in other sections. Please answer the following questions separately, so that the output data can be collated into a table. If authors did not provide any details in the article, then please write ‘not described’. 1. What tool was used for pathway enrichment analysis? 2. Was a tool version number provided? 3. What gene set library was queried (eg: GO, KEGG, Reactome or other)? 4. Was a detection threshold applied to the data? 5. How were genes ranked prior to enrichment analysis? 6. What statistical test was used for enrichment analysis? 7. Was false discovery rate correction used to control the number of false positives in the pathway enrichment analysis? |
 
+# Figure captions
+
+Figure 1. FDR control reduces false positives. (A) Effect of FDR control on enrichment results from a set of 1000 random genes. 100 simulations. (B) Euler diagram demonstrates the impact of FDR correction of p-values on the number of ‘significant’ gene sets in the example gene profile (AML3 cells with and without azacitidine exposure).
+
+Figure 2. A custom background list is essential for ORA. (A) Impact of background list selection on the number of ‘significant’ gene sets. The incorrect background includes all genes described in the annotation set, while the correct background includes only the genes that met the detection threshold. 100 simulations. (B) Gene sets appearing as false positives in 100/100 simulations include those related to cancer. (C) Impact of background list selection on the number of significant gene sets in the example gene profile (AML3 cells with and without azacitidine exposure).
+
+Figure 3. Scatterplot showing absolute enrichment scores (x-axis) and log-transformed significance values (y-axis) for each detected pathway. Gene sets with FDR<0.01 are highlighted in red.
+
+Figure 4. Effect of gene list size (x-axis) on number of significant pathways (y-axis). Red and dark blue correspond to significant pathways without filtering on the fold enrichment score (FES). Pink and light blue include pathways that meet the minimum FES of 3.0. Upregulated pathways are shown in red and pink. Downregulated pathways shown in dark blue and light blue.
+
+Figure 5. Combining up and downregulated genes into one ORA test yields fewer results.
+
+Figure 6. Reactome gene set growth over time. Gene sets were downloaded from the MSigDB website, except for 2025_09 which represents the latest gene sets downloaded directly from Reactome but not yet incorporated into MSigDB.
+
 # Bibliography
