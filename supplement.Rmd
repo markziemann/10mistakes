@@ -1,5 +1,5 @@
 ---
-title: "10 common mistakes that could ruin your enrichment analysis"
+title: "Supplemental supporting information - 10 common mistakes that could ruin your enrichment analysis"
 date: "`r Sys.Date()`"
 output:
   rmdformats::robobook:
@@ -13,70 +13,82 @@ bibliography: 10mistakes.bib
 csl: plos-computational-biology.csl
 ---
 
-<strong>Anusuiya Bora<sup>1,2</sup>, Matthew McKenzie<sup>1</sup> & Mark Ziemann<sup>1,2*</sup></strong>
+Here we provide additional evidence supporting the recommendations in the main text. 
 
-1. Deakin University, School of Life and Environmental Sciences, Geelong, Australia.
+# Methods
 
-2. Burnet Institute, Melbourne, Australia
+The example RNA-seq dataset used involves AML3 cells with and without azacytidine treatment
+@lund2014dnmt.
+This dataset was selected because it represents a typical transcriptomic study; with three
+experimental replicates and over 1000 differentially expressed genes.
+Read counts were obtained from the DEE2 database using the getDEE2 R package using SRA
+project accession SRP038101 as a query @ziemann2019digital.
+Genes with average expression above 10 counts per sample were considered detected, and genes
+not meeting this criterion were removed from downstream analysis (unless stated).
+Differential expression was conducted using DESeq2 v1.48.2 @love2014differential.
+Human gene symbols were updated to Ensembl 115 @dyer2025ensembl.
+Genes with FDR<0.01 were considered significantly differentially expressed.
+Reactome gene sets were downloaded in GMT format on 2nd Sept 2025 @milacic2024reactome, and
+these gene sets were used for all subsequent enrichment tests unless otherwise stated.
+All ORA tests were conducted using the fora function belonging to the fgsea package v1.34.2
+@Korotkevich2021-xm.
+Minimum gene set size was set to 5 for all subsequent enrichment tests.
+Gene sets with FDR<0.01 were considered significantly differentially regulated.
 
-(*) Correspondence: mark.ziemann@burnet.edu.au
+To demonstrate the importance of FDR control (Mistake 1), random sampling of 1000 detected
+genes was followed with ORA with and without FDR control.
+This was repeated 100 times.
+For comparison of the nominal and FDR corrected results, the top 1000 up- and 1000
+down-regulated genes by p-value altered by azacitidine treatment underwent separate ORA tests
+using a background consisting of the 13,063 detected genes with gene symbols.
+The number of significant gene sets (FDR<0.01) from each test were combined for visualisation
+using an Euler diagram.
 
-| Author | ORCID |
-| --- | --- |
-| Anusuiya Bora | 0009-0006-2908-1352 |
-| Matthew McKenzie | 0000-0001-7508-1800 |
-| Mark Ziemann | 0000-0002-7688-6974 |
+To demonstrate the importance of a suitable background gene list (Mistake 2), random sampling
+of 1000 detected genes as the foreground followed by ORA using either all annotated genes as
+the background or custom background consisting of detected genes.
+This process was repeated 100 times.
+To show the effect of incorrect background on the azacitidine gene profile, 1000 up- and 1000
+down-regulated genes selected by p-value underwent ORA using a background including all
+55,503 annotated genes.
+These results were compared to those generated using a background consisting of the 13,063
+detected genes using an Euler diagram.
 
-Target journal: Nature Methods
+To demonstrate the importance of using enrichment scores for interpretation of FEA results,
+(Mistake 3 and 4) the mitch package v1.20.0 was used for FCS analysis of the differential
+expression data @kaspi2020mitch.
 
-# Abstract
+To investigate how foreground gene set size impacts the number of ORA results (Mistake 5),
+the top N significant up- and down-regulated genes were selected for ORA compared to the
+background consisting of detected genes, where N was varied between 50 and 7000.
 
-Functional enrichment analysis (FEA) is an incredibly powerful way to summarise complex
-genomics data into information about the regulation of biological pathways including cellular
-metabolism, signalling and immune responses.
-About 10,000 scientific articles describe using FEA each year, making it among the most
-used techniques in bioinformatics.
-While FEA has become a routine part of workflows via myriad software packages and easy-to-use
-websites, mistakes can easily creep in due to poor tool design and unawareness among users of
-pitfalls.
-Here we outline 10 mistakes that undermine the effectiveness of FEA which we commonly see in
-research articles.
-We provide practical advice on their mitigation.
+To demonstrate the effect of combining up and down regulated genes into a single test
+(Mistake 6), the top significant 750 genes irrespective of fold change direction were used
+as the foreground for an ORA test, and compared with results from the separate approach with
+750 up- and 750 down-regulated genes respectively.
 
-# Background
+To show the effect of using shallow gene annotations (Mistake 7), various gene set libraries
+were extracted from the MSigDB Collection (msigdb.v2025.1.Hs.symbols.gmt)
+@liberzon2015molecular.
+These gene set libraries were each used for ORA tests with foreground lists of 750 genes as
+above.
 
-PubMed searches indicate keywords like "pathway analysis" and "enrichment analysis" appear in
-titles or abstracts of approximately 10,000 articles per year, and that the number of articles
-matching these keywords has increased by a factor of 5.4 between 2014 and 2024.
-The purpose of FEA is to understand whether gene categories are collectively
-differentially represented in the molecular profile at hand, and involves querying hundreds or
-thousands of functional categories representing gene pathways or ontologies.
-There are a variety of methods for FEA, but the main two are over-representation analysis
-(ORA) and functional class scoring (FCS) @Khatri2012-yq.
-ORA involves selecting genes based on a hard cut-off followed by a test of enrichment (e.g.:
-Fisher's exact test) as compared to a background list @Tavazoie1999-as.
-Popular ORA tools include websites like DAVID @Sherman2022-kg and software packages like
-ClusterProfiler @Wu2021-mg.
-FCS involves ranking all detected genes followed by a test to assess whether the distribution
-of scores deviates towards the up- or down-regulated directions.
-GSEA @Subramanian2005-bd is a stand-alone FCS software with a graphical user interface, and
-there are several command-line implementations such as fgsea @Korotkevich2021-xm.
+To show the difference in size of old gene sets (Mistake 8), Reactome gene sets were
+extracted from archived MSigDB Collections going back to 2010.
+These were compared to the most recent Reactome release (2nd Sept 2025) obtained directly from
+the Reactome website.
 
-Recommendations on correct application of pathway enrichment have been previously published
-[@Tilford2009-kh; @Tipney2010-sy; @Chicco2022-aa; @Zhao2023-av], yet we and others continue to
-observe blatant mistakes and methodological deficiencies appearing in peer-reviewed
-publications at an alarming rate [@Timmons2015-yb; @Wijesooriya2022-we].
-Such methodological and interpretation errors are known to "snowball" - a process where an
-initial flawed research study can create cascading problems for scientific reliability
-@liu2023misuse.
+Instances of poor presentation (Mistake 9) and methods reproducibility (Mistake 10)
+were drawn from unpublished notes made during a previous systematic analysis of the
+literature @Wijesooriya2022-we.
 
-The purpose of this opinion article is to share what our group has learned about successful
-FEA over the past 15 years having authored several articles using it and critically examining
-hundreds of published articles describing the use of FEA.
+Analysis was conducted in R 4.5.1 using a Bioconductor Docker image corresponding to
+Bioconductor release 3.21.
+Analysis code is available from GitHub (https://github.com/markziemann/10mistakes)
+and the Docker image is available from DockerHub (https://hub.docker.com/repository/docker/mziemann/10mistakes/general).
+These will be archived to Zenodo upon acceptance.
 
-Using an example RNA-seq dataset and simulation analysis, we provide evidence to show just how
-impactful these mistakes are.
-Details of this analysis are provided in the Methods and Supplementary Material.
+# Results
 
 ```{r,setup,echo=FALSE}
 
@@ -94,40 +106,20 @@ if ( ! file.exists("analysis.html") ) {
 
 # 1. Using uncorrected p-values for statistical significance 
 
-Enrichment tests generate p-values (probability values) between 0 and 1.
-The p-value estimates the probability of an observed result occurring by random chance.
-A low p-value (eg: p<0.05) suggests the observed result would be unlikely from random data,
-suggesting a real effect.
-However, as gene set libraries can contain thousands of categories, we could expect 5% of the
-gene sets to meet the p<0.05 threshold with random data.
-Therefore, we almost always get many "significant" results just by chance.
-This leads to the multiple testing problem whereby uncorrected p-values lead to high rates of
-false positives.
+Using a simulation approach, we randomly selected 1000 genes that met the detection
+threshold and submitted these to ORA with gene sets from Reactome.
+Of the 1840 Reactome gene sets with five or more members detected, on average we obtained a
+mean of 10.4 hits (p<0.01; 100 repeats) with these random genes (**Figure 1A**), proving that
+reporting raw p-values is bound to yield some false positives, in this case at a rate of
+0.56%.
+When conducting the same analysis, but using a threshold of FDR<0.01 the mean number of
+significant pathways was just 0.02.
 
-In the example dataset (see Methods below), we randomly selected 1000 genes that met the
-detection threshold and submitted these to ORA with gene sets from Reactome.
-Of the 1840 Reactomes with five or more members detected, on average we obtained a mean of
-51.6 hits (p<0.05; 100 repeats) with these random genes (**Figure 1A**), proving that
-reporting raw p-values is bound to yield many false positives, in this case at a rate of 2.8%.
-There are a variety of p-value correction methods to reduce the risk of false positives
-@Tilford2009-kh, including approaches from Sidak @Ury01021976, Holm-Bonferroni @holm1979simple
-and Benjamini-Hochberg @benjamini1995controlling.
-The Benjamini-Hochberg method, also called the false discovery rate (FDR) method, appears to
-be the most widely used in genomics to adjust p-values, but it has been critiqued as being
-overly conservative when a larger fraction of tests are not null @storey2003statistical.
-After applying FDR adjustment to the results of the random gene sets (**Figure 1A**), the
-mean number of significant hits (FDR adjusted p<0.05) is 0.16, effectively eliminating false
-positives.
-
-In the example dataset (AML3 cells with and without azacitidine treatment), there were 3598
-differentially expressed genes, with 1672 up- and 1926 down-regulated.
+In the example dataset (AML3 cells with and without azacitidine treatment), there were 2498
+differentially expressed genes, (FDR<0.01) with 1066 up- and 1432 down-regulated.
 The top 1000 up- and down-regulated genes by p-value were selected for separate ORA tests.
-Omitting FDR correction led to the identification of 627 Reactomes with p<0.05, of which 317
-are likely false positives (50.6%) (**Figure 1B**).
-Omitting p-value correction could lead to half of the enrichment results being false, which
-is why it is number one on our list.
-Most enrichment analysis packages provide adjusted p-values, so if the tool you're using
-doesn't, then it is time for a change.
+Omitting FDR correction led to the identification of 380 Reactome pathways with p<0.01, of
+which 173 are likely false positives (45.5%) (**Figure 1B**).
 
 ```{r,1a,fig.cap="Figure 1A. FDR control reduces false positives.",echo=FALSE,fig.height=4,fig.width=4}
 
@@ -143,42 +135,31 @@ grid.raster(mypng, x=0.5, y=0.5, width=1)
 
 ```
 
-# 2. Not using a custom background gene list 
+# 2. Wrong background gene list
 
-Every omics analysis has its limitations.
-In the world of gene expression, microarrays can only measure genes it has been designed to assay.
-RNA-seq has certain genes that are poorly detected as a result of sequence similarity or GC bias.
-Biological differences also play a big part in what is detected @Timmons2015-yb.
-Out of the 78,691 human genes annotated in Ensembl's latest release (v115), typically only 12-20k are
-expressed at detectable levels with RNA-seq in any one tissue.
-In the example dataset based on an earlier Ensembl release (v90) that involves 58,302 annotated genes,
-most are silent.
-For example, 45,134 recorded a mean <10 reads per sample across the six samples, with
-only 13,168 genes meeting this detection threshold.
-Although 77.4% of genes are discarded at this step, they account for a miniscule 0.2% of reads.
-Filtering poorly detected genes gives a slight boost to differential gene identification
-@sha2015effect, but it is most crucial in defining the background gene list for subsequent enrichment
-analysis.
-Genes with very low expression are unlikely to be biologically relevant in the context being studied
-and should be excluded from the background.
+In the example dataset based on an earlier Ensembl release (v90) there are 58,302 annotated
+genes.
+Using a minimum detection threshold of ≥10 reads per sample on average across the six
+samples, only 13,168 genes pass this filter and 45,134 are discarded.
+Although 77.4% of genes are discarded at this step, they account for a miniscule 0.2% of
+reads.
 
-Using a simulation approach, we can demonstrate the consequence of omitting a custom background gene
-list on an RNA-seq experiment.
-By drawing a random set of 1000 genes in the AML3 example dataset with expression above 10 reads per
-sample on average and using an enrichment test (hypergeometric) that uses the whole genome
-annotation as a background, we see 444 gene sets reaching the FDR<0.05 significance level on average
-(**Figure 2A**).
-Alternatively, if we use a custom background gene list composed of genes meeting the 10 reads per
-sample threshold, we expect 0.16 gene sets with FDR<0.05, practically eliminating false positives.
+Using a simulation approach, we can demonstrate the consequence of omitting a custom
+background gene list on an RNA-seq experiment.
+By drawing a random set of 1000 genes in the AML3 example dataset with expression above 10
+reads per sample on average and using an enrichment test (hypergeometric) that uses all
+annotated genes as a background, we see 262 gene sets reaching the FDR<0.01 significance
+level on average (**Figure 2A**).
+Alternatively, if we use a custom background gene list composed of genes meeting the 10
+reads per sample threshold, we observe a mean of 0.02 gene sets with FDR<0.01, practically
+eliminating false positives.
 These false positives are highly reproducible (**Figure 2B**), and as many of them are
-cancer-relevant pathways like cell cycle and immune signalling, they have the
-potential to mislead readers.
+cancer-relevant pathways like cell cycle, transcription regulation by TP53 and lipid
+metabolism, they have the potential to mislead readers.
 
-Performing ORA with azacitidine-responsive genes with the whole genome background gave a much
-larger number of "significant" gene sets (1047) in contrast to the custom background analysis
-(310) (**Figure 2C**), giving a Jaccard statistic of 0.30.
-In other words, without the right background gene list, up to 70% of results could be false
-positives.
+Performing ORA with azacitidine-responsive genes with the whole genome background gave a
+much larger number of "significant" gene sets (807) in contrast to the custom background
+analysis (207) (**Figure 2C**), giving a Jaccard statistic of 0.20.
 
 ```{r,2a,fig.cap="Figure 2A. Impact of background list on the number of significant gene sets. 100 simulations.",echo=FALSE,fig.height=4,fig.width=4}
 
@@ -201,7 +182,7 @@ grid.raster(mypng, x=0.5, y=0.5, width=1)
 
 ```
 
-# 3. Using a tool that doesn’t report enrichment scores 
+# 3. Using a tool that does not report enrichment scores 
 
 FDR values can tell us whether something is statistically significant, but it doesn’t directly
 indicate whether there will be any biological impact [@sullivan2012using;@schober2018statistical].
@@ -223,13 +204,9 @@ and fgsea (fora) @Korotkevich2021-xm.
 
 # 4. Prioritising results solely by p-value 
 
-Pathway enrichment analysis can return hundreds of significant results, which can be
-confusing to interpret.
-Many tools by default will sort the results by significance, but this can lead users to
-prioritise pathways that are very large but where each gene is only slightly dysregulated.
-To demonstrate this, see the results from a typical pathway enrichment analysis result with
-p-value prioritisation and with enrichment score (ES) prioritisation after removal of
-non-significant pathways **(Table 1 and Table 2)**.
+To demonstrate the problem with p-value prioritisation, see the results from a typical
+pathway enrichment analysis result with p-value prioritisation and with enrichment score (ES)
+prioritisation after removal of non-significant pathways (Table 1 and Table 2).
 
 ```{r,m4tbl,echo=FALSE}
 
@@ -253,12 +230,10 @@ mytbl |>
 
 ```
 
-P-value prioritisation (**Table 1**) emphasises generic functions with large gene
-sets and moderate fold changes, while enrichment score prioritisation (**Table 2**)
-highlights smaller gene sets with highly specific functions, where member genes have bigger
-fold changes.
-These more specific gene sets are (generally) better candidates for downstream validation due
-to their explanatory power.
+P-value prioritisation (**Table 1**) emphasises generic functions with large gene sets and
+moderate fold changes, while enrichment score prioritisation (Table 2) highlights smaller
+gene sets with highly specific functions, where member genes have bigger fold changes.
+
 The scatterplot shown in **Figure 3** shows how focusing on statistical significance only
 could overlook interesting results with larger effect sizes.
 End users should therefore use both prioritisation approaches to interpret their data.
@@ -270,34 +245,26 @@ grid.raster(mypng, x=0.5, y=.5, width=1)
 
 ```
 
-# 5. Using gene lists that are too large or too small for ORA 
+# 5. Foreground lists that are too large or too small for ORA
 
-It’s a common misconception that only differentially expressed genes that meet the FDR
-threshold should be submitted to an enrichment test.
-Tarca and colleagues suggest a heuristic that selects the top 1% of genes if there are none
-that meet the standard significance cut-off @tarca2013comparison.
-If proper FDR control of enrichment results is applied (See #1 above), then gene selection
-criteria can be flexible.
-The caveat is that enrichment tests (like the hypergeometric method) have size ranges of
-input gene lists that work best.
-We tested different input gene list sizes in ORA and found that 2500 yielded the most (455
-with FDR<0.05), while lists of 200 and fewer yielded very few (**Figure 4**).
-In the range of 300-1000, there’s a steep increase in the number of significant pathways,
-with the gradient reducing with more than 1000 genes.
-This result indicates that using a larger gene list of up to 2500 genes would be better, but
+We tested different input gene list sizes in ORA and found that a list of 3000 yielded the
+most significantly enriched pathways (294 with FDR<0.01), while a small list size of 200
+genes yielded only 41 pathways (**Figure 4**).
+In the range of 300-1000 genes, there’s a steep increase in the number of significant
+pathways obtained, with the gradient reducing with more than 1000 genes.
+This result indicates that using a larger gene list of up to 3000 genes would be better, but
 the main downside is that these additional statistically significant results correspond to
 relatively small enrichment scores.
 For example, significantly downregulated pathways at a gene set size of 100, mean fold
-enrichment scores were 16.9, and at a size of 2500, they were 2.5.
-Users may wish to prespecify a fold enrichment score that they consider biologically relevant
-(3-5 seems reasonable), and then tune their analysis to capture the most statistically
-significant enrichments above this score.
-In the example dataset, the number of gene sets meeting a minimum fold enrichment score
-of 3 appeared to peak with a gene set size of 700 for the upregulated genes, and 800 for
-downregulated genes (**Figure 4**), which corresponds to 5-6% of all detected genes.
-
-This suggests that a gene list size of 700-800 genes, or 5-6% of all those detected would
-be reasonable for a differential expression study.
+enrichment scores were 17.4, and at a size of 3000, they were only 2.2.
+Users may wish to pre-specify a fold enrichment score that they consider biologically
+relevant (3-5 seems reasonable), and then tune their analysis to capture the most
+statistically significant enrichments above this score.
+In the example dataset, the number of gene sets meeting a minimum fold enrichment score of 3
+appeared to peak with a gene set size of 700 for the upregulated genes, and 900 for
+downregulated genes (**Figure 4**), which corresponds to 5-7% of all detected genes.
+This suggests that a gene list size of 700-900 genes, or 5-7% of all those detected would be
+a reasonable recommendation for a differential expression study.
 Nevertheless, some users may want to avoid setting seemingly arbitrary thresholds - in that
 case, using an FCS method like GSEA instead that calculates enrichment from all detected
 genes would be recommended.
@@ -309,32 +276,14 @@ grid.raster(mypng, x=0.5, y=.5, width=1)
 
 ```
 
-# 6. Combining up and down-regulated genes in the same ORA test 
+# 6. Not running ORA separately on up and down-regulated genes
 
-In some articles, we noticed that authors didn’t conduct separate ORA tests for
-up- and down-regulated gene lists, instead opting to submit the combined list for ORA.
-This isn’t necessarily an error, as it tests the hypothesis that some pathways are
-“dysregulated”; a mix of up- and down-regulated genes which appear at an elevated rate.
-However, this combined approach can miss many enriched gene sets when compared to the
-separate approach.
-According to the results of our example analysis, the separate approach identified 289
-pathways compared to the combined approach that found only 53 (84% fewer; **Figure 5**).
-The combined approach does uniquely identify some pathways, but this is relatively few.
-In the example dataset, only 2.0% (6) of gene sets were identified exclusively with the combined
-test.
-
-The reason behind this is two-fold.
-Firstly, we know that genes in the same pathway are typically correlated with each other
-@Gatti2010-tb.
-Consider cell cycle genes, or genes responding to pathogens, which are activated in unison
-to coordinate a complex biological process.
-In a typical differential expression experiment after a stimulus, this results in pathways
-that are predominantly up or down regulated, but rarely a mix of up and down.
-Due to this phenomenon, the up and down lists each have relatively strong enrichments, but
-they are diluted when combined @Hong2014-yn.
-Based on this, failing to report data using the separate approach could result in fewer
-identified gene sets, and an incomplete picture of what's happening at the molecular
-level.
+In ORA, up- and down-regulated genes can be combined into a single list, or divided into
+separate lists for separate enrichment tests.
+We conducted both analyses for the example dataset.
+The separate approach identified 117 significant pathways (FDR<0.01) compared to the
+combined approach that found only 31 (82% fewer; Figure 5).
+There were no pathways observed to be uniquely enriched in the combined test.
 
 ```{r,6m,fig.cap="Figure 5. Combining up and downregulated genes into one ORA test yields far fewer results.",echo=FALSE,fig.height=3,fig.width=5}
 
@@ -345,16 +294,11 @@ grid.raster(mypng, x=0.5, y=.5, width=1)
 
 # 7. Using shallow gene annotations 
 
-One of the most important decisions for pathway enrichment analysis is selecting the
-database to query.
-There are many options to consider, both proprietary and open source.
-When choosing, users should consider whether the database contains the gene sets that they
-a priori suspect will be altered.
-Secondly, consider the breadth and depth of the pathway library; this will be where the
-unexpected discoveries may occur and it pays to use a comprehensive library to capture as many
-aspects of the dataset as possible.
-To demonstrate this, note how KEGG legacy and KEGG Medicus seem tiny when compared to Reactome,
-which is itself dwarfed by Gene Ontology’s Biological Process (GOBP; Table 3).
+Table 3 compares pathway database size metrics including the raw number of gene sets, the
+total number of annotations, the median gene set size and the number of genes with one or
+more annotations.
+It shows that KEGG legacy and KEGG Medicus seem small when compared to Reactome, which is
+itself dwarfed by Gene Ontology’s Biological Process (GOBP; Table 3).
 Consequently, the results obtained for the example dataset are substantially richer for
 Reactome and GOBP as compared to KEGG libraries.
 
@@ -369,28 +313,10 @@ m8 |>
 
 # 8. Using outdated gene identifiers and gene sets 
 
-Data repositories like GEO @clough2024ncbi contain thousands of previously published data
-sets that we can reanalyse with new pathway databases and software tools to gain further
-insights.
-However, when the data is several years old, we should use it with caution, as many
-gene names may have changed.
-For example, Illumina’s EPIC DNA Methylation microarray was released in 2016, and in the
-following eight years, 3,253 of 22,588 gene names on the chip have changed (14.4%)
-@Ziemann2024-be.
-Therefore, these genes wouldn’t be recognised by the pathway enrichment software.
-To update defunct gene symbols, the HGNChelper R package can help @Oh2020-ku, also having
-the benefit of fixing gene symbols corrupted by Excel autocorrect, which are unfortunately
-common in GEO @Ziemann2016-hp.
-Persistent gene identifiers like Ensembl (eg: ENSG00000180096) and HGNC (eg: HGNC:2879)
-are less likely to change over time and are therefore preferable over gene symbols
-(eg: *SEPTIN1*) for FEA.
-
-The depth of pathway databases increases every year as annotation consortia continue
-assimilating functional information from the literature, and this impacts the
-quality of results and the conclusions that can be derived @wadi2016impact.
-These databases can undergo large updates, as shown by the chart of Reactome growth over time
-(**Figure 6**).
-Therefore, it’s always best to download and use the newest available version of the gene sets.
+The size of Reactome pathway database growth over time is shown in Figure 6.
+It shows a constant growth and occasional big increases between versions.
+Therefore, it is always best to download and use the newest available version of pathway
+gene sets.
 
 ```{r,9m,fig.cap="Figure 6. The number of Reactome gene sets grows over time. Gene sets were downloaded from the MSigDB website, except The last bar which represents the latest gene sets downloaded directly from Reactome, not yet incorporated into MSigDB.",echo=FALSE,fig.height=3,fig.width=5}
 
@@ -401,81 +327,42 @@ grid.raster(mypng, x=0.5, y=.5, width=1)
 
 # 9. Bad presentation
 
-When discussing FEA with colleagues, it is often said that the method is used to generate
-"filler"; data and charts used to "pad out" articles that would otherwise be too short or
-lack the normal number of figures.
-For FEA, a general rule of thumb is to only show the charts and data that are relevant to
-assessing aims and hypotheses, and which contribute to the conclusions.
-While others have recommended using multiple FEA tools @Chicco2022-aa, we'd suggest limiting
-the amount of data shown in an article to just one FEA method and one or two gene set
-databases (eg: Reactome, transcription factor target genes).
-Excessive use of tools and databases can make the results difficult to interpret, as in
-@lin2019indoxyl.
-
-We've also noticed cases of confusing, incomplete or incorrect data
-presentation choices that should be avoided:
+To support the examples of bad presentation mentioned in the main text, here are the
+citations.
 
 1. The number of selected genes in a category is often shown as evidence of enrichment,
 [@zhao2019itraq; @li2019candidate;@sariman2019investigation;@bhatia2019long],
 but this can be misleading because this is one of four numbers that goes into calculating
 a fold enrichment score.
-
-2. Similarly, the proportion of selected genes that belong to a gene category is sometimes
+Similarly, the proportion of selected genes that belong to a gene category is sometimes
 shown [@wang2019osteoporosatlas;@wang2019comparison;@hu2019itraq;@koh2019baicalein],
 but this does not directly reflect the fold enrichment score.
 
-3. Presenting enrichment results as a pie chart
+2. Presenting enrichment results as a pie chart
 [@liu20196;@li2019candidate;@hu2019itraq;@lin2019indoxyl]
 isn't recommended because it isn't possible to show enrichment scores and significance
 values in this form.
 
-4. Sometimes a network of genes or pathways are shown, but the significance of nodes and
+3. Sometimes a network of genes or pathways are shown, but the significance of nodes and
 edges aren't described @bandi2019hepatic.
 
-5. Figures missing key elements such as axis labels
+4. Figures missing key elements such as axis labels
 [@boyko2019reference;@lou2019high;@shi2019physiological;@li2019identification;
 @li2019candidate].
 
-6. FEA mentioned in the abstract but no data shown in the main article or supplement
+5. FEA mentioned in the abstract but no data shown in the main article or supplement
 [@xu2019sirt2; @di2019genome].
 
-7. Confusion around which tool was used for each figure and panel [eg: @jin2019expression].
+6. Confusion around which tool was used for each figure and panel [eg: @jin2019expression].
 
-Such misinterpretation and data presentation problems can also occur when a tool is used without
-understanding the statistical basis of inference @liu2023misuse, so it is crucial that users
-take the time to familiarise themselves with the tool's documentation and recommendations.
+Lastly it is worth mentioning that excessive use of tools and databases can make the results
+difficult to interpret, as in @lin2019indoxyl.
 
 # 10. Neglecting methods reproducibility
 
-According to Goodman and colleagues @goodman2016does, methods reproducibility is:
-
-> "the provision of enough detail about study procedures and data so the same procedures
-could, in theory or in actuality, be exactly repeated."
-
-There are several crucial pieces of information required in order to enable reproducibility
-of enrichment analysis including;
-
-* how genes were selected or scored - especially whether up or down-regulated genes were considered
-separately or combined,
-
-* the tool used, and its version,
-
-* the options or parameters applied,
-
-* the statistical test used,
-
-* the gene set/pathway database(s) queries, and their versions,
-
-* for ORA, how a background list was defined, and,
-
-* how p-value correction was done [@Chicco2022-aa;@wijesooriya2021guidelines].
-
-A systematic literature analysis published in 2022 found insufficient background description
-in 95% of articles describing ORA tests, and p-value correction was insufficiently
-described in 57% of articles, suggesting that enrichment analysis generally suffers from a
-lack of methods reproducibility @Wijesooriya2022-we.
-Indeed, this literature analysis identified some inadequate methodological descriptions
-including:
+A previous literature analysis @Wijesooriya2022-we identified some inadequate methodological
+descriptions which are worth including here as they illustrate the dire state of methods
+reproducibility:
 
 >"GO and KEGG enrichment analysis were performed on the DEGs by perl scripts in house."
 @zhou2019transcriptome.
@@ -483,131 +370,26 @@ including:
 >"Gene ontology (GO) and pathway analysis were performed in the standard enrichment
 computation method." @liu2019long.
 
-We've also noted some cases where FEA wasn't described in the methods at all, despite being important
-enough to mention said results in the abstract [@hu2019high; @zhao2019characterization;
-@chen2019usf1].
-Moreover, we've identified cases where the tool mentioned in the methods section is inconsistent
-with what's shown in the results [@li2019spag5;@tong2019combined].
+We've also noted some cases where FEA wasn't described in the methods at all, despite being
+important enough to mention said results in the abstract [@hu2019high;
+@zhao2019characterization; @chen2019usf1].
+Moreover, we've identified cases where the tool mentioned in the methods section is
+inconsistent with what's shown in the results [@li2019spag5;@tong2019combined].
 
-In addition to including the methodological details mentioned above, authors could also
-provide gene profile data and/or gene lists used for enrichment analysis as supplementary
-files, or better still, provide full reproducibility and transparency with the five
-pillars framework @ziemann2023five.
+**Box 2** shows modified excerpts from recent transcriptome articles using ORA and FCS that we
+think are good examples.
 
-# Other issues
+| Box 2. Positive examples of FEA methods as applied to RNA-seq for ORA and FCS adapted from Ziemann et al, (2024) and Bastawy et al, (2024). Some changes were made to conform with the recommendations in this article. |
+| --- |
+| **ORA:** For each transcriptome dataset, kallisto (v0.43.1) (Bray et al. 2016) transcript counts were aggregated to the gene level. Genes with fewer than 10 reads per sample on average were removed from downstream analysis. The remaining genes passing this selection were included in the background gene set. Differential expression analysis was conducted with DESeq2 v1.44.0 (Love et al. 2014), with genes identified by their Ensembl identifiers. Gene symbols were then fetched using biomaRt v2.60.0, based on Ensembl version 112 (Durinck et al. 2009). Human gene sets were obtained from MSigDB v2023.2 (Liberzon et al. 2015). Foreground genes were defined as the top 700 top statistically significant differentially expressed genes , with separate lists for up- and down-regulated genes. These gene lists were subjected to ORA using clusterProfiler’s enricher function v4.12.0, using a minimum set size of 5 and no maximum set size. This function uses a hypergeometric test to ascertain p-value estimates of enrichment. Enrichment results with FDR<0.01 were considered significant. |
+| **FCS:** The reference mouse transcriptome was downloaded from GENCODE version 28 [144]. The raw reads (FASTQ) were inspected for sequence quality using Fastqc (v0.11.9) [145] and trimmed using Skewer (v0.2.2) [146] to remove Q < 20 bases from 3′ ends. Kallisto (0.46.1) was used to align the paired-end RNA-seq reads to the mouse transcriptome [147]. The counts at the transcript level were imported into RStudio v4.1 and then consolidated into counts at the gene level. Genes displaying an average count of less than 10 reads across samples were omitted from subsequent analysis. The differential gene expression between control and asthmatic groups was performed using the generalized linear model proposed and implemented in the R package DESeq2 (1.36.0). DESeq2 is one of the most popular statistical tools for differential expression analysis. It makes full use of biological replicate information to estimate differential expression p-values and effect sizes, as detailed in the publication by Love et al. [148]. Volcano plots and heatmaps were generated in base R. For pathway analysis, REACTOME gene sets were obtained from the Molecular Signatures Database and converted to mouse gene identifiers with the msigdbr R package (1.4.0) [149,150,151]. Differential pathway analysis was then performed with the mitch R package (1.8.0) with default settings [152]. Mitch is a functional class scoring technique that uses a rank–ANOVA test to ascertain the collective enrichment of genes in either the up- or downregulated direction. To reduce the chance of false positives, differential gene and pathway analyses were subjected to false discovery rate (FDR) correction using the method of [153]. Genes and pathways with an FDR < 0.01 were considered statistically significant. All the data were analyzed using RStudio version (2022.07.1) and GraphPad prism version 8 software. |
 
-There are several more subtle issues not covered in depth here but are worth mentioning as they
-have been flagged as potential problems.
-First, the length of genes is known to impact the ease at which they are detected and so correction of
-gene length has been suggested to improve enrichment results [@mi2012length;@mandelboum2019recurrent].
-Second, many FEA tests use genes as the sampling unit and do not take into consideration (or model) biological
-variation which could yield unrealistic significance values @goeman2007analyzing.
-Third, the size of gene sets, even though they represent similar biology, can disproportionately impact significance
-scores and complicate interpretation [@karp2021pathway;@mubeen2022influence].
-Fourth, tight correlation between each gene's expression within a pathway could exacerbate false positive rates
-[@gatti2010heading; @wu2012camera].
-Fifth, slight differences in the implementation of ORA tests can impact results in some circumstances
-@ziemann2024two.
-Lastly, some web-based FEA tools lack longevity.
-For example, DAVID 6.8 [@huang2009systematic;@Sherman2022-kg] has been used for over 10,000 publications but
-since 2022 has been taken offline, leaving these articles irreproducible.
-As web-based tools appear to be the most popular option for FEA [@xie2021popularity;@Wijesooriya2022-we],
-we should advocate preservation/archiving of the tool as a Docker image [eg: @Ge2020-lr],
-to enable reproducibility into the future @perkel2020challenge.
+**Box 3** contains a prompt that could be provided to an AI chatbot to identify some of the most
+crucial methodological deficiencies for ORA and FCS analyses.
 
-# Conclusion
-
-So why are problems so pervasive in enrichment analysis?
-It's likely a combination of poor researcher training, supervision and peer-review scrutiny.
-The design of tools and (low) quality of tool documentation might also play a role.
-We also know that inadequate methods have a type of advantage compared to the more rigorous ones
-due to researcher preferences to present "significant" findings @smaldino2016natural and reliance upon default settings
-even if they are incorrect [@mubeen2022influence;@Wijesooriya2022-we].
-Problems 2, 3, 5 and 6 appear to be specific to ORA-based tools, and can be avoided entirely by switching to
-FCS tools like GSEA, which has the added benefit of enhanced accuracy in terms of precision and
-recall [@kaspi2020mitch;@ziemann2024two].
-Although learning and running FCS tools is more difficult and time-consuming, the benefits to the quality of results
-are substantial.
-
-The deluge of manuscripts in genomics and other fields places an increasing burden on a limited pool of competent,
-voluntary peer-reviewers to a point where editors are struggling to maintain high quality,
-consistent peer-review @adam2025peer.
-As studies become ever more multi-disciplinary, it is increasingly difficult for editors to
-cover all the technical aspects thoroughly, causing mistakes like the above to become widespread.
-Ultimately, responsibility for using best practices in enrichment analysis lies with authors.
-Avoiding these mistakes will have many benefits, including avoiding wasted resources on unreliable research directions.
-
-# Methods
-
-The example RNA-seq dataset used involves AML3 cells with and without azacytidine treatment
-@lund2014dnmt.
-This dataset was selected because it represents a typical transcriptomic study; with three
-experimental replicates and over 1000 differentially expressed genes.
-Read counts were obtained from the DEE2 database using the getDEE2 R package using SRA
-project accession SRP038101 as a query @ziemann2019digital.
-Genes with average expression above 10 counts per sample were considered detected, and
-genes not meeting this criterion were removed from downstream analysis (unless stated).
-Differential expression was conducted using DESeq2 v1.48.2 @love2014differential.
-Human gene symbols were updated to Ensembl 115 @dyer2025ensembl.
-Genes with FDR<0.05 were considered significantly differentially expressed.
-Reactome gene sets were downloaded in GMT format on 02/09/2025 @milacic2024reactome, and
-these gene sets were used for all subsequent enrichment tests unless otherwise stated.
-All ORA tests were conducted using the `fora` function belonging to the `fgsea` package
-v1.34.2 @Korotkevich2021-xm.
-Minimum gene set size was set to 5 for all subsequent enrichment tests.
-Gene sets with FDR<0.05 were considered significantly differentially expressed.
-
-To demonstrate the importance of FDR control (Mistake 1), random sampling of 1000 detected
-genes was followed with ORA with and without FDR control.
-This was repeated 100 times.
-For comparison of the nominal and FDR corrected results, the top 1000 up- and 1000
-down-regulated genes by p-value altered by azacitidine treatment underwent separate ORA tests
-using a background consisting of the 13,063 detected genes with gene symbols.
-The number of significant gene sets (FDR<0.05) from each test were combined for visualisation
-using an Euler diagram.
-
-To demonstrate the importance of a suitable background gene list (Mistake 2), random sampling
-of 1000 detected genes as the foreground followed by ORA using either the whole genome
-background or background consisting of detected genes.
-This process was repeated 100 times.
-To show the effect of incorrect background on the azacitidine gene profile, 1000 up- and
-1000 down-regulated genes selected by p-value underwent ORA using a background including
-55,503 genes present in the genome annotation.
-These results were compared to those generated using a background consisting of the 13,063
-detected genes using an Euler diagram.
-
-To demonstrate the importance of using enrichment scores for interpretation of FEA results,
-(Mistake 3 and 4) the `mitch` package v1.20.0 was used for FCS analysis of the differential
-expression data @kaspi2020mitch.
-
-To investigate how foreground gene set size impacts the number of ORA results (Mistake 5),
-the top N significant up- and down-regulated genes were selected for ORA compared to the
-background consisting of detected genes, where N was varied between 50 and 7000.
-
-To demonstrate the effect of combining up and down regulated genes into a single test
-(Mistake 6), the top significant 750 genes irrespective of fold change direction were used
-as the foreground for an ORA test, and compared with results from the separate approach
-with 750 up- and 750 down-regulated genes respectively.
-
-To show the effect of using shallow gene annotations (Mistake 7), various gene set
-libraries were extracted from the MSigDB Collection (msigdb.v2025.1.Hs.symbols.gmt)
-@liberzon2015molecular.
-These gene set libraries were each used for ORA tests with foreground lists of 750 genes as
-above.
-
-To show the difference in size of old gene sets (Mistake 8), Reactome gene sets were
-extracted from archived MSigDB Collections going back to 2010.
-These were compared to the most recent Reactome release (02/09/2025) obtained directly from
-the Reactome website.
-
-Instances of poor presentation (Mistake 9) and methods reproducibility (Mistake 10)
-were drawn from unpublished notes made during a previous systematic analysis of the
-literature @Wijesooriya2022-we.
-
-Analysis was conducted in R 4.5.1 using a Bioconductor Docker image corresponding to
-Bioconductor release 3.21.
-Analysis code is available from GitHub (https://github.com/markziemann/10mistakes)
-and the Docker image is available from DockerHub (https://hub.docker.com/repository/docker/mziemann/10mistakes/general).
-These will be archived to Zenodo upon acceptance.
+| Box 3. Example AI chatbot prompts for examining key methodological details in ORA and FCS based FEA. |
+| --- |
+| **ORA:** I need you to carefully examine how pathway enrichment analysis was conducted in this scientific article. I need you to focus on the Methods section, but information can also be found in other sections. Please answer the following questions separately, so that the output data can be collated into a table. If authors did not provide any details in the article, then please write ‘not described’. 1. What tool was used for pathway enrichment analysis? 2. Was a tool version number provided? 3. What gene set library was queried (eg: GO, KEGG, Reactome or other)?  4. How was the foreground gene list selected for pathway enrichment analysis? 5. Was a background gene list defined for pathway enrichment analysis? 6. What statistical test was used for enrichment analysis? 7. Was false discovery rate correction used to control the number of false positives in the pathway enrichment analysis? |
+| **FCS:** I need you to carefully examine how pathway enrichment analysis was conducted in this scientific article. I need you to focus on the Methods section, but information can also be found in other sections. Please answer the following questions separately, so that the output data can be collated into a table. If authors did not provide any details in the article, then please write ‘not described’. 1. What tool was used for pathway enrichment analysis? 2. Was a tool version number provided? 3. What gene set library was queried (eg: GO, KEGG, Reactome or other)? 4. Was a detection threshold applied to the data? 5. How were genes ranked prior to enrichment analysis? 6. What statistical test was used for enrichment analysis? 7. Was false discovery rate correction used to control the number of false positives in the pathway enrichment analysis? |
 
 # Bibliography

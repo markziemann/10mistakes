@@ -218,9 +218,9 @@ This is not necessarily an error, as it tests the hypothesis that some pathways 
 "dysregulated"; a mix of up- and down-regulated genes which appear at an elevated rate.
 However, the results from the "combined" and "separate" approaches are very different.
 
-The example dataset shows the combined approach identified 84% fewer results as compared to
+The example dataset shows the combined approach identified 82% fewer results as compared to
 the separate approach (Figure 5).
-Only 2% of results were unique to the combined approach.
+There were no enriched pathways specific to the combined test.
 
 The reason behind this is two-fold.
 Firstly, we know that genes in the same pathway are typically correlated with each other
