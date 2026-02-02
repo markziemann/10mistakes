@@ -277,6 +277,13 @@ annotations strongly influences the findings @wadi2016impact.
 Therefore, it is generally best to download and use the newest available version of the gene
 sets.
 
+FEA users should also understand how well updated their preferred pathway databases are.
+Actively updated databases like Reactome @Ragueneau2026-gi constantly increase in size as
+annotation consortia continue assimilating functional information from the literature
+(See S6 Fig), however the popular KEGG database hasn’t grown since 2010.
+A regularly updated database is likely to lead to richer and more relevant FEA findings
+@wadi2016impact.
+
 # 9. Bad presentation
 
 Bad presentation of data is not exclusive to pathway enrichment, but there are a few key
