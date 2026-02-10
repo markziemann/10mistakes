@@ -1462,8 +1462,6 @@ This corresponds to Figure 6.
 
 ```{r,outdated}
 
-blah()
-
 par(mar=c(5.1,5.1,4.1,2.1))
 
 kegg_files <- list.files("ref/msigdb/kegg/",full.names=TRUE)
