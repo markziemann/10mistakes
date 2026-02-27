@@ -365,7 +365,10 @@ disproportionately impact significance scores and complicate interpretation
 [@karp2021pathway;@mubeen2022influence].
 Fourth, tight correlation between each gene’s expression within a pathway could exacerbate
 false positive rates [@gatti2010heading; @wu2012camera].
-Fifth, slight differences in the implementation of ORA tests can impact results in some
+Fifth, related to this, gene sets with a high degree of overlap could be a source of false
+positives, and enrichment algorithms have been adjusted to circumvent this potential
+problem [@tarca_2012_downweighting;@simillion_2017_avoiding].
+Sixth, slight differences in the implementation of ORA tests can impact results in some
 circumstances @ziemann2024two.
 Lastly, some web-based FEA tools lack longevity.
 For example, DAVID the version 6.8 [@huang2009systematic;@Sherman2022-kg] has been used for

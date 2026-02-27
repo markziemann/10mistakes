@@ -337,7 +337,7 @@ This correponds to the data shown in Figure 1A.
 
 ```{r,mistake1_sim,fig.height=6,fig.width=6}
 
-seeds <- seq(from=100,to=1000*100,by=100)
+seeds <- seq(from=100,to=100*100,by=100)
 
 m1sim <- mclapply(seeds, function(seed) {
   set.seed(seed)
@@ -351,13 +351,37 @@ m1sim <- mclapply(seeds, function(seed) {
 m1sim <- do.call(rbind,m1sim)
 colnames(m1sim) <- c("p<0.01","FDR<0.01")
 
-boxplot(m1sim,main="Random foreground (1000 repetitions)",ylab="no. gene sets meeting \"significance\" threshold <0.01",frame=FALSE)
+boxplot(m1sim,main="Random foreground (100 repetitions)",ylab="no. gene sets meeting \"significance\" threshold <0.01",frame=FALSE)
 beeswarm(list(mean(m1sim[,1]), mean(m1sim[,2])),add=TRUE,pch=4,cex=2)
 lab1 <- paste("Mean=",signif(mean(m1sim[,1]) , 3),sep="")
 lab2 <- paste("Mean=",signif(mean(m1sim[,2]) , 2),sep="")
 text(c(1.2,2.2), c( mean(m1sim[,1])+5, mean(m1sim[,2])+5 ), labels=c(lab1,lab2) )
 
 par(mar=c(5.1,4.1,4.1,2.1))
+
+unlink("img/1a.png")
+png("img/1a.png", width = 480, height = 480)
+par(mfrow=c(1,2))
+boxplot(m1sim, ylab="no. gene sets meeting \"significance\" threshold <0.01",
+  frame=FALSE, ylim=c(0,60))
+beeswarm(list(mean(m1sim[,1]), mean(m1sim[,2])),add=TRUE,pch=4,cex=2)
+lab1 <- paste("Mean=",signif(mean(m1sim[,1]) , 3),sep="")
+lab2 <- paste("Mean=",signif(mean(m1sim[,2]) , 2),sep="")
+text(c(1.2,2.2), c( mean(m1sim[,1])+5, mean(m1sim[,2])+5 ), labels=c(lab1,lab2) )
+mtext("Random foreground\nReactome gene sets\n100 repetitions")
+dev.off()
+
+unlink("img/1a.pdf")
+pdf("img/1a.pdf", width = 5, height = 5)
+par(mfrow=c(1,2))
+boxplot(m1sim, ylab="no. gene sets meeting \"significance\" threshold <0.01",
+  frame=FALSE,ylim=c(0,60))
+beeswarm(list(mean(m1sim[,1]), mean(m1sim[,2])),add=TRUE,pch=4,cex=2)
+lab1 <- paste("Mean=",signif(mean(m1sim[,1]) , 3),sep="")
+lab2 <- paste("Mean=",signif(mean(m1sim[,2]) , 2),sep="")
+text(c(1.2,2.2), c( mean(m1sim[,1])+5, mean(m1sim[,2])+5 ), labels=c(lab1,lab2) )
+mtext("Random foreground\nReactome gene sets\n100 repetitions")
+dev.off()
 
 ```
 
@@ -394,7 +418,7 @@ m2sim <- mclapply(seeds, function(seed) {
 m2sim <- do.call(rbind,m2sim)
 colnames(m2sim) <- c("p<0.01","FDR<0.01")
 
-boxplot(m2sim,main="Random foreground and gene sets (1000 repetitions)",ylab="no. gene sets meeting \"significance\" threshold <0.01",frame=FALSE)
+boxplot(m2sim,main="Random foreground and gene sets (100 repetitions)",ylab="no. gene sets meeting \"significance\" threshold <0.01",frame=FALSE)
 beeswarm(list(mean(m2sim[,1]), mean(m2sim[,2])),add=TRUE,pch=4,cex=2)
 lab1 <- paste("Mean=",signif(mean(m2sim[,1]) , 3),sep="")
 lab2 <- paste("Mean=",signif(mean(m2sim[,2]) , 2),sep="")
@@ -406,7 +430,6 @@ par(mar=c(5.1,4.1,4.1,2.1))
 
 Now plot together.
 
-
 ```{r,mistake1_sim3}
 
 par(mfrow=c(1,2))
@@ -417,7 +440,7 @@ beeswarm(list(mean(m1sim[,1]), mean(m1sim[,2])),add=TRUE,pch=4,cex=2)
 lab1 <- paste("Mean=",signif(mean(m1sim[,1]) , 3),sep="")
 lab2 <- paste("Mean=",signif(mean(m1sim[,2]) , 2),sep="")
 text(c(1.2,2.2), c( mean(m1sim[,1])+5, mean(m1sim[,2])+5 ), labels=c(lab1,lab2) )
-mtext("Random foreground\nReactome gene sets\n1000 repetitions")
+mtext("Random foreground\nReactome gene sets\n100 repetitions")
 
 boxplot(m2sim, ylab="no. gene sets meeting \"significance\" threshold <0.01",
   frame=FALSE,ylim=c(0,60))
@@ -425,46 +448,46 @@ beeswarm(list(mean(m2sim[,1]), mean(m2sim[,2])),add=TRUE,pch=4,cex=2)
 lab1 <- paste("Mean=",signif(mean(m2sim[,1]) , 3),sep="")
 lab2 <- paste("Mean=",signif(mean(m2sim[,2]) , 2),sep="")
 text(c(1.2,2.2), c( mean(m2sim[,1])+5, mean(m2sim[,2])+5 ), labels=c(lab1,lab2) )
-mtext("Random foreground\nRandom gene sets\n1000 repetitions")
+mtext("Random foreground\nRandom gene sets\n100 repetitions")
 
-unlink("img/1a.png")
-png("img/1a.png", width = 480, height = 480)
+unlink("img/1ax.png")
+png("img/1a.png", width = 560, height = 480)
 par(mfrow=c(1,2))
-
 boxplot(m1sim, ylab="no. gene sets meeting \"significance\" threshold <0.01",
   frame=FALSE, ylim=c(0,60))
 beeswarm(list(mean(m1sim[,1]), mean(m1sim[,2])),add=TRUE,pch=4,cex=2)
 lab1 <- paste("Mean=",signif(mean(m1sim[,1]) , 3),sep="")
 lab2 <- paste("Mean=",signif(mean(m1sim[,2]) , 2),sep="")
 text(c(1.2,2.2), c( mean(m1sim[,1])+5, mean(m1sim[,2])+5 ), labels=c(lab1,lab2) )
-mtext("Random foreground\nReactome gene sets\n1000 repetitions")
+mtext("Random foreground\nReactome gene sets\n100 repetitions")
 
 boxplot(m2sim, ylab="no. gene sets meeting \"significance\" threshold <0.01",
   frame=FALSE, ylim=c(0,60))
-beeswarm(list(mean(m1sim[,1]), mean(m1sim[,2])),add=TRUE,pch=4,cex=2)
-lab1 <- paste("Mean=",signif(mean(m1sim[,1]) , 3),sep="")
-lab2 <- paste("Mean=",signif(mean(m1sim[,2]) , 2),sep="")
-text(c(1.2,2.2), c( mean(m1sim[,1])+5, mean(m1sim[,2])+5 ), labels=c(lab1,lab2) )
-mtext("Random foreground\nRandom gene sets\n1000 repetitions")
+beeswarm(list(mean(m2sim[,1]), mean(m2sim[,2])),add=TRUE,pch=4,cex=2)
+lab1 <- paste("Mean=",signif(mean(m2sim[,1]) , 3),sep="")
+lab2 <- paste("Mean=",signif(mean(m2sim[,2]) , 2),sep="")
+text(c(1.2,2.2), c( mean(m2sim[,1])+5, mean(m2sim[,2])+5 ), labels=c(lab1,lab2) )
+mtext("Random foreground\nRandom gene sets\n100 repetitions")
 dev.off()
 
-unlink("img/1a.pdf")
+unlink("img/1ax.pdf")
 pdf("img/1a.pdf", width = 6, height = 5)
+par(mfrow=c(1,2))
 boxplot(m1sim, ylab="no. gene sets meeting \"significance\" threshold <0.01",
   frame=FALSE,ylim=c(0,60))
 beeswarm(list(mean(m1sim[,1]), mean(m1sim[,2])),add=TRUE,pch=4,cex=2)
 lab1 <- paste("Mean=",signif(mean(m1sim[,1]) , 3),sep="")
 lab2 <- paste("Mean=",signif(mean(m1sim[,2]) , 2),sep="")
 text(c(1.2,2.2), c( mean(m1sim[,1])+5, mean(m1sim[,2])+5 ), labels=c(lab1,lab2) )
-mtext("Random foreground\nReactome gene sets\n1000 repetitions")
+mtext("Random foreground\nReactome gene sets\n100 repetitions")
 
-boxplot(m1sim, ylab="no. gene sets meeting \"significance\" threshold <0.01",
+boxplot(m2sim, ylab="no. gene sets meeting \"significance\" threshold <0.01",
   frame=FALSE,ylim=c(0,60))
-beeswarm(list(mean(m1sim[,1]), mean(m1sim[,2])),add=TRUE,pch=4,cex=2)
-lab1 <- paste("Mean=",signif(mean(m1sim[,1]) , 3),sep="")
-lab2 <- paste("Mean=",signif(mean(m1sim[,2]) , 2),sep="")
-text(c(1.2,2.2), c( mean(m1sim[,1])+5, mean(m1sim[,2])+5 ), labels=c(lab1,lab2) )
-mtext("Random foreground\nRandom gene sets\n1000 repetitions")
+beeswarm(list(mean(m2sim[,1]), mean(m2sim[,2])),add=TRUE,pch=4,cex=2)
+lab1 <- paste("Mean=",signif(mean(m2sim[,1]) , 3),sep="")
+lab2 <- paste("Mean=",signif(mean(m2sim[,2]) , 2),sep="")
+text(c(1.2,2.2), c( mean(m2sim[,1])+5, mean(m2sim[,2])+5 ), labels=c(lab1,lab2) )
+mtext("Random foreground\nRandom gene sets\n100 repetitions")
 dev.off()
 
 ```
@@ -477,7 +500,8 @@ gsetsf <- gsets[which(lapply(gsets,length)>5)]
 commonality_score <- unlist(mclapply( gsetsf, function(i) {
   jac <- unlist(lapply( gsets,function(j) {
     myintx <- length(intersect(i,j))
-    myunion <- length(union(i,j)) ; myintx/myunion
+    myunion <- length(union(i,j))
+    myintx/myunion
   } ))
   jac <- jac[order(-jac)]
   mean(jac[2:4])
@@ -513,11 +537,59 @@ hist(commonality_score_rand)
 
 par(mfrow=c(2,1))
 
-hist(commonality_score)
-hist(commonality_score_rand)
-
+hist(commonality_score,xlab="commonality score",main="")
+mtext("Reactome pathways")
+hist(commonality_score_rand,xlab="commonality score",main="")
+mtext("Random gene sets")
 
 par(mfrow=c(1,1))
+
+```
+
+Eliminate pathways with high commonality scores
+
+```{r,eliminateOL1}
+
+length(gsetsf)
+length(commonality_score)
+
+gsetsf_common <- gsetsf[which(commonality_score>=0.6)]
+gsetsf_unique <- gsetsf[which(commonality_score<0.6)]
+
+length(gsetsf_common)
+length(gsetsf_unique)
+
+fres_common_dn <- fres_dn[which(fres_dn$pathway %in% names(gsetsf_common)),]
+fres_unique_dn <- fres_dn[which(fres_dn$pathway %in% names(gsetsf_unique)),]
+fres_common_up <- fres_up[which(fres_up$pathway %in% names(gsetsf_common)),]
+fres_unique_up <- fres_up[which(fres_up$pathway %in% names(gsetsf_unique)),]
+
+fres_common_up_p <- subset(fres_common_up,pval<0.01)$pathway
+fres_common_up_fdr <- subset(fres_common_up,padj<0.01)$pathway
+fres_common_dn_p <- subset(fres_common_dn,pval<0.01)$pathway
+fres_common_dn_fdr <- subset(fres_common_dn,padj<0.01)$pathway
+
+fres_unique_up_p <- subset(fres_unique_up,pval<0.01)$pathway
+fres_unique_up_fdr <- subset(fres_unique_up,padj<0.01)$pathway
+fres_unique_dn_p <- subset(fres_unique_dn,pval<0.01)$pathway
+fres_unique_dn_fdr <- subset(fres_unique_dn,padj<0.01)$pathway
+
+fres_common_p <- unique(c(fres_common_up_p,fres_common_dn_p))
+fres_common_fdr <- unique(c(fres_common_up_fdr,fres_common_dn_fdr))
+fres_unique_p <- unique(c(fres_unique_up_p,fres_unique_dn_p))
+fres_unique_fdr <- unique(c(fres_unique_up_fdr,fres_unique_dn_fdr))
+
+par(mar=c(1,1,1,1))
+par(mfrow=c(1,1))
+v1 <- list("Common p"=fres_common_p, "Common FDR"=fres_common_fdr)
+plot(euler(v1),quantities = list(cex = 2), labels = list(cex = 2))
+
+v1 <- list("Unique p"=fres_unique_p, "Unique FDR"=fres_unique_fdr)
+plot(euler(v1),quantities = list(cex = 2), labels = list(cex = 2))
+
+# error rate for common and unique gene sets
+length(setdiff(fres_common_p,fres_common_fdr)) / length(fres_common_p)
+length(setdiff(fres_unique_p,fres_unique_fdr)) / length(fres_unique_p)
 
 ```
 
@@ -980,7 +1052,6 @@ lab1 <- paste("Mean=",signif(mean(m2sim[,1]) , 3),sep="")
 lab2 <- paste("Mean=",signif(mean(m2sim[,2]) , 2),sep="")
 text(c(1.2,2.2), c( mean(m2sim[,1])+15, mean(m2sim[,2])+15 ), labels=c(lab1,lab2) )
 dev.off()
-par(mfrow=c(1,1))
 
 par(mar=c(5.1,4.1,4.1,2.1))
 unlink("img/2a.pdf")
