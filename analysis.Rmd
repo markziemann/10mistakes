@@ -1568,6 +1568,43 @@ In particular, the more comprehensive the gene sets, the more comprehensive the
 pathway enrichment will be.
 This corresponds to Table 3.
 
+
+
+```{r,keggrest1}
+
+# get the kegg sets from keggrest
+#BiocManager::install(c("KEGGREST""EnrichmentBrowser"))
+#library(KEGGREST)
+#library(EnrichmentBrowser)
+#kegg_sets <- getGenesets(org = "hsa", db = "kegg", return.type = "list")
+#writeGMT(kegg_sets, gmt.file = "kegg_human_feb2026.gmt")
+
+# translate them to symbols
+#library(org.Hs.eg.db)
+#library(AnnotationDbi)
+#gene.list <- mapIds(org.Hs.eg.db, keys=gene.list[,1], column="SYMBOL", keytype="ENTREZID")
+#kegg2 <- gmtPathways("ref/kegg_human_feb2026.gmt")
+#entrez <- unique(unlist((kegg2)))
+#symbols <- mapIds(org.Hs.eg.db, keys=entrez, column="SYMBOL", keytype="ENTREZID")
+#kegg2symbols <- lapply(kegg2,function(x) {
+#  unique(unname(symbols[which(entrez %in% x)]))
+#})
+#writeGMT(kegg2symbols, gmt.file = "ref/kegg_human_feb2026_symbols.gmt")
+kegg2symbols <- gmtPathways("ref/kegg_human_feb2026_symbols.gmt")
+
+message("Updated kegg number of sets")
+length(kegg2symbols)
+
+message("Updated Kegg total number of annotations")
+length(unlist(kegg2symbols))
+
+message("No. genes with one or more annotations")
+length(unique(unlist(kegg2symbols)))
+
+```
+
+
+
 ```{r,m8a}
 
 message("no. up genes for ORA test")
@@ -1615,6 +1652,16 @@ message("no. significantly downregulated KEGG medicus pathways")
 nrow(subset(kegg_med_dn,padj<0.01))
 message("no. significantly dysregulated KEGG medicus pathways")
 sum(nrow(subset(kegg_med_up,padj<0.01)), nrow(subset(kegg_med_dn,padj<0.01) ))
+
+# kegg2symbols
+kegg2_up <- fora(pathways=kegg2symbols, genes=up, universe=bg, minSize = 5, maxSize = Inf)
+kegg2_dn <- fora(pathways=kegg2symbols, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
+message("no. significantly upregulated KEGG2 pathways")
+nrow(subset(kegg2_up,padj<0.01))
+message("no. significantly downregulated KEGG2 pathways")
+nrow(subset(kegg2_dn,padj<0.01))
+message("no. significantly dysregulated KEGG2 pathways")
+sum(nrow(subset(kegg2_up,padj<0.01)), nrow(subset(kegg2_dn,padj<0.01) ))
 
 reactome_up <- fora(pathways=reactome, genes=up, universe=bg, minSize = 5, maxSize = Inf)
 reactome_dn <- fora(pathways=reactome, genes=dn, universe=bg, minSize = 5, maxSize = Inf)
