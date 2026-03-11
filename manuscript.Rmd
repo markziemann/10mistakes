@@ -368,6 +368,9 @@ false positive rates [@gatti2010heading; @wu2012camera].
 Fifth, related to this, gene sets with a high degree of overlap could be a source of false
 positives, and enrichment algorithms have been adjusted to circumvent this potential
 problem [@tarca_2012_downweighting;@simillion_2017_avoiding].
+It is recommended that users assess the overlap of resulting gene set enrichments using a
+tool such as “enrichment map” (GSEA) or “clustered heat map” (DAVID) because gene sets may
+be driven by the same subset of genes @merico2010enrichment.
 Sixth, slight differences in the implementation of ORA tests can impact results in some
 circumstances @ziemann2024two.
 Lastly, some web-based FEA tools lack longevity.
